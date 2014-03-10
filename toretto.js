@@ -397,16 +397,13 @@
     /**
      * Get HTML for the first node or set HTML for all nodes.
      */
-    html: function(html, text) {
-      var
-      method = text ? (docEl.textContent ? "textContent" : "innerText") : "innerHTML";
-
+    html: function(html) {
       return typeof html === typeString ?
         this.each(function(node) {
-          node[method] = html;
+          node.innerHTML = html;
         }) :
         this[length] > 0 ?
-          this[0][method] :
+          this[0].innerHTML :
           null;
     },
 
@@ -440,10 +437,12 @@
       var
       first;
 
+      html = normalize(html);
+
       return this.each(function(node) {
         first = node[firstChild];
 
-        each(normalize(html), function(item) {
+        each(html, function(item) {
           node[inBefore](item[cloneNode](true), first);
         });
       });
@@ -484,7 +483,16 @@
      * Get text for the first node or set text for all nodes.
      */
     text: function(text) {
-      return this.html(text, true);
+      var
+      method = docEl.textContent ? "textContent" : "innerText";
+
+      return typeof text === typeString ?
+        this.each(function(node) {
+          node[method] = text;
+        }) :
+        this[length] > 0 ?
+          this[0][method] :
+          null;
     },
 
     /**
