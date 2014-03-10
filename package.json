@@ -1,0 +1,18 @@
+{
+  "author": "Oscar Palmér <opalmer@me.com> (http://opalmer.me)",
+  "description": "A badass DOM utility.",
+  "files": ["toretto.js", "toretto.min.js"],
+  "homepage": "http://git.io/toretto",
+  "jam": {
+    "main": "toretto.min.js"
+  },
+  "keywords": ["dom"],
+  "license": "MIT",
+  "main": "toretto.min.js",
+  "name": "toretto",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oscarpalmer/toretto.git"
+  },
+  "version": "0.2.0"
+}
