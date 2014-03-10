@@ -6,7 +6,6 @@ Toretto is a badass DOM utility.
 
 - JSDoc.
 - Tests.
-- npm, Jam, Ender...
 
 ## License
 

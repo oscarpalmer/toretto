@@ -1,11 +1,12 @@
 {
   "description": "A badass DOM utility.",
   "ignore": [
+    "ender.js",
     "LICENSE",
     "package.json",
     "README.md"
   ],
   "main": "toretto.min.js",
   "name": "toretto",
-  "version": "0.2.0"
+  "version": "0.3.0"
 }
