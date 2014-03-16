@@ -279,8 +279,8 @@
      */
     attr: function(attr, value) {
       if (typeOf(attr) === typeObject) {
-        each(attr, function(key, val) {
-          this.attr(key, val);
+        each(attr, function(key, value) {
+          this.attr(key, value);
         }, this);
 
         return this;
@@ -313,8 +313,8 @@
      */
     css: function(style, value) {
       if (typeOf(style) === typeObject) {
-        each(style, function(key, val) {
-          this.css(key, val);
+        each(style, function(key, value) {
+          this.css(key, value);
         }, this);
 
         return this;
@@ -334,8 +334,8 @@
      */
     data: function(attr, value) {
       if (typeOf(attr) === typeObject) {
-        each(attr, function(key, val) {
-          this.attr("data-" + key, "" + val);
+        each(attr, function(key, value) {
+          this.attr("data-" + key, "" + value);
         }, this);
 
         return this;
@@ -545,8 +545,8 @@
     if (typeof name === typeString && typeof fn === "function") {
       Toretto.prototype[name] = fn;
     } else if (typeOf(name) === typeObject) {
-      each(name, function(key, val) {
-        Toretto.prototype[key] = val;
+      each(name, function(key, value) {
+        toretto.add(key, value);
       });
     }
   };
