@@ -1,5 +1,7 @@
 # Toretto
 
+[![NPM version](https://badge.fury.io/js/toretto.png)](http://badge.fury.io/js/toretto)
+
 Toretto is a badass DOM utility for badass people.
 
 ## Installation
