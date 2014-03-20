@@ -16,7 +16,7 @@ t.html("My name is <b>Dom Toretto</b>.").after("<p>I like Chargers.</p>");
 
 And that's it!
 
-Right now, the best way to check what Toretto can do is to read the [actual code](toretto.js), but I assure you, proper documentation is on the way.
+Right now, the best way to check what Toretto can do is to read the [actual code](src/toretto.js), but I assure you, proper documentation is on the way.
 
 ## Extending Toretto
 
