@@ -15,11 +15,11 @@
   },
   "keywords": ["dom", "ender"],
   "license": "MIT",
-  "main": "dist/toretto.js",
+  "main": "src/toretto.js",
   "name": "toretto",
   "repository": {
     "type": "git",
     "url": "https://github.com/oscarpalmer/toretto.git"
   },
-  "version": "0.6.0"
+  "version": "0.7.0"
 }

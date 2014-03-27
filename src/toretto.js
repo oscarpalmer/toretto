@@ -11,22 +11,13 @@
   win        = this,
   doc        = win.document,
   docEl      = doc.documentElement,
-  className  = "className",
-  cloneNode  = "cloneNode",
-  firstChild = "firstChild",
-  inBefore   = "insertBefore",
-  length     = "length",
-  nodeType   = "nodeType",
-  parentNode = "parentNode",
-  replace    = "replace",
-  typeObject = "object",
-  typeString = "string";
+  htmlString = /^\s*<(\w+|!)[^>]*>/;
 
   /**
    * Camelcase string for CSS.
    */
   function camelCase(string) {
-    return string[replace](/\-(\w{1})/g, function(full, match) {
+    return string.replace(/\-(\w{1})/g, function(full, match) {
       return match.toUpperCase();
     });
   }
@@ -54,7 +45,7 @@
    * Uncamelcase string for CSS.
    */
   function unCamelCase(string) {
-    return string[replace](/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+    return string.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
   }
 
   /**
@@ -66,13 +57,10 @@
     langd;
 
     if (likeArray(obj)) {
-      index = 0;
-      langd = obj[length];
-
-      for (; index < langd; index++) {
+      for (index = 0, langd = obj.length; index < langd; index++) {
         fn.call(scope || obj[index], obj[index], index, obj);
       }
-    } else if (typeOf(obj) === typeObject) {
+    } else if (typeOf(obj) === "object") {
       for (index in obj) {
         if (obj.hasOwnProperty(index)) {
           fn.call(scope || index, index, obj[index], obj);
@@ -87,7 +75,7 @@
    * Check if node has class.
    */
   function hasClass(node, name) {
-    return classRegex(name).test(node[className]);
+    return classRegex(name).test(node.className);
   }
 
   /**
@@ -98,10 +86,10 @@
     element = doc.createElement("div"),
     results = [];
 
-    element.innerHTML = typeof html === typeString ? html : "";
+    element.innerHTML = typeof html === "string" ? html : "";
 
     each(element.childNodes, function(node) {
-      if (isNode(node)) {
+      if (isNodeLike(node)) {
         results.push(node);
       }
     });
@@ -115,7 +103,7 @@
   function inArray(obj, item) {
     var
     index = 0,
-    langd = obj[length];
+    langd = obj.length;
 
     for (; index < langd; index++) {
       if (obj[index] === item) {
@@ -127,24 +115,10 @@
   }
 
   /**
-   * Check if object is document.
+   * Check if object is like a node.
    */
-  function isDoc(obj) {
-    return obj && obj[nodeType] === 9;
-  }
-
-  /**
-   * Check if object is a node.
-   */
-  function isNode(obj) {
-    return obj && obj.nodeName && obj[nodeType] === 1;
-  }
-
-  /**
-   * Check if object is window.
-   */
-  function isWindow(obj) {
-    return obj && obj === obj.window;
+  function isNodeLike(obj) {
+    return obj && (obj.nodeType === 1 || obj.nodeType === 9 || obj === obj.window);
   }
 
   /**
@@ -152,10 +126,11 @@
    */
   function likeArray(obj) {
     return obj && (
-      typeOf(obj) === "array" || (
-      typeof obj !== typeString &&
-      typeof obj[length] === "number" &&
-      obj[length] - 1 in obj));
+           obj instanceof Array || (
+             typeof obj !== "string" &&
+             typeof obj.length === "number" &&
+             obj.length - 1 in obj)
+           );
   }
 
   /**
@@ -177,23 +152,23 @@
    */
   function normalize(obj) {
     return likeArray(obj) ? obj :
-      isDoc(obj) || isNode(obj) || isWindow(obj) ? [obj] :
-      /^\s*<(\w+|!)[^>]*>/.exec(obj) ? htmlify(obj) :
-      [];
+           isNodeLike(obj) ? [obj] :
+           htmlString.exec(obj) ? htmlify(obj) :
+           [];
   }
 
   /**
    * Trim string; remove leading and trailing whitespace and fix spaces.
    */
   function trim(string) {
-    return string[replace](/(^\s*|\s*$)/g, "")[replace](/\s+/g, " ");
+    return string.replace(/(^\s*|\s*$)/g, "").replace(/\s+/g, " ");
   }
 
   /**
    * Check type of object; better than typeof, but slower.
    */
   function typeOf(obj) {
-    return ({}).toString.call(obj)[replace](/^\[\w+\s(\w+)\]$/, "$1").toLowerCase();
+    return {}.toString.call(obj).replace(/^\[\w+\s(\w+)\]$/, "$1").toLowerCase();
   }
 
   /**
@@ -218,13 +193,16 @@
   function Toretto(elements) {
     elements = normalize(elements);
 
-    this[length] = elements[length];
+    this.length = elements.length;
 
     each(elements, function(node, index) {
       this[index] = node;
     }, this);
   }
 
+  /**
+   * Toretto's prototypal functions.
+   */
   Toretto.prototype = {
     /**
      * Add class(es) to nodes.
@@ -235,11 +213,11 @@
       return this.each(function(node) {
         each(name, function(klass) {
           if (!hasClass(node, klass)) {
-            node[className] += " " + klass;
+            node.className += " " + klass;
           }
         });
 
-        node[className] = trim(node[className]);
+        node.className = trim(node.className);
       });
     },
 
@@ -256,7 +234,7 @@
         next = node.nextSibling;
 
         each(html, function(item) {
-          node[parentNode][inBefore](item[cloneNode](true), next);
+          node.parentNode.insertBefore(item.cloneNode(true), next);
         });
       });
     },
@@ -269,7 +247,7 @@
 
       return this.each(function(node) {
         each(html, function(item) {
-          node[inBefore](item[cloneNode](true), null);
+          node.insertBefore(item.cloneNode(true), null);
         });
       });
     },
@@ -278,7 +256,7 @@
      * Get or set attributes.
      */
     attr: function(attr, value) {
-      if (typeOf(attr) === typeObject) {
+      if (typeOf(attr) === "object") {
         each(attr, function(key, value) {
           this.attr(key, value);
         }, this);
@@ -286,11 +264,11 @@
         return this;
       }
 
-      return typeof value === typeString ?
+      return typeof value === "string" ?
         this.each(function(node) {
           node.setAttribute(attr, value);
         }) :
-        this[length] > 0 ?
+        this.length > 0 ?
           this[0].getAttribute(attr) :
           null;
     },
@@ -303,7 +281,7 @@
 
       return this.each(function(node) {
         each(html, function(item) {
-          node[parentNode][inBefore](item[cloneNode](true), node);
+          node.parentNode.insertBefore(item.cloneNode(true), node);
         });
       });
     },
@@ -312,7 +290,7 @@
      * Add CSS to nodes or get style value for the first node.
      */
     css: function(style, value) {
-      if (typeOf(style) === typeObject) {
+      if (typeOf(style) === "object") {
         each(style, function(key, value) {
           this.css(key, value);
         }, this);
@@ -320,11 +298,11 @@
         return this;
       }
 
-      return typeof value === typeString ?
+      return typeof value === "string" ?
         this.each(function(node) {
           node.style[camelCase(style)] = value;
         }) :
-        this[length] > 0 ?
+        this.length > 0 ?
           win.getComputedStyle(this[0], null).getPropertyValue(unCamelCase(style)) :
           null;
     },
@@ -333,7 +311,7 @@
      * Get or set data attributes.
      */
     data: function(attr, value) {
-      if (typeOf(attr) === typeObject) {
+      if (typeOf(attr) === "object") {
         each(attr, function(key, value) {
           this.attr("data-" + key, "" + value);
         }, this);
@@ -341,9 +319,9 @@
         return this;
       }
 
-      return typeof value === typeString ?
+      return typeof value === "string" ?
         this.attr("data-" + attr, "" + value) :
-        this[length] > 0 ?
+        this.length > 0 ?
           dataValue(this[0].getAttribute("data-" + attr)) :
           null;
     },
@@ -360,8 +338,8 @@
      */
     empty: function() {
       return this.each(function(node) {
-        while (node[firstChild]) {
-          node.removeChild(node[firstChild]);
+        while (node.firstChild) {
+          node.removeChild(node.firstChild);
         }
       });
     },
@@ -370,7 +348,7 @@
      * Get a new Toretto object containing node matching index.
      */
     eq: function(index) {
-      return toretto(index >= 0 && index < this[length] ? this[index] : null);
+      return toretto(index >= 0 && index < this.length ? this[index] : null);
     },
 
     /**
@@ -384,7 +362,7 @@
      * Get a raw node by index.
      */
     get: function(index) {
-      return index >= 0 && index < this[length] ? this[index] : null;
+      return index >= 0 && index < this.length ? this[index] : null;
     },
 
     /**
@@ -398,11 +376,11 @@
      * Get HTML for the first node or set HTML for all nodes.
      */
     html: function(html) {
-      return typeof html === typeString ?
+      return typeof html === "string" ?
         this.each(function(node) {
           node.innerHTML = html;
         }) :
-        this[length] > 0 ?
+        this.length > 0 ?
           this[0].innerHTML :
           null;
     },
@@ -411,7 +389,7 @@
      * Get a new Toretto object containing the last node.
      */
     last: function() {
-      return this.eq(this[length] - 1);
+      return this.eq(this.length - 1);
     },
 
     /**
@@ -426,7 +404,7 @@
      */
     parent: function() {
       return toretto(unique(map(this, function(node) {
-        return node[parentNode];
+        return node.parentNode;
       })));
     },
 
@@ -440,10 +418,10 @@
       html = normalize(html);
 
       return this.each(function(node) {
-        first = node[firstChild];
+        first = node.firstChild;
 
         each(html, function(item) {
-          node[inBefore](item[cloneNode](true), first);
+          node.insertBefore(item.cloneNode(true), first);
         });
       });
     },
@@ -456,7 +434,7 @@
       parents = this.parent();
 
       this.each(function(node) {
-        node[parentNode].removeChild(node);
+        node.parentNode.removeChild(node);
       });
 
       return parents;
@@ -471,11 +449,11 @@
       return this.each(function(node) {
         each(name, function(klass) {
           if (hasClass(node, klass)) {
-            node[className] = node[className][replace](classRegex(klass), " ");
+            node.className = node.className.replace(classRegex(klass), " ");
           }
         });
 
-        node[className] = trim(node[className]);
+        node.className = trim(node.className);
       });
     },
 
@@ -486,11 +464,11 @@
       var
       method = docEl.textContent ? "textContent" : "innerText";
 
-      return typeof text === typeString ?
+      return typeof text === "string" ?
         this.each(function(node) {
           node[method] = text;
         }) :
-        this[length] > 0 ?
+        this.length > 0 ?
           this[0][method] :
           null;
     },
@@ -515,7 +493,7 @@
           toretto(node)[hasClass(node, klass) ? "removeClass" : "addClass"](klass);
         });
 
-        node[className] = trim(node[className]);
+        node.className = trim(node.className);
       });
     },
 
@@ -525,7 +503,7 @@
     val: function(value) {
       return typeof value !== "undefined" ?
         this.attr("value", value) :
-        this[length] > 0 ?
+        this.length > 0 ?
           this[0].value :
           null;
     }
@@ -537,19 +515,6 @@
   function toretto(elements) {
     return new Toretto(elements);
   }
-
-  /**
-   * Add function(s) to Toretto.
-   */
-  toretto.add = function(name, fn) {
-    if (typeof name === typeString && typeof fn === "function") {
-      Toretto.prototype[name] = fn;
-    } else if (typeOf(name) === typeObject) {
-      each(name, function(key, value) {
-        toretto.add(key, value);
-      });
-    }
-  };
 
   toretto.each   = each;
   toretto.fn     = Toretto.prototype;

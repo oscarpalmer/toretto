@@ -25,14 +25,10 @@ Right now, the best way to check what Toretto can do is to read the [actual code
 Toretto is pretty cool and versatile on its own, but maybe you'd like to add your own function? That's easy!
 
 ```js
-toretto.fn.myFunction = myFunction;
-
-toretto.add("myFunction", myFunction);
-
-toretto.add({
-  myFunction: myFunction
-});
+toretto.fn.myFunction = function(){};
 ```
+
+Wow, that's just like jQuery!
 
 ## Todo
 
