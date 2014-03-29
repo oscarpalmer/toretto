@@ -2,10 +2,9 @@
   "author": "Oscar Palmér <opalmer@me.com> (http://opalmer.me)",
   "description": "A badass DOM utility.",
   "devDependencies": {
-    "gulp": "*",
-    "gulp-concat": "*",
-    "gulp-jshint": "*",
-    "gulp-uglify": "*"
+    "grunt": "*",
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-uglify": "*"
   },
   "ender": "src/ender.js",
   "files": ["dist/toretto.js", "src/ender.js", "src/toretto.js"],
@@ -15,11 +14,11 @@
   },
   "keywords": ["dom", "ender"],
   "license": "MIT",
-  "main": "src/toretto.js",
+  "main": "dist/toretto.js",
   "name": "toretto",
   "repository": {
     "type": "git",
     "url": "https://github.com/oscarpalmer/toretto.git"
   },
-  "version": "0.7.0"
+  "version": "0.7.1"
 }
