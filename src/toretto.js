@@ -34,11 +34,11 @@
    */
   function dataValue(value) {
     return value === "null" ? null :
-      value === "undefined" ? undefined :
-      value === "false"     ? false :
-      value === "true"      ? true :
-      /^\d+$/.test(value)   ? value++ :
-      value;
+           value === "undefined" ? undefined :
+           value === "false" ? false :
+           value === "true" ? true :
+           /^\d+$/.test(value) ? value++ :
+           value;
   }
 
   /**
@@ -60,7 +60,7 @@
       for (index = 0, langd = obj.length; index < langd; index++) {
         fn.call(scope || obj[index], obj[index], index, obj);
       }
-    } else if (typeOf(obj) === "object") {
+    } else {
       for (index in obj) {
         if (obj.hasOwnProperty(index)) {
           fn.call(scope || index, index, obj[index], obj);
@@ -162,13 +162,6 @@
    */
   function trim(string) {
     return string.replace(/(^\s*|\s*$)/g, "").replace(/\s+/g, " ");
-  }
-
-  /**
-   * Check type of object; better than typeof, but slower.
-   */
-  function typeOf(obj) {
-    return {}.toString.call(obj).replace(/^\[\w+\s(\w+)\]$/, "$1").toLowerCase();
   }
 
   /**
