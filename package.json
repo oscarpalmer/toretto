@@ -4,7 +4,8 @@
   "devDependencies": {
     "grunt": "*",
     "grunt-contrib-jshint": "*",
-    "grunt-contrib-uglify": "*"
+    "grunt-contrib-uglify": "*",
+    "tape": "~2.4.0"
   },
   "ender": "src/ender.js",
   "files": ["dist/toretto.js", "src/ender.js", "src/toretto.js"],
@@ -19,6 +20,19 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/oscarpalmer/toretto.git"
+  },
+  "testling": {
+    "browsers": [
+      "android-browser/4.2",
+      "chrome/25..latest",
+      "firefox/20..latest",
+      "ie/9..latest",
+      "ipad/6",
+      "iphone/6",
+      "opera/11..latest",
+      "safari/6..latest"
+    ],
+    "html": "tests/index.html"
   },
   "version": "0.7.2"
 }

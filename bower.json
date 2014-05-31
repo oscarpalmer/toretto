@@ -1,6 +1,7 @@
 {
   "description": "A badass DOM utility.",
   "ignore": [
+    "tests/",
     "src/ender.js",
     "gulpfile.js",
     "LICENSE",

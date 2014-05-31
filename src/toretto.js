@@ -10,7 +10,6 @@
   var
   win        = this,
   doc        = win.document,
-  docEl      = doc.documentElement,
   htmlString = /^\s*<(\w+|!)[^>]*>/;
 
   /**
@@ -33,10 +32,10 @@
    * Get raw value from data attribute.
    */
   function dataValue(value) {
-    return value === "null" ? null :
-           value === "undefined" ? undefined :
-           value === "false" ? false :
-           value === "true" ? true :
+    return value == "null" ? null :
+           value == "undefined" ? undefined :
+           value == "false" ? false :
+           value == "true" ? true :
            /^\d+$/.test(value) ? value++ :
            value;
   }
@@ -50,6 +49,11 @@
 
   /**
    * Loop arrays or objects.
+   *
+   * @param {Array|Object} obj
+   * @param {Function} fn
+   * @param {*=} scope - Optional scope for 'this' in function
+   * @return {Array|Object}
    */
   function each(obj, fn, scope) {
     var
@@ -118,19 +122,14 @@
    * Check if object is like a node.
    */
   function isNodeLike(obj) {
-    return obj && (obj.nodeType === 1 || obj.nodeType === 9 || obj === obj.window);
+    return obj && (obj.nodeType === 1 || obj.nodeType === 9);
   }
 
   /**
    * Check if object is like an array, i.e. an array or an array-like object.
    */
   function likeArray(obj) {
-    return obj && (
-           obj instanceof Array || (
-             typeof obj !== "string" &&
-             typeof obj.length === "number" &&
-             obj.length - 1 in obj)
-           );
+    return obj && (typeOf(obj) === "array" || typeof obj === "object" && typeof obj.length === "number");
   }
 
   /**
@@ -138,10 +137,15 @@
    */
   function map(obj, fn, scope) {
     var
-    results = [];
+    results = [],
+    result;
 
     each(obj, function(item, index) {
-      results.push(fn.call(this || item, item, index, obj));
+      result = fn.call(this || item, item, index, obj);
+
+      if (result != null ) {
+        results.push(result);
+      }
     }, scope);
 
     return results;
@@ -165,6 +169,13 @@
   }
 
   /**
+   * Check _real_ type of object.
+   */
+  function typeOf(obj) {
+    return {}.toString.call(obj).replace(/^\[\w+\s(\w+)\]$/, "$1").toLowerCase();
+  }
+
+  /**
    * Create a unique array from an existing one.
    */
   function unique(obj) {
@@ -182,6 +193,9 @@
 
   /**
    * Create a new Toretto object.
+   *
+   * @param {Array|Element|String} elements
+   * @return {Toretto}
    */
   function Toretto(elements) {
     elements = normalize(elements);
@@ -199,6 +213,9 @@
   Toretto.prototype = {
     /**
      * Add class(es) to nodes.
+     *
+     * @param {String} name
+     * @return {Toretto}
      */
     addClass: function(name) {
       name = name.split(/\s+/);
@@ -216,6 +233,9 @@
 
     /**
      * Add HTML after nodes.
+     *
+     * @param {String} html
+     * @return {Toretto}
      */
     after: function(html) {
       var
@@ -234,19 +254,26 @@
 
     /**
      * Append HTML to nodes.
+     *
+     * @param {String} html
+     * @return {Toretto}
      */
     append: function(html) {
       html = normalize(html);
 
       return this.each(function(node) {
         each(html, function(item) {
-          node.insertBefore(item.cloneNode(true), null);
+          node.appendChild(item.cloneNode(true));
         });
       });
     },
 
     /**
      * Get or set attributes.
+     *
+     * @param {Object|String} attr
+     * @param {String=} value
+     * @return {Toretto|String}
      */
     attr: function(attr, value) {
       if (typeOf(attr) === "object") {
@@ -268,6 +295,9 @@
 
     /**
      * Add HTML before nodes.
+     *
+     * @param {String} html
+     * @return {Toretto}
      */
     before: function(html) {
       html = normalize(html);
@@ -281,6 +311,10 @@
 
     /**
      * Add CSS to nodes or get style value for the first node.
+     *
+     * @param {Object|String} style
+     * @param {String=} value
+     * @return {Toretto|String}
      */
     css: function(style, value) {
       if (typeOf(style) === "object") {
@@ -302,6 +336,10 @@
 
     /**
      * Get or set data attributes.
+     *
+     * @param {Object|String} attr
+     * @param {*=} value
+     * @return {*|Toretto}
      */
     data: function(attr, value) {
       if (typeOf(attr) === "object") {
@@ -312,7 +350,7 @@
         return this;
       }
 
-      return typeof value === "string" ?
+      return typeof value !== "undefined" ?
         this.attr("data-" + attr, "" + value) :
         this.length > 0 ?
           dataValue(this[0].getAttribute("data-" + attr)) :
@@ -321,6 +359,9 @@
 
     /**
      * Loop all the nodes with a function.
+     *
+     * @param {Function} fn
+     * @return {Toretto}
      */
     each: function(fn) {
       return each(this, fn);
@@ -328,6 +369,8 @@
 
     /**
      * Remove children for nodes.
+     *
+     * @return {Toretto}
      */
     empty: function() {
       return this.each(function(node) {
@@ -339,6 +382,9 @@
 
     /**
      * Get a new Toretto object containing node matching index.
+     *
+     * @param {Number} index
+     * @return {Toretto}
      */
     eq: function(index) {
       return toretto(index >= 0 && index < this.length ? this[index] : null);
@@ -346,6 +392,8 @@
 
     /**
      * Get a new Toretto object containing the first node.
+     *
+     * @return {Toretto}
      */
     first: function() {
       return this.eq(0);
@@ -353,6 +401,9 @@
 
     /**
      * Get a raw node by index.
+     *
+     * @param {Number} index
+     * @return {Element}
      */
     get: function(index) {
       return index >= 0 && index < this.length ? this[index] : null;
@@ -360,6 +411,9 @@
 
     /**
      * Check if the first node has class name.
+     *
+     * @param {String} name
+     * @return {Boolean}
      */
     hasClass: function(name) {
       return hasClass(this[0], name);
@@ -367,6 +421,9 @@
 
     /**
      * Get HTML for the first node or set HTML for all nodes.
+     *
+     * @param {String=} html
+     * @return {Toretto|String}
      */
     html: function(html) {
       return typeof html === "string" ?
@@ -380,6 +437,8 @@
 
     /**
      * Get a new Toretto object containing the last node.
+     *
+     * @return {Toretto}
      */
     last: function() {
       return this.eq(this.length - 1);
@@ -387,6 +446,9 @@
 
     /**
      * Create a new Toretto object with a filter function.
+     *
+     * @param {Function} fn
+     * @return {Toretto}
      */
     map: function(fn) {
       return toretto(map(this, fn));
@@ -394,6 +456,8 @@
 
     /**
      * Get parent(s) for node(s).
+     *
+     * @return {Toretto}
      */
     parent: function() {
       return toretto(unique(map(this, function(node) {
@@ -403,6 +467,9 @@
 
     /**
      * Prepend HTML to nodes.
+     *
+     * @param {String} html
+     * @return {Toretto}
      */
     prepend: function(html) {
       var
@@ -421,6 +488,8 @@
 
     /**
      * Remove nodes; returns parent(s).
+     *
+     * @return {Toretto}
      */
     remove: function() {
       var
@@ -435,6 +504,9 @@
 
     /**
      * Remove class(es) for nodes.
+     *
+     * @param {String} name
+     * @return {Toretto}
      */
     removeClass: function(name) {
       name = name.split(/\s+/);
@@ -452,22 +524,24 @@
 
     /**
      * Get text for the first node or set text for all nodes.
+     *
+     * @param {String=} text
+     * @return {Toretto}
      */
     text: function(text) {
-      var
-      method = docEl.textContent ? "textContent" : "innerText";
-
       return typeof text === "string" ?
         this.each(function(node) {
-          node[method] = text;
+          node.textContent = text;
         }) :
         this.length > 0 ?
-          this[0][method] :
+          this[0].textContent :
           null;
     },
 
     /**
      * Get a raw array of nodes.
+     *
+     * @return {Array}
      */
     toArray: function() {
       return toretto.map(this, function(node) {
@@ -477,6 +551,9 @@
 
     /**
      * Toggle class(es) for nodes.
+     *
+     * @param {String} name
+     * @return {Toretto}
      */
     toggleClass: function(name) {
       name = name.split(/\s+/);
@@ -492,6 +569,9 @@
 
     /**
      * Get value for the first node or set value for all nodes.
+     *
+     * @param {String=} value
+     * @return {Toretto|String}
      */
     val: function(value) {
       return typeof value !== "undefined" ?
