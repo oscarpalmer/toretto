@@ -2,7 +2,7 @@
 
 [![NPM version](https://badge.fury.io/js/toretto.png)](http://badge.fury.io/js/toretto)
 
-Toretto is a badass DOM utility for badass people.
+Toretto is a badass DOM utility for [badass browsers](#browser-support).
 
 ## Installation
 
@@ -30,10 +30,12 @@ toretto.fn.myFunction = function(){};
 
 Wow, that's just like jQuery!
 
+## Browser support
+
+[![Testling](https://ci.testling.com/oscarpalmer/toretto.png)](https://ci.testling.com/oscarpalmer/toretto)
+
 ## Todo
 
-- Tests.
-- JSDoc.
 - API documentation.
 
 ## License
