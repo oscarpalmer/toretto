@@ -143,7 +143,7 @@
     each(obj, function(item, index) {
       result = fn.call(this || item, item, index, obj);
 
-      if (result != null ) {
+      if (typeof result !== "undefined") {
         results.push(result);
       }
     }, scope);
