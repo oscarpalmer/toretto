@@ -8,7 +8,7 @@
     "tape": "~2.4.0"
   },
   "ender": "src/ender.js",
-  "files": ["dist/toretto.js", "src/ender.js", "src/toretto.js"],
+  "files": ["dist/toretto.js", "src/ender.js"],
   "homepage": "http://git.io/toretto",
   "jam": {
     "main": "dist/toretto.js"
@@ -34,5 +34,5 @@
     ],
     "html": "tests/index.html"
   },
-  "version": "0.8.0"
+  "version": "0.8.1"
 }
