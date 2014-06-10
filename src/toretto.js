@@ -8,9 +8,10 @@
   }
 })("toretto", this, function(){
   var
-  win        = this,
-  doc        = win.document,
-  htmlString = /^\s*<(\w+|!)[^>]*>/;
+  win       = this,
+  doc       = win.document,
+  array     = [],
+  htmlRegex = /^\s*<(\w+|!)[^>]*>/;
 
   /**
    * Camelcase string for CSS.
@@ -61,9 +62,9 @@
     langd;
 
     if (likeArray(obj)) {
-      for (index = 0, langd = obj.length; index < langd; index++) {
+      array.forEach.call(obj, function(node, index) {
         fn.call(scope || obj[index], obj[index], index, obj);
-      }
+      });
     } else {
       for (index in obj) {
         if (obj.hasOwnProperty(index)) {
@@ -88,34 +89,17 @@
   function htmlify(html) {
     var
     element = doc.createElement("div"),
-    results = [];
+    result  = [];
 
-    element.innerHTML = typeof html === "string" ? html : "";
+    element.innerHTML = html;
 
     each(element.childNodes, function(node) {
       if (isNodeLike(node)) {
-        results.push(node);
+        result.push(node);
       }
     });
 
-    return results;
-  }
-
-  /**
-   * Check if item exists in array.
-   */
-  function inArray(obj, item) {
-    var
-    index = 0,
-    langd = obj.length;
-
-    for (; index < langd; index++) {
-      if (obj[index] === item) {
-        return true;
-      }
-    }
-
-    return false;
+    return result;
   }
 
   /**
@@ -129,7 +113,7 @@
    * Check if object is like an array, i.e. an array or an array-like object.
    */
   function likeArray(obj) {
-    return obj && (typeOf(obj) === "array" || typeof obj === "object" && typeof obj.length === "number");
+    return obj && typeof obj === "object" && typeof obj.length === "number";
   }
 
   /**
@@ -137,18 +121,18 @@
    */
   function map(obj, fn, scope) {
     var
-    results = [],
-    result;
+    result = [],
+    value;
 
     each(obj, function(item, index) {
-      result = fn.call(this || item, item, index, obj);
+      value = fn.call(this || item, item, index, obj);
 
-      if (typeof result !== "undefined") {
-        results.push(result);
+      if (typeof value !== "undefined") {
+        result.push(value);
       }
     }, scope);
 
-    return results;
+    return result;
   }
 
   /**
@@ -157,7 +141,7 @@
   function normalize(obj) {
     return likeArray(obj) ? obj :
            isNodeLike(obj) ? [obj] :
-           htmlString.exec(obj) ? htmlify(obj) :
+           htmlRegex.exec(obj) ? htmlify(obj) :
            [];
   }
 
@@ -169,26 +153,19 @@
   }
 
   /**
-   * Check _real_ type of object.
-   */
-  function typeOf(obj) {
-    return {}.toString.call(obj).replace(/^\[\w+\s(\w+)\]$/, "$1").toLowerCase();
-  }
-
-  /**
    * Create a unique array from an existing one.
    */
   function unique(obj) {
     var
-    results = [];
+    result = [];
 
     each(obj, function(item) {
-      if (inArray(results, item) !== true) {
-        results.push(item);
+      if (result.indexOf(item) === -1) {
+        result.push(item);
       }
     });
 
-    return results;
+    return result;
   }
 
   /**
@@ -276,21 +253,17 @@
      * @return {Toretto|String}
      */
     attr: function(attr, value) {
-      if (typeOf(attr) === "object") {
-        each(attr, function(key, value) {
-          this.attr(key, value);
-        }, this);
-
-        return this;
-      }
-
-      return typeof value === "string" ?
+      return typeof attr === "object" ?
         this.each(function(node) {
-          node.setAttribute(attr, value);
-        }) :
-        this.length > 0 ?
-          this[0].getAttribute(attr) :
-          null;
+          each(attr, function(key, value) {
+            node.setAttribute(attr, value);
+          });
+        }) : typeof value === "string" ?
+          this.each(function(node) {
+            node.setAttribute(attr, value);
+          }) :
+            this.length > 0 ?
+              this[0].getAttribute(attr) : null;
     },
 
     /**
@@ -317,21 +290,17 @@
      * @return {Toretto|String}
      */
     css: function(style, value) {
-      if (typeOf(style) === "object") {
-        each(style, function(key, value) {
-          this.css(key, value);
-        }, this);
-
-        return this;
-      }
-
-      return typeof value === "string" ?
+      return typeof style === "object" ?
         this.each(function(node) {
-          node.style[camelCase(style)] = value;
-        }) :
-        this.length > 0 ?
-          win.getComputedStyle(this[0], null).getPropertyValue(unCamelCase(style)) :
-          null;
+          each(style, function(key, value) {
+            node.style[camelCase(key)] = value;
+          });
+        }) : typeof value === "string" ?
+          this.each(function(node) {
+            node.style[camelCase(style)] = value;
+          }) :
+            this.length > 0 ?
+              win.getComputedStyle(this[0], null).getPropertyValue(unCamelCase(style)) : null;
     },
 
     /**
@@ -342,19 +311,17 @@
      * @return {*|Toretto}
      */
     data: function(attr, value) {
-      if (typeOf(attr) === "object") {
-        each(attr, function(key, value) {
-          this.attr("data-" + key, "" + value);
-        }, this);
-
-        return this;
-      }
-
-      return typeof value !== "undefined" ?
-        this.attr("data-" + attr, "" + value) :
-        this.length > 0 ?
-          dataValue(this[0].getAttribute("data-" + attr)) :
-          null;
+      return typeof attr === "object" ?
+        this.each(function(node) {
+          each(attr, function(key, value) {
+            node.setAttribute("data-" + key, "" + value);
+          });
+        }) : typeof value !== "undefined" ?
+          this.each(function(node) {
+            node.setAttribute("data-" + attr, "" + value);
+          }) :
+            this.length > 0 ?
+              dataValue(this[0].getAttribute("data-" + attr)) : null;
     },
 
     /**

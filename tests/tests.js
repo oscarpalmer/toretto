@@ -79,7 +79,7 @@ equal(each, "01234");
 
 
 // empty node(s)
-equal(empty.html(), "<i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i>");
+equal(empty.html(), "<i>1</i><i>2</i><i>3</i><i>4</i><i>5</i>");
 equal(empty.empty().html(), "");
 
 
