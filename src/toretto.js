@@ -30,18 +30,6 @@
   }
 
   /**
-   * Get raw value from data attribute.
-   */
-  function dataValue(value) {
-    return value == "null" ? null :
-           value == "undefined" ? undefined :
-           value == "false" ? false :
-           value == "true" ? true :
-           /^\d+$/.test(value) ? value++ :
-           value;
-  }
-
-  /**
    * Uncamelcase string for CSS.
    */
   function unCamelCase(string) {
@@ -314,14 +302,14 @@
       return typeof attr === "object" ?
         this.each(function(node) {
           each(attr, function(key, value) {
-            node.setAttribute("data-" + key, "" + value);
+            node.setAttribute("data-" + key, JSON.stringify(value));
           });
         }) : typeof value !== "undefined" ?
           this.each(function(node) {
-            node.setAttribute("data-" + attr, "" + value);
+            node.setAttribute("data-" + attr, JSON.stringify(value));
           }) :
             this.length > 0 ?
-              dataValue(this[0].getAttribute("data-" + attr)) : null;
+              JSON.parse(this[0].getAttribute("data-" + attr)) : null;
     },
 
     /**
