@@ -39,9 +39,9 @@ equal(klass.hasClass("beta") && klass.hasClass("existing"), true);
 
 
 // slap some HTML before and after an element
-near.after("<b> after</b>");
+near.after(" after");
 near.before("<b>before </b>");
-equal($("near-wrapper").html(), "<b>before </b><i id=\"near\">middle?</i><b> after</b>");
+equal($("near-wrapper").html(), "<b>before </b><i id=\"near\">middle?</i> after");
 
 
 // append and prepend html

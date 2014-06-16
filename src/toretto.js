@@ -8,10 +8,13 @@
   }
 })("toretto", this, function(){
   var
-  win       = this,
-  doc       = win.document,
-  array     = [],
-  htmlRegex = /^\s*<(\w+|!)[^>]*>/;
+  win        = this,
+  doc        = win.document,
+  array      = [],
+  divElement = doc.createElement("div"),
+  camelRegex = /([a-z])([A-Z])/g,
+  htmlRegex  = /^\s*<(\w+|!)[^>]*>/,
+  spaceRegex = /\s+/g;
 
   /**
    * Camelcase string for CSS.
@@ -30,13 +33,6 @@
   }
 
   /**
-   * Uncamelcase string for CSS.
-   */
-  function unCamelCase(string) {
-    return string.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
-  }
-
-  /**
    * Loop arrays or objects.
    *
    * @param {Array|Object} obj
@@ -50,9 +46,12 @@
     langd;
 
     if (likeArray(obj)) {
-      array.forEach.call(obj, function(node, index) {
+      index = 0;
+      langd = obj.length;
+
+      for (; index < langd; index++) {
         fn.call(scope || obj[index], obj[index], index, obj);
-      });
+      }
     } else {
       for (index in obj) {
         if (obj.hasOwnProperty(index)) {
@@ -75,19 +74,15 @@
    * Convert string to actual HTML.
    */
   function htmlify(html) {
-    var
-    element = doc.createElement("div"),
-    result  = [];
+    if (typeof html !== "string") {
+      return normalize(html);
+    }
 
-    element.innerHTML = html;
+    divElement.innerHTML = html + "";
 
-    each(element.childNodes, function(node) {
-      if (isNodeLike(node)) {
-        result.push(node);
-      }
+    return each(array.slice.call(divElement.childNodes), function(node) {
+      divElement.removeChild(node);
     });
-
-    return result;
   }
 
   /**
@@ -137,7 +132,14 @@
    * Trim string; remove leading and trailing whitespace and fix spaces.
    */
   function trim(string) {
-    return string.replace(/(^\s*|\s*$)/g, "").replace(/\s+/g, " ");
+    return string.replace(/(^\s*|\s*$)/g, "").replace(spaceRegex, " ");
+  }
+
+  /**
+   * Uncamelcase string for CSS.
+   */
+  function unCamelCase(string) {
+    return string.replace(camelRegex, "$1-$2").toLowerCase();
   }
 
   /**
@@ -183,7 +185,7 @@
      * @return {Toretto}
      */
     addClass: function(name) {
-      name = name.split(/\s+/);
+      name = name.split(spaceRegex);
 
       return this.each(function(node) {
         each(name, function(klass) {
@@ -206,7 +208,7 @@
       var
       next;
 
-      html = normalize(html);
+      html = htmlify(html);
 
       return this.each(function(node) {
         next = node.nextSibling;
@@ -224,7 +226,7 @@
      * @return {Toretto}
      */
     append: function(html) {
-      html = normalize(html);
+      html = htmlify(html);
 
       return this.each(function(node) {
         each(html, function(item) {
@@ -261,7 +263,7 @@
      * @return {Toretto}
      */
     before: function(html) {
-      html = normalize(html);
+      html = htmlify(html);
 
       return this.each(function(node) {
         each(html, function(item) {
@@ -430,7 +432,7 @@
       var
       first;
 
-      html = normalize(html);
+      html = htmlify(html);
 
       return this.each(function(node) {
         first = node.firstChild;
@@ -464,7 +466,7 @@
      * @return {Toretto}
      */
     removeClass: function(name) {
-      name = name.split(/\s+/);
+      name = name.split(spaceRegex);
 
       return this.each(function(node) {
         each(name, function(klass) {
@@ -511,7 +513,7 @@
      * @return {Toretto}
      */
     toggleClass: function(name) {
-      name = name.split(/\s+/);
+      name = name.split(spaceRegex);
 
       return this.each(function(node) {
         each(name, function(klass) {
