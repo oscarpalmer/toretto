@@ -30,10 +30,6 @@ toretto.fn.myFunction = function(){};
 
 Wow, that's just like jQuery!
 
-## Browser support
-
-[![Testling](https://ci.testling.com/oscarpalmer/toretto.png)](https://ci.testling.com/oscarpalmer/toretto)
-
 ## Todo
 
 - API documentation.
