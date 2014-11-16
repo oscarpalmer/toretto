@@ -10,11 +10,9 @@
   var
   win        = this,
   doc        = win.document,
-  array      = [],
-  divElement = doc.createElement("div"),
-  camelRegex = /([a-z])([A-Z])/g,
   htmlRegex  = /^\s*<(\w+|!)[^>]*>/,
   spaceRegex = /\s+/g;
+
 
   /**
    * Camelcase string for CSS.
@@ -74,15 +72,17 @@
    * Convert string to actual HTML.
    */
   function htmlify(html) {
+    var
+    div;
+
     if (typeof html !== "string") {
       return normalize(html);
     }
 
-    divElement.innerHTML = html + "";
+    div = doc.createElement("div");
+    div.innerHTML = html;
 
-    return each(array.slice.call(divElement.childNodes), function(node) {
-      divElement.removeChild(node);
-    });
+    return [].slice.call(div.childNodes);
   }
 
   /**
@@ -139,7 +139,7 @@
    * Uncamelcase string for CSS.
    */
   function unCamelCase(string) {
-    return string.replace(camelRegex, "$1-$2").toLowerCase();
+    return string.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
   }
 
   /**
@@ -363,6 +363,8 @@
      * @return {Element}
      */
     get: function(index) {
+      index = index || 0;
+
       return index >= 0 && index < this.length ? this[index] : null;
     },
 
@@ -383,7 +385,7 @@
      * @return {Toretto|String}
      */
     html: function(html) {
-      return typeof html === "string" ?
+      return typeof html !== "undefined" ?
         this.each(function(node) {
           node.innerHTML = html;
         }) :
@@ -486,7 +488,7 @@
      * @return {Toretto}
      */
     text: function(text) {
-      return typeof text === "string" ?
+      return typeof text !== "undefined" ?
         this.each(function(node) {
           node.textContent = text;
         }) :
@@ -501,9 +503,7 @@
      * @return {Array}
      */
     toArray: function() {
-      return toretto.map(this, function(node) {
-        return node;
-      });
+      return [].slice.call(this);
     },
 
     /**
@@ -539,6 +539,7 @@
     }
   };
 
+
   /**
    * Create a new Toretto object.
    */
@@ -546,10 +547,12 @@
     return new Toretto(elements);
   }
 
+
   toretto.each   = each;
   toretto.fn     = Toretto.prototype;
   toretto.map    = map;
   toretto.unique = unique;
+
 
   return toretto;
 });
