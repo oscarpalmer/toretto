@@ -48,7 +48,7 @@
       langd = obj.length;
 
       for (; index < langd; index++) {
-        fn.call(scope || obj[index], obj[index], index, obj);
+        fn.call(scope || obj[index], index, obj[index], obj);
       }
     } else {
       for (index in obj) {
@@ -107,8 +107,8 @@
     result = [],
     value;
 
-    each(obj, function(item, index) {
-      value = fn.call(this || item, item, index, obj);
+    each(obj, function(index, item) {
+      value = fn.call(this || item, index, item, obj);
 
       if (typeof value !== "undefined") {
         result.push(value);
@@ -149,7 +149,7 @@
     var
     result = [];
 
-    each(obj, function(item) {
+    each(obj, function(index, item) {
       if (result.indexOf(item) === -1) {
         result.push(item);
       }
@@ -169,7 +169,7 @@
 
     this.length = elements.length;
 
-    each(elements, function(node, index) {
+    each(elements, function(index, node) {
       this[index] = node;
     }, this);
   }
@@ -188,7 +188,7 @@
       name = name.split(spaceRegex);
 
       return this.each(function(node) {
-        each(name, function(klass) {
+        each(name, function(index, klass) {
           if (!hasClass(node, klass)) {
             node.className += " " + klass;
           }
@@ -210,7 +210,7 @@
 
       html = htmlify(html);
 
-      return this.each(function(node) {
+      return this.each(function(index, node) {
         next = node.nextSibling;
 
         each(html, function(item) {
@@ -228,7 +228,7 @@
     append: function(html) {
       html = htmlify(html);
 
-      return this.each(function(node) {
+      return this.each(function(index, node) {
         each(html, function(item) {
           node.appendChild(item.cloneNode(true));
         });
@@ -243,17 +243,19 @@
      * @return {Toretto|String}
      */
     attr: function(attr, value) {
-      return typeof attr === "object" ?
-        this.each(function(node) {
+      if (typeof attr === "object") {
+        return this.each(function(index, node) {
           each(attr, function(key, value) {
             node.setAttribute(attr, value);
           });
-        }) : typeof value === "string" ?
-          this.each(function(node) {
-            node.setAttribute(attr, value);
-          }) :
-            this.length > 0 ?
-              this[0].getAttribute(attr) : null;
+        });
+      } else if (typeof value === "string") {
+        return this.each(function(index, node) {
+          node.setAttribute(attr, value);
+        });
+      }
+
+      return this.length > 0 ? this[0].getAttribute(attr) : null;
     },
 
     /**
@@ -265,8 +267,8 @@
     before: function(html) {
       html = htmlify(html);
 
-      return this.each(function(node) {
-        each(html, function(item) {
+      return this.each(function(index, node) {
+        each(html, function(index, item) {
           node.parentNode.insertBefore(item.cloneNode(true), node);
         });
       });
@@ -280,17 +282,19 @@
      * @return {Toretto|String}
      */
     css: function(style, value) {
-      return typeof style === "object" ?
-        this.each(function(node) {
+      if (typeof style === "object") {
+        return this.each(function(index, node) {
           each(style, function(key, value) {
             node.style[camelCase(key)] = value;
           });
-        }) : typeof value === "string" ?
-          this.each(function(node) {
-            node.style[camelCase(style)] = value;
-          }) :
-            this.length > 0 ?
-              win.getComputedStyle(this[0], null).getPropertyValue(unCamelCase(style)) : null;
+        });
+      } else if (typeof value === "string") {
+        return this.each(function(index, node) {
+          node.style[camelCase(style)] = value;
+        });
+      }
+
+      return this.length > 0 ? win.getComputedStyle(this[0], null).getPropertyValue(unCamelCase(style)) : null;
     },
 
     /**
@@ -301,17 +305,19 @@
      * @return {*|Toretto}
      */
     data: function(attr, value) {
-      return typeof attr === "object" ?
-        this.each(function(node) {
+      if (typeof attr === "object") {
+        return this.each(function(index, node) {
           each(attr, function(key, value) {
             node.setAttribute("data-" + key, JSON.stringify(value));
           });
-        }) : typeof value !== "undefined" ?
-          this.each(function(node) {
-            node.setAttribute("data-" + attr, JSON.stringify(value));
-          }) :
-            this.length > 0 ?
-              JSON.parse(this[0].getAttribute("data-" + attr)) : null;
+        });
+      } else if (typeof value !== "undefined") {
+        return this.each(function(index, node) {
+          node.setAttribute("data-" + attr, JSON.stringify(value));
+        });
+      }
+
+      return this.length > 0 ? JSON.parse(this[0].getAttribute("data-" + attr)) : null;
     },
 
     /**
@@ -330,7 +336,7 @@
      * @return {Toretto}
      */
     empty: function() {
-      return this.each(function(node) {
+      return this.each(function(index, node) {
         while (node.firstChild) {
           node.removeChild(node.firstChild);
         }
@@ -385,13 +391,13 @@
      * @return {Toretto|String}
      */
     html: function(html) {
-      return typeof html !== "undefined" ?
-        this.each(function(node) {
+      if (typeof html !== "undefined") {
+        return this.each(function(index, node) {
           node.innerHTML = html;
-        }) :
-        this.length > 0 ?
-          this[0].innerHTML :
-          null;
+        });
+      }
+
+      return this.length > 0 ? this[0].innerHTML : null;
     },
 
     /**
@@ -419,7 +425,7 @@
      * @return {Toretto}
      */
     parent: function() {
-      return toretto(unique(map(this, function(node) {
+      return toretto(unique(map(this, function(index, node) {
         return node.parentNode;
       })));
     },
@@ -436,10 +442,10 @@
 
       html = htmlify(html);
 
-      return this.each(function(node) {
+      return this.each(function(index, node) {
         first = node.firstChild;
 
-        each(html, function(item) {
+        each(html, function(index, item) {
           node.insertBefore(item.cloneNode(true), first);
         });
       });
@@ -454,7 +460,7 @@
       var
       parents = this.parent();
 
-      this.each(function(node) {
+      this.each(function(index, node) {
         node.parentNode.removeChild(node);
       });
 
@@ -470,8 +476,8 @@
     removeClass: function(name) {
       name = name.split(spaceRegex);
 
-      return this.each(function(node) {
-        each(name, function(klass) {
+      return this.each(function(index, node) {
+        each(name, function(index, klass) {
           if (hasClass(node, klass)) {
             node.className = node.className.replace(classRegex(klass), " ");
           }
@@ -488,13 +494,13 @@
      * @return {Toretto}
      */
     text: function(text) {
-      return typeof text !== "undefined" ?
-        this.each(function(node) {
+      if (typeof text !== "undefined") {
+        return this.each(function(index, node) {
           node.textContent = text;
-        }) :
-        this.length > 0 ?
-          this[0].textContent :
-          null;
+        });
+      }
+
+      return this.length > 0 ? this[0].textContent : null;
     },
 
     /**
@@ -515,8 +521,8 @@
     toggleClass: function(name) {
       name = name.split(spaceRegex);
 
-      return this.each(function(node) {
-        each(name, function(klass) {
+      return this.each(function(index, node) {
+        each(name, function(index, klass) {
           toretto(node)[hasClass(node, klass) ? "removeClass" : "addClass"](klass);
         });
 
@@ -531,11 +537,7 @@
      * @return {Toretto|String}
      */
     val: function(value) {
-      return typeof value !== "undefined" ?
-        this.attr("value", value) :
-        this.length > 0 ?
-          this[0].value :
-          null;
+      return typeof value !== "undefined" ? this.attr("value", value) : this.length > 0 ? this[0].value : null;
     }
   };
 
