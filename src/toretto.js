@@ -187,7 +187,7 @@
     addClass: function(name) {
       name = name.split(spaceRegex);
 
-      return this.each(function(node) {
+      return this.each(function(index, node) {
         each(name, function(index, klass) {
           if (!hasClass(node, klass)) {
             node.className += " " + klass;
@@ -213,7 +213,7 @@
       return this.each(function(index, node) {
         next = node.nextSibling;
 
-        each(html, function(item) {
+        each(html, function(index, item) {
           node.parentNode.insertBefore(item.cloneNode(true), next);
         });
       });
@@ -229,7 +229,7 @@
       html = htmlify(html);
 
       return this.each(function(index, node) {
-        each(html, function(item) {
+        each(html, function(index, item) {
           node.appendChild(item.cloneNode(true));
         });
       });
