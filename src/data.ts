@@ -3,7 +3,7 @@ import {parse} from '@oscarpalmer/atoms/string';
 import {setElementValues, updateElementValue} from './internal/element-value';
 
 /**
- * Get data values from an element as an object
+ * Get data values from an element
  */
 export function getData<Value extends PlainObject>(
 	element: HTMLElement,

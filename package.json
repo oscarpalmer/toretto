@@ -32,6 +32,18 @@
 			"bun": "./src/attribute.ts",
 			"import": "./dist/attribute.mjs",
 			"require": "./dist/attribute.js"
+		},
+		"./data": {
+			"types": "./types/data.d.ts",
+			"bun": "./src/data.ts",
+			"import": "./dist/data.mjs",
+			"require": "./dist/data.js"
+		},
+		"./style": {
+			"types": "./types/style.d.ts",
+			"bun": "./src/style.ts",
+			"import": "./dist/style.mjs",
+			"require": "./dist/style.js"
 		}
 	},
 	"files": ["dist", "src", "types"],
@@ -56,5 +68,5 @@
 	},
 	"type": "module",
 	"types": "types/index.d.cts",
-	"version": "0.4.0"
+	"version": "0.5.0"
 }

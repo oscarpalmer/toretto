@@ -1,6 +1,6 @@
 import type { PlainObject } from '@oscarpalmer/atoms/models';
 /**
- * Get data values from an element as an object
+ * Get data values from an element
  */
 export declare function getData<Value extends PlainObject>(element: HTMLElement, keys: string[]): Value;
 /**

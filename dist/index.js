@@ -147,7 +147,35 @@ function setData(element, first, second) {
 function updateDataAttribute(element, key, value2) {
   updateElementValue(element, `data-${key}`, value2, element.setAttribute, element.removeAttribute, true);
 }
+// src/style.ts
+function getStyle(element, property) {
+  return element.style[property];
+}
+function getStyles(element, properties) {
+  const styles = {};
+  const { length } = properties;
+  for (let index = 0;index < length; index += 1) {
+    const property = properties[index];
+    styles[property] = element.style[property];
+  }
+  return styles;
+}
+function setStyle(element, property, value2) {
+  setElementValues(element, property, value2, updateStyleProperty);
+}
+function setStyles(element, styles) {
+  setElementValues(element, styles, null, updateStyleProperty);
+}
+function updateStyleProperty(element, key, value2) {
+  updateElementValue(element, key, value2, function(property, value3) {
+    this.style[property] = value3;
+  }, function(property) {
+    this.style[property] = "";
+  }, false);
+}
 export {
+  setStyles,
+  setStyle,
   setData,
   setAttributes,
   setAttribute,
@@ -155,6 +183,8 @@ export {
   isEmptyNonBooleanAttribute,
   isBooleanAttribute,
   isBadAttribute,
+  getStyles,
+  getStyle,
   getData,
   booleanAttributes
 };
