@@ -1,0 +1,23 @@
+{
+	"compilerOptions": {
+		"allowImportingTsExtensions": true,
+		"allowJs": true,
+		"allowSyntheticDefaultImports": true,
+		"composite": false,
+		"declaration": true,
+		"declarationDir": "./types",
+		"downlevelIteration": true,
+		"emitDeclarationOnly": true,
+		"forceConsistentCasingInFileNames": true,
+		"jsx": "react-jsx",
+		"lib": ["DOM", "DOM.Iterable", "ESNext"],
+		"module": "esnext",
+		"moduleDetection": "force",
+		"moduleResolution": "bundler",
+		"rootDir": "./src",
+		"skipLibCheck": true,
+		"strict": true,
+		"target": "esnext"
+	},
+	"exclude": ["dist", "node_modules", "test", "types", "www"]
+}

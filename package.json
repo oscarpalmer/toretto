@@ -1,17 +1,20 @@
 {
-  "author": {
+	"author": {
 		"name": "Oscar Palmér",
 		"url": "https://osacrpalmer.se"
 	},
-  "description": "A collection of badass DOM utilities.",
-  "devDependencies": {
+	"dependencies": {
+		"@oscarpalmer/atoms": "0.70.1"
+	},
+	"description": "A collection of badass DOM utilities.",
+	"devDependencies": {
 		"@biomejs/biome": "^1.8.3",
 		"@happy-dom/global-registrator": "^14.12.3",
 		"@types/bun": "^1.1.6",
 		"bun": "^1.1.21",
 		"dts-bundle-generator": "^9.5.1",
 		"typescript": "^5.5.4"
-  },
+	},
 	"exports": {
 		".": {
 			"bun": "./src/index.ts",
@@ -25,17 +28,27 @@
 			}
 		}
 	},
-  "files": ["dist", "src", "types"],
-  "keywords": ["dom", "utility"],
-  "license": "MIT",
-  "main": "dist/index.js",
+	"files": ["dist", "src", "types"],
+	"keywords": ["dom", "utility"],
+	"license": "MIT",
+	"main": "dist/index.js",
 	"module": "dist/index.mjs",
-  "name": "@oscarpalmer/toretto",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/oscarpalmer/toretto.git"
-  },
+	"name": "@oscarpalmer/toretto",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/oscarpalmer/toretto.git"
+	},
+	"scripts": {
+		"build": "bun run clean && bun run compile && bun run types",
+		"clean": "rm -rf ./dist && rm -rf ./types && rm -f ./tsconfig.tsbuildinfo",
+		"compile": "bunx bun ./.bun.ts && bunx bun ./.bun.ts --mjs",
+		"test": "bun test",
+		"types": "bun run types:cjs && bun run types:esm",
+		"types:cjs": "bunx dts-bundle-generator --out-file ./types/index.d.cts --external-inlines '@oscarpalmer/atoms' 'type-fest' --no-check --silent ./src/index.ts",
+		"types:esm": "bunx tsc -p ./tsconfig.json",
+		"watch": "bun build ./src/index.ts --outfile ./dist/index.js --watch"
+	},
 	"type": "module",
 	"types": "types/index.d.cts",
-  "version": "0.1.0"
+	"version": "0.2.0"
 }
