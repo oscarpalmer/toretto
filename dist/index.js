@@ -11,8 +11,28 @@ function getString(value2) {
   return asString.startsWith("[object ") ? JSON.stringify(value2) : asString;
 }
 // src/attribute.ts
-function setAttribute(element, name, value2) {
-  setAttributeValue(element, name, value2);
+function isBadAttribute(attribute) {
+  return onPrefix.test(attribute.name) || sourcePrefix.test(attribute.name) && valuePrefix.test(attribute.value);
+}
+function isBooleanAttribute(name) {
+  return booleanAttributes.includes(name.toLowerCase());
+}
+function isEmptyNonBooleanAttribute(attribute) {
+  return !booleanAttributes.includes(attribute.name) && attribute.value.trim().length === 0;
+}
+function isInvalidBooleanAttribute(attribute) {
+  if (!booleanAttributes.includes(attribute.name)) {
+    return true;
+  }
+  const normalised = attribute.value.toLowerCase().trim();
+  return !(normalised.length === 0 || normalised === attribute.name || attribute.name === "hidden" && normalised === "until-found");
+}
+function setAttribute(element, first, second) {
+  if (typeof first === "object" && typeof first?.name === "string") {
+    setAttributeValue(element, first.name, first.value);
+  } else if (typeof first === "string") {
+    setAttributeValue(element, first, second);
+  }
 }
 function setAttributeValue(element, name, value2) {
   if (value2 == null) {
@@ -34,7 +54,41 @@ function setAttributes(element, attributes) {
     }
   }
 }
+var booleanAttributes = Object.freeze([
+  "async",
+  "autofocus",
+  "autoplay",
+  "checked",
+  "controls",
+  "default",
+  "defer",
+  "disabled",
+  "formnovalidate",
+  "hidden",
+  "inert",
+  "ismap",
+  "itemscope",
+  "loop",
+  "multiple",
+  "muted",
+  "nomodule",
+  "novalidate",
+  "open",
+  "playsinline",
+  "readonly",
+  "required",
+  "reversed",
+  "selected"
+]);
+var onPrefix = /^on/i;
+var sourcePrefix = /^(href|src|xlink:href)$/i;
+var valuePrefix = /(data:text\/html|javascript:)/i;
 export {
   setAttributes,
-  setAttribute
+  setAttribute,
+  isInvalidBooleanAttribute,
+  isEmptyNonBooleanAttribute,
+  isBooleanAttribute,
+  isBadAttribute,
+  booleanAttributes
 };

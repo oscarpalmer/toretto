@@ -26,6 +26,12 @@
 				"types": "./types/index.d.cts",
 				"default": "./dist/index.js"
 			}
+		},
+		"./attribute": {
+			"types": "./types/attribute.d.ts",
+			"bun": "./src/attribute.ts",
+			"import": "./dist/attribute.mjs",
+			"require": "./dist/attribute.js"
 		}
 	},
 	"files": ["dist", "src", "types"],
@@ -50,5 +56,5 @@
 	},
 	"type": "module",
 	"types": "types/index.d.cts",
-	"version": "0.2.0"
+	"version": "0.3.0"
 }
