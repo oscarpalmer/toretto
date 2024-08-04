@@ -1,24 +1,41 @@
 {
-  "author": "Oscar Palmér <opalmer@me.com> (http://opalmer.me)",
-  "description": "A badass DOM utility.",
+  "author": {
+		"name": "Oscar Palmér",
+		"url": "https://osacrpalmer.se"
+	},
+  "description": "A collection of badass DOM utilities.",
   "devDependencies": {
-    "grunt": "*",
-    "grunt-contrib-jshint": "*",
-    "grunt-contrib-uglify": "*"
+		"@biomejs/biome": "^1.8.3",
+		"@happy-dom/global-registrator": "^14.12.3",
+		"@types/bun": "^1.1.6",
+		"bun": "^1.1.21",
+		"dts-bundle-generator": "^9.5.1",
+		"typescript": "^5.5.4"
   },
-  "ender": "src/ender.js",
-  "files": ["dist/toretto.js", "src/ender.js"],
-  "homepage": "http://git.io/toretto",
-  "jam": {
-    "main": "dist/toretto.js"
-  },
-  "keywords": ["dom", "ender"],
+	"exports": {
+		".": {
+			"bun": "./src/index.ts",
+			"import": {
+				"types": "./types/index.d.ts",
+				"default": "./dist/index.mjs"
+			},
+			"require": {
+				"types": "./types/index.d.cts",
+				"default": "./dist/index.js"
+			}
+		}
+	},
+  "files": ["dist", "src", "types"],
+  "keywords": ["dom", "utility"],
   "license": "MIT",
-  "main": "dist/toretto.js",
-  "name": "toretto",
+  "main": "dist/index.js",
+	"module": "dist/index.mjs",
+  "name": "@oscarpalmer/toretto",
   "repository": {
     "type": "git",
     "url": "https://github.com/oscarpalmer/toretto.git"
   },
-  "version": "0.8.9"
+	"type": "module",
+	"types": "types/index.d.cts",
+  "version": "0.1.0"
 }
