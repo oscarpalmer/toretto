@@ -1,3 +1,4 @@
+import {isPlainObject} from '@oscarpalmer/atoms/is';
 import {getString} from '@oscarpalmer/atoms/string';
 
 type Attribute<Value = unknown> = {
@@ -107,10 +108,7 @@ export function setAttribute(
 	first: unknown,
 	second?: unknown,
 ): void {
-	if (
-		typeof first === 'object' &&
-		typeof (first as Attribute)?.name === 'string'
-	) {
+	if (isPlainObject(first) && typeof (first as Attribute)?.name === 'string') {
 		setAttributeValue(
 			element,
 			(first as Attribute).name,
