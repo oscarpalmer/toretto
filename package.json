@@ -55,6 +55,12 @@
 			"types": "./types/models.d.ts",
 			"bun": "./src/models.ts"
 		},
+		"./sanitise": {
+			"types": "./types/sanitise.d.ts",
+			"bun": "./src/sanitise.ts",
+			"import": "./dist/sanitise.mjs",
+			"require": "./dist/sanitise.js"
+		},
 		"./style": {
 			"types": "./types/style.d.ts",
 			"bun": "./src/style.ts",
@@ -91,5 +97,5 @@
 	},
 	"type": "module",
 	"types": "types/index.d.cts",
-	"version": "0.8.0"
+	"version": "0.9.0"
 }

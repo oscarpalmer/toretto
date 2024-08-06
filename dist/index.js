@@ -437,6 +437,34 @@ var tabbableFilters = [
   isNotTabbableRadio,
   ...focusableFilters
 ];
+// src/sanitise.ts
+function sanitise(value2, options) {
+  return sanitiseNodes(Array.isArray(value2) ? value2 : [value2], {
+    sanitiseBooleanAttributes: options?.sanitiseBooleanAttributes ?? true
+  });
+}
+function sanitiseAttributes(element, attributes, options) {
+  const { length } = attributes;
+  for (let index = 0;index < length; index += 1) {
+    const attribute2 = attributes[index];
+    if (isBadAttribute(attribute2) || isEmptyNonBooleanAttribute(attribute2)) {
+      element.removeAttribute(attribute2.name);
+    } else if (options.sanitiseBooleanAttributes && isInvalidBooleanAttribute(attribute2)) {
+      element.setAttribute(attribute2.name, "");
+    }
+  }
+}
+function sanitiseNodes(nodes, options) {
+  const { length } = nodes;
+  for (let index = 0;index < length; index += 1) {
+    const node = nodes[index];
+    if (node instanceof Element) {
+      sanitiseAttributes(node, [...node.attributes], options);
+    }
+    sanitiseNodes([...node.childNodes], options);
+  }
+  return nodes;
+}
 // src/style.ts
 function getStyle(element, property) {
   return element.style[property];
@@ -476,6 +504,7 @@ export {
   setData,
   setAttributes,
   setAttribute,
+  sanitise,
   isTabbable,
   isInvalidBooleanAttribute,
   isFocusable,
