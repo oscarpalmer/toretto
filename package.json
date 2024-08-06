@@ -51,6 +51,12 @@
 			"import": "./dist/focusable.mjs",
 			"require": "./dist/focusable.js"
 		},
+		"./html": {
+			"types": "./types/html.d.ts",
+			"bun": "./src/html.ts",
+			"import": "./dist/html.mjs",
+			"require": "./dist/html.js"
+		},
 		"./models": {
 			"types": "./types/models.d.ts",
 			"bun": "./src/models.ts"
@@ -97,5 +103,5 @@
 	},
 	"type": "module",
 	"types": "types/index.d.cts",
-	"version": "0.9.0"
+	"version": "0.10.0"
 }

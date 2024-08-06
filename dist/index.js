@@ -465,6 +465,43 @@ function sanitiseNodes(nodes, options) {
   }
   return nodes;
 }
+
+// src/html.ts
+function createTemplate(html) {
+  const template2 = document.createElement("template");
+  template2.innerHTML = html;
+  templates[html] = template2;
+  return template2;
+}
+function getTemplate(value2) {
+  if (value2.trim().length === 0) {
+    return;
+  }
+  let template2;
+  if (/^[\w-]+$/.test(value2)) {
+    template2 = document.querySelector(`#${value2}`);
+  }
+  if (template2 instanceof HTMLTemplateElement) {
+    return template2;
+  }
+  return templates[value2] ?? createTemplate(value2);
+}
+function html(value2, sanitisation) {
+  const options = sanitisation == null || sanitisation === true ? {} : isPlainObject(sanitisation) ? { ...sanitisation } : null;
+  const template2 = value2 instanceof HTMLTemplateElement ? value2 : typeof value2 === "string" ? getTemplate(value2) : null;
+  if (template2 == null) {
+    return [];
+  }
+  const cloned = template2.content.cloneNode(true);
+  const scripts = cloned.querySelectorAll("script");
+  const { length } = scripts;
+  for (let index = 0;index < length; index += 1) {
+    scripts[index].remove();
+  }
+  cloned.normalize();
+  return options != null ? sanitise([...cloned.childNodes], options) : [...cloned.childNodes];
+}
+var templates = {};
 // src/style.ts
 function getStyle(element, property) {
   return element.style[property];
@@ -511,6 +548,7 @@ export {
   isEmptyNonBooleanAttribute,
   isBooleanAttribute,
   isBadAttribute,
+  html,
   getTextDirection,
   getTabbable,
   getStyles,
