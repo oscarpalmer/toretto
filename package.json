@@ -45,6 +45,12 @@
 			"import": "./dist/find.mjs",
 			"require": "./dist/find.js"
 		},
+		"./focusable": {
+			"types": "./types/focusable.d.ts",
+			"bun": "./src/focusable.ts",
+			"import": "./dist/focusable.mjs",
+			"require": "./dist/focusable.js"
+		},
 		"./models": {
 			"types": "./types/models.d.ts",
 			"bun": "./src/models.ts"
@@ -85,5 +91,5 @@
 	},
 	"type": "module",
 	"types": "types/index.d.cts",
-	"version": "0.7.0"
+	"version": "0.8.0"
 }

@@ -36,7 +36,7 @@ export function getStyles<Property extends keyof CSSStyleDeclaration>(
 export function getTextDirection(element: Element): TextDirection {
 	const direction = element.getAttribute('dir');
 
-	if (direction !== null && /^(ltr|rtl)$/i.test(direction)) {
+	if (direction != null && /^(ltr|rtl)$/i.test(direction)) {
 		return direction.toLowerCase() as TextDirection;
 	}
 

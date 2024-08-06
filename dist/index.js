@@ -291,6 +291,152 @@ function traverse(from, to) {
   }
   return -1e6;
 }
+// src/focusable.ts
+function getFocusable(parent) {
+  return getValidElements(parent, focusableFilters, false);
+}
+function getItem(element, tabbable) {
+  return {
+    element,
+    tabIndex: tabbable ? getTabIndex(element) : -1
+  };
+}
+function getTabbable(parent) {
+  return getValidElements(parent, tabbableFilters, true);
+}
+function getTabIndex(element) {
+  const tabIndex = element?.tabIndex ?? -1;
+  if (tabIndex < 0 && (/^(audio|details|video)$/i.test(element.tagName) || isEditable(element)) && !hasTabIndex(element)) {
+    return 0;
+  }
+  return tabIndex;
+}
+function getValidElements(parent, filters, tabbable) {
+  const elements = [...parent.querySelectorAll(selector)];
+  const items = [];
+  let { length } = elements;
+  for (let index = 0;index < length; index += 1) {
+    const item = getItem(elements[index], tabbable);
+    if (!filters.some((filter2) => filter2(item))) {
+      items.push(item);
+    }
+  }
+  if (!tabbable) {
+    return items.map((item) => item.element);
+  }
+  const indiced = [];
+  const zeroed = [];
+  length = items.length;
+  for (let index = 0;index < length; index += 1) {
+    const item = items[index];
+    if (item.tabIndex === 0) {
+      zeroed.push(item.element);
+    } else {
+      indiced[item.tabIndex] = [
+        ...indiced[item.tabIndex] ?? [],
+        item.element
+      ];
+    }
+  }
+  return [...indiced.flat(), ...zeroed];
+}
+function hasTabIndex(element) {
+  return !Number.isNaN(Number.parseInt(element.getAttribute("tabindex"), 10));
+}
+function isDisabled(item) {
+  if (/^(button|input|select|textarea)$/i.test(item.element.tagName) && isDisabledFromFieldset(item.element)) {
+    return true;
+  }
+  return (item.element.disabled ?? false) || item.element.getAttribute("aria-disabled") === "true";
+}
+function isDisabledFromFieldset(element) {
+  let parent = element.parentElement;
+  while (parent != null) {
+    if (parent instanceof HTMLFieldSetElement && parent.disabled) {
+      const children = Array.from(parent.children);
+      const { length } = children;
+      for (let index = 0;index < length; index += 1) {
+        const child = children[index];
+        if (child instanceof HTMLLegendElement) {
+          return parent.matches("fieldset[disabled] *") ? true : !child.contains(element);
+        }
+      }
+      return true;
+    }
+    parent = parent.parentElement;
+  }
+  return false;
+}
+function isEditable(element) {
+  return /^(|true)$/i.test(element.getAttribute("contenteditable"));
+}
+function isFocusable(element) {
+  return isValidElement(element, focusableFilters, false);
+}
+function isHidden(item) {
+  if ((item.element.hidden ?? false) || item.element instanceof HTMLInputElement && item.element.type === "hidden") {
+    return true;
+  }
+  const isDirectSummary = item.element.matches("details > summary:first-of-type");
+  const nodeUnderDetails = isDirectSummary ? item.element.parentElement : item.element;
+  if (nodeUnderDetails?.matches("details:not([open]) *") ?? false) {
+    return true;
+  }
+  const style = getComputedStyle(item.element);
+  if (style.display === "none" || style.visibility === "hidden") {
+    return true;
+  }
+  const { height, width } = item.element.getBoundingClientRect();
+  return height === 0 && width === 0;
+}
+function isInert(item) {
+  return (item.element.inert ?? false) || /^(|true)$/i.test(item.element.getAttribute("inert")) || item.element.parentElement != null && isInert({
+    element: item.element.parentElement,
+    tabIndex: -1
+  });
+}
+function isNotTabbable(item) {
+  return (item.tabIndex ?? -1) < 0;
+}
+function isNotTabbableRadio(item) {
+  if (!(item.element instanceof HTMLInputElement) || item.element.type !== "radio" || !item.element.name || item.element.checked) {
+    return false;
+  }
+  const parent = item.element.form ?? item.element.getRootNode?.() ?? item.element.ownerDocument;
+  const realName = CSS?.escape?.(item.element.name) ?? item.element.name;
+  const radios = Array.from(parent.querySelectorAll(`input[type="radio"][name="${realName}"]`));
+  const checked = radios.find((radio) => radio.checked);
+  return checked != null && checked !== item.element;
+}
+function isSummarised(item) {
+  return item.element instanceof HTMLDetailsElement && Array.from(item.element.children).some((child) => /^summary$/i.test(child.tagName));
+}
+function isTabbable(element) {
+  return isValidElement(element, tabbableFilters, true);
+}
+function isValidElement(element, filters, tabbable) {
+  const item = getItem(element, tabbable);
+  return !filters.some((filter2) => filter2(item));
+}
+var focusableFilters = [isDisabled, isInert, isHidden, isSummarised];
+var selector = [
+  '[contenteditable]:not([contenteditable="false"])',
+  "[tabindex]:not(slot)",
+  "a[href]",
+  "audio[controls]",
+  "button",
+  "details",
+  "details > summary:first-of-type",
+  "input",
+  "select",
+  "textarea",
+  "video[controls]"
+].map((selector2) => `${selector2}:not([inert])`).join(",");
+var tabbableFilters = [
+  isNotTabbable,
+  isNotTabbableRadio,
+  ...focusableFilters
+];
 // src/style.ts
 function getStyle(element, property) {
   return element.style[property];
@@ -306,7 +452,7 @@ function getStyles(element, properties) {
 }
 function getTextDirection(element) {
   const direction = element.getAttribute("dir");
-  if (direction !== null && /^(ltr|rtl)$/i.test(direction)) {
+  if (direction != null && /^(ltr|rtl)$/i.test(direction)) {
     return direction.toLowerCase();
   }
   return getComputedStyle?.(element)?.direction === "rtl" ? "rtl" : "ltr";
@@ -330,13 +476,17 @@ export {
   setData,
   setAttributes,
   setAttribute,
+  isTabbable,
   isInvalidBooleanAttribute,
+  isFocusable,
   isEmptyNonBooleanAttribute,
   isBooleanAttribute,
   isBadAttribute,
   getTextDirection,
+  getTabbable,
   getStyles,
   getStyle,
+  getFocusable,
   getElementUnderPointer,
   getData,
   findRelatives,

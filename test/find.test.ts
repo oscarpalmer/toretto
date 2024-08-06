@@ -1,4 +1,4 @@
-import {expect, test} from 'bun:test';
+import {afterAll, expect, test} from 'bun:test';
 import * as Find from '../src/find';
 
 document.body.innerHTML = `<div>
@@ -12,12 +12,16 @@ document.body.innerHTML = `<div>
 	</div>
 </div>`;
 
+afterAll(() => {
+	document.body.innerHTML = '';
+});
+
 test('findAncestor', () => {
 	const hidden = document.querySelector('[hidden]');
 	const origin = document.getElementById('origin');
 	const target = document.querySelector('.target');
 
-	if (origin === null) {
+	if (origin == null) {
 		return;
 	}
 

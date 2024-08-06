@@ -53,10 +53,10 @@ test('getTextDirection', () => {
 	const textElement = fragment.getElementById('text');
 
 	if (
-		parentElement === null ||
-		outerElement === null ||
-		innerElement === null ||
-		textElement === null
+		parentElement == null ||
+		outerElement == null ||
+		innerElement == null ||
+		textElement == null
 	) {
 		return;
 	}
