@@ -85,5 +85,5 @@
 	},
 	"type": "module",
 	"types": "types/index.d.cts",
-	"version": "0.6.0"
+	"version": "0.7.0"
 }

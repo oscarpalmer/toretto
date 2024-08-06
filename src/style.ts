@@ -1,4 +1,5 @@
 import {setElementValues, updateElementValue} from './internal/element-value';
+import type {TextDirection} from './models';
 
 /**
  * Get a style from an element
@@ -27,6 +28,21 @@ export function getStyles<Property extends keyof CSSStyleDeclaration>(
 	}
 
 	return styles;
+}
+
+/**
+ * Get the text direction of an element
+ */
+export function getTextDirection(element: Element): TextDirection {
+	const direction = element.getAttribute('dir');
+
+	if (direction !== null && /^(ltr|rtl)$/i.test(direction)) {
+		return direction.toLowerCase() as TextDirection;
+	}
+
+	return (
+		getComputedStyle?.(element)?.direction === 'rtl' ? 'rtl' : 'ltr'
+	) as TextDirection;
 }
 
 /**

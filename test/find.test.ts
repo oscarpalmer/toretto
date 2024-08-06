@@ -1,12 +1,5 @@
 import {expect, test} from 'bun:test';
-import {
-	$,
-	$$,
-	findAncestor,
-	findElement,
-	findElements,
-	findRelatives,
-} from '../src/find';
+import * as Find from '../src/find';
 
 document.body.innerHTML = `<div>
 	<div class="target">
@@ -28,37 +21,39 @@ test('findAncestor', () => {
 		return;
 	}
 
-	expect(findAncestor(origin, '#origin')).toBe(origin);
-	expect(findAncestor(origin, '.target')).toBe(target);
+	expect(Find.findAncestor(origin, '#origin')).toBe(origin);
+	expect(Find.findAncestor(origin, '.target')).toBe(target);
 
-	expect(findAncestor(origin, element => element.id === 'origin')).toBe(origin);
-
-	expect(findAncestor(origin, element => (element as HTMLElement).hidden)).toBe(
-		hidden,
+	expect(Find.findAncestor(origin, element => element.id === 'origin')).toBe(
+		origin,
 	);
 
-	expect(findAncestor(origin, 'noop')).toBe(null);
+	expect(
+		Find.findAncestor(origin, element => (element as HTMLElement).hidden),
+	).toBe(hidden);
 
-	expect(findAncestor(origin, element => element.tagName === 'noop')).toBe(
+	expect(Find.findAncestor(origin, 'noop')).toBe(null);
+
+	expect(Find.findAncestor(origin, element => element.tagName === 'noop')).toBe(
 		null,
 	);
 
 	// @ts-expect-error Testing invalid input
-	expect(findAncestor(null, 'span')).toBe(null);
+	expect(Find.findAncestor(null, 'span')).toBe(null);
 });
 
 test('findElement', () => {
-	const target = findElement('.target');
+	const target = Find.findElement('.target');
 
 	expect(target).toBeInstanceOf(HTMLDivElement);
 	expect(target?.classList.contains('target') ?? false).toBe(true);
 
-	const origin = findElement('#origin', '.target');
+	const origin = Find.findElement('#origin', '.target');
 
 	expect(origin).toBeInstanceOf(HTMLDivElement);
 	expect(origin?.id).toBe('origin');
 
-	const child = $('*', origin);
+	const child = Find.$('*', origin);
 
 	expect(child).toBeInstanceOf(HTMLSpanElement);
 	expect(child?.id).toBe('hover');
@@ -66,31 +61,33 @@ test('findElement', () => {
 });
 
 test('findElements', () => {
-	const elements = findElements('.target');
+	const elements = Find.findElements('.target');
 
 	expect(elements.length).toBe(1);
 	expect(elements[0].classList.contains('target')).toBe(true);
 
-	let origin = findElements('#origin', '.target');
+	let origin = Find.findElements('#origin', '.target');
 
 	expect(origin.length).toBe(1);
 	expect(origin[0].id).toBe('origin');
 
-	origin = findElements(origin, findElement('.target'));
+	origin = Find.findElements(origin, Find.findElement('.target'));
 
 	expect(origin.length).toBe(1);
 	expect(origin[0].id).toBe('origin');
 
-	const children = $$('*', origin);
+	const children = Find.$$('*', origin);
 
 	expect(children.length).toBe(1);
 	expect(children[0].id).toBe('hover');
 	expect(children[0].textContent).toBe('hello');
 
 	expect(
-		// @ts-expect-error Testing invalid input
-		findElements([123, 'a', document.body, ...origin, ...children], document)
-			.length,
+		Find.findElements(
+			// @ts-expect-error Testing invalid input
+			[123, 'a', document.body, ...origin, ...children],
+			document,
+		).length,
 	).toBe(3);
 });
 
@@ -142,17 +139,17 @@ test('findRelatives', () => {
 
 	element.innerHTML = template;
 
-	const divOrigin = $('div.origin', element);
-	const liOrigin = $('li.origin', element);
-	const buttonOrigin = $('button.origin', element);
+	const divOrigin = Find.$('div.origin', element);
+	const liOrigin = Find.$('li.origin', element);
+	const buttonOrigin = Find.$('button.origin', element);
 
 	if (divOrigin == null || liOrigin == null || buttonOrigin == null) {
 		return;
 	}
 
-	const divTargets = findRelatives(divOrigin, 'div.target', element);
-	const liTargets = findRelatives(liOrigin, 'li.target', element);
-	const buttonTargets = findRelatives(buttonOrigin, 'li.target', element);
+	const divTargets = Find.findRelatives(divOrigin, 'div.target', element);
+	const liTargets = Find.findRelatives(liOrigin, 'li.target', element);
+	const buttonTargets = Find.findRelatives(buttonOrigin, 'li.target', element);
 
 	expect(divTargets.length).toBe(2);
 	expect(divTargets.map(target => target.textContent?.trim())).toEqual([
@@ -169,9 +166,13 @@ test('findRelatives', () => {
 	expect(buttonTargets.length).toBe(1);
 	expect(buttonTargets[0].textContent?.trim()).toBe('good');
 
-	expect(findRelatives(buttonOrigin, 'button.origin', element)[0]).toBe(
+	expect(Find.findRelatives(buttonOrigin, 'button.origin', element)[0]).toBe(
 		buttonOrigin,
 	);
 
-	expect(findRelatives(liOrigin, '.not-found').length).toBe(0);
+	expect(Find.findRelatives(liOrigin, '.not-found').length).toBe(0);
+});
+
+test('getElementUnderPointer', () => {
+	// TODO: find a way to test hover, etc.
 });

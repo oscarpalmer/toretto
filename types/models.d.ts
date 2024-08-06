@@ -3,3 +3,4 @@ export type Attribute<Value = unknown> = {
     value: Value;
 };
 export type Selector = string | Document | Element | Element[] | NodeList;
+export type TextDirection = 'ltr' | 'rtl';

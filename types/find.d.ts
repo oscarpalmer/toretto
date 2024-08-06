@@ -23,4 +23,10 @@ export declare function findElements(selector: Selector, context?: Selector): El
  * - _(If you only want to traverse up, use `findAncestor`)_
  */
 export declare function findRelatives(origin: Element, selector: string, context?: Document | Element): Element[];
+/**
+ * - Get the most specific element under the pointer
+ * - Ignores elements with `pointer-events: none` and `visibility: hidden`
+ * - If `skipIgnore` is `true`, no elements are ignored
+ */
+export declare function getElementUnderPointer(skipIgnore?: boolean): Element | undefined;
 export { findElement as $, findElements as $$ };

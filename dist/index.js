@@ -249,6 +249,22 @@ function findRelatives(origin, selector, context) {
   }
   return minimum == null ? [] : distances.filter((found) => found.distance === minimum).map((found) => found.element);
 }
+function getElementUnderPointer(skipIgnore) {
+  const elements = [...document.querySelectorAll(":hover")];
+  const { length } = elements;
+  const returned = [];
+  for (let index = 0;index < length; index += 1) {
+    const element = elements[index];
+    if (/^head$/i.test(element.tagName)) {
+      continue;
+    }
+    const style = getComputedStyle(element);
+    if (skipIgnore === true || style.pointerEvents !== "none" && style.visibility !== "hidden") {
+      returned.push(element);
+    }
+  }
+  return returned.at(-1);
+}
 function traverse(from, to) {
   const children = [...to.children];
   if (children.includes(from)) {
@@ -288,6 +304,13 @@ function getStyles(element, properties) {
   }
   return styles;
 }
+function getTextDirection(element) {
+  const direction = element.getAttribute("dir");
+  if (direction !== null && /^(ltr|rtl)$/i.test(direction)) {
+    return direction.toLowerCase();
+  }
+  return getComputedStyle?.(element)?.direction === "rtl" ? "rtl" : "ltr";
+}
 function setStyle(element, property, value2) {
   setElementValues(element, property, value2, updateStyleProperty);
 }
@@ -311,8 +334,10 @@ export {
   isEmptyNonBooleanAttribute,
   isBooleanAttribute,
   isBadAttribute,
+  getTextDirection,
   getStyles,
   getStyle,
+  getElementUnderPointer,
   getData,
   findRelatives,
   findElements,

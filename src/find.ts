@@ -210,6 +210,39 @@ export function findRelatives(
 				.map(found => found.element);
 }
 
+/**
+ * - Get the most specific element under the pointer
+ * - Ignores elements with `pointer-events: none` and `visibility: hidden`
+ * - If `skipIgnore` is `true`, no elements are ignored
+ */
+export function getElementUnderPointer(
+	skipIgnore?: boolean,
+): Element | undefined {
+	const elements = [...document.querySelectorAll(':hover')];
+	const {length} = elements;
+
+	const returned: Element[] = [];
+
+	for (let index = 0; index < length; index += 1) {
+		const element = elements[index];
+
+		if (/^head$/i.test(element.tagName)) {
+			continue;
+		}
+
+		const style = getComputedStyle(element);
+
+		if (
+			skipIgnore === true ||
+			(style.pointerEvents !== 'none' && style.visibility !== 'hidden')
+		) {
+			returned.push(element);
+		}
+	}
+
+	return returned.at(-1);
+}
+
 function traverse(from: Element, to: Element): number {
 	const children = [...to.children];
 
