@@ -1,7 +1,7 @@
 import {expect, test} from 'bun:test';
 import * as Style from '../src/style';
 
-test('setStyles', done => {
+test('getStyle(s) & setStyle(s)', done => {
 	const div = document.createElement('div');
 
 	div.style.display = 'none';

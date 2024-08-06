@@ -21,11 +21,7 @@ async function getFiles(path: string): Promise<string[]> {
 
 getFiles('./src').then(async files => {
 	for (const file of files) {
-		const parts = file.split('/');
-
-		if (
-			(!isMjs && file.endsWith('models.ts'))
-		) {
+		if (!isMjs && file.endsWith('models.ts')) {
 			continue;
 		}
 

@@ -1,10 +1,6 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
 import {getString} from '@oscarpalmer/atoms/string';
-
-type Attribute<Value = unknown> = {
-	name: string;
-	value: Value;
-};
+import type {Attribute} from './models';
 
 /**
  * List of boolean attributes

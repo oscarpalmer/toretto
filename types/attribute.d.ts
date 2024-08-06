@@ -1,7 +1,4 @@
-type Attribute<Value = unknown> = {
-    name: string;
-    value: Value;
-};
+import type { Attribute } from './models';
 /**
  * List of boolean attributes
  */
@@ -39,4 +36,3 @@ export declare function setAttributes(element: Element, attributes: Attribute[])
  * Set one or more attributes on an element  _(or remove them, if their value is `null` or `undefined`)_
  */
 export declare function setAttributes(element: Element, attributes: Record<string, unknown>): void;
-export {};

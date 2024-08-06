@@ -147,6 +147,134 @@ function setData(element, first, second) {
 function updateDataAttribute(element, key, value2) {
   updateElementValue(element, `data-${key}`, value2, element.setAttribute, element.removeAttribute, true);
 }
+// src/find.ts
+function calculateDistance(origin, target) {
+  if (origin === target || origin.parentElement === target) {
+    return 0;
+  }
+  const comparison = origin.compareDocumentPosition(target);
+  const children = [...origin.parentElement?.children ?? []];
+  switch (true) {
+    case children.includes(target):
+      return Math.abs(children.indexOf(origin) - children.indexOf(target));
+    case !!(comparison & 2 || comparison & 8):
+      return traverse(origin, target);
+    case !!(comparison & 4 || comparison & 16):
+      return traverse(target, origin);
+    default:
+      return -1;
+  }
+}
+function findAncestor(origin, selector) {
+  if (origin == null || selector == null) {
+    return null;
+  }
+  if (typeof selector === "string") {
+    if (origin.matches?.(selector)) {
+      return origin;
+    }
+    return origin.closest(selector);
+  }
+  if (selector(origin)) {
+    return origin;
+  }
+  let parent = origin.parentElement;
+  while (parent != null && !selector(parent)) {
+    if (parent === document.body) {
+      return null;
+    }
+    parent = parent.parentElement;
+  }
+  return parent;
+}
+function findElement(selector, context) {
+  return findElementOrElements(selector, context, true);
+}
+function findElementOrElements(selector, context, single) {
+  const callback = single ? document.querySelector : document.querySelectorAll;
+  const contexts = context == null ? [document] : findElementOrElements(context, undefined, false);
+  const result = [];
+  if (typeof selector === "string") {
+    const { length: length2 } = contexts;
+    for (let index = 0;index < length2; index += 1) {
+      const value2 = callback.call(contexts[index], selector);
+      if (single) {
+        if (value2 == null) {
+          continue;
+        }
+        return value2;
+      }
+      result.push(...Array.from(value2));
+    }
+    return single ? undefined : result.filter((value2, index, array2) => array2.indexOf(value2) === index);
+  }
+  const nodes = Array.isArray(selector) ? selector : selector instanceof NodeList ? Array.from(selector) : [selector];
+  const { length } = nodes;
+  for (let index = 0;index < length; index += 1) {
+    const node = nodes[index];
+    const element = node instanceof Document ? node.body : node instanceof Element ? node : undefined;
+    if (element != null && (context == null || contexts.length === 0 || contexts.some((context2) => context2 === element || context2.contains(element))) && !result.includes(element)) {
+      result.push(element);
+    }
+  }
+  return result;
+}
+function findElements(selector, context) {
+  return findElementOrElements(selector, context, false);
+}
+function findRelatives(origin, selector, context) {
+  if (origin.matches(selector)) {
+    return [origin];
+  }
+  const elements = [...(context ?? document).querySelectorAll(selector)];
+  const { length } = elements;
+  if (length === 0) {
+    return [];
+  }
+  const distances = [];
+  let minimum = null;
+  for (let index = 0;index < length; index += 1) {
+    const element = elements[index];
+    const distance = calculateDistance(origin, element);
+    if (distance < 0) {
+      continue;
+    }
+    if (minimum == null || distance < minimum) {
+      minimum = distance;
+    }
+    distances.push({
+      distance,
+      element
+    });
+  }
+  return minimum == null ? [] : distances.filter((found) => found.distance === minimum).map((found) => found.element);
+}
+function traverse(from, to) {
+  const children = [...to.children];
+  if (children.includes(from)) {
+    return children.indexOf(from) + 1;
+  }
+  let current = from;
+  let distance = 0;
+  let parent = from.parentElement;
+  while (parent != null) {
+    if (parent === to) {
+      return distance + 1;
+    }
+    const children2 = [...parent.children ?? []];
+    if (children2.includes(to)) {
+      return distance + Math.abs(children2.indexOf(current) - children2.indexOf(to));
+    }
+    const index = children2.findIndex((child) => child.contains(to));
+    if (index > -1) {
+      return distance + Math.abs(index - children2.indexOf(current)) + traverse(to, children2[index]);
+    }
+    current = parent;
+    distance += 1;
+    parent = parent.parentElement;
+  }
+  return -1e6;
+}
 // src/style.ts
 function getStyle(element, property) {
   return element.style[property];
@@ -186,5 +314,11 @@ export {
   getStyles,
   getStyle,
   getData,
-  booleanAttributes
+  findRelatives,
+  findElements,
+  findElement,
+  findAncestor,
+  booleanAttributes,
+  findElements as $$,
+  findElement as $
 };
