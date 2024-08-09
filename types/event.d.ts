@@ -1,4 +1,4 @@
-import type { CustomDispatchOptions, DispatchOptions, EventPosition } from './models';
+import type { DispatchOptions, EventPosition } from './models';
 /**
  * Remove the current event listener
  */
@@ -10,15 +10,7 @@ export declare function dispatch<Type extends keyof HTMLElementEventMap>(target:
 /**
  * Dispatch an event for a target
  */
-export declare function dispatch<Type extends keyof HTMLElementEventMap>(target: EventTarget, type: Type, options?: CustomDispatchOptions): void;
-/**
- * Dispatch an event for a target
- */
 export declare function dispatch(target: EventTarget, type: string, options?: DispatchOptions): void;
-/**
- * Dispatch an event for a target
- */
-export declare function dispatch(target: EventTarget, type: string, options?: CustomDispatchOptions): void;
 /**
  * Get the X- and Y-coordinates from a pointer event
  */

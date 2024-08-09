@@ -3,14 +3,11 @@ export type Attribute<Value = unknown> = {
 	value: Value;
 };
 
-export type CustomDispatchOptions = {
-	detail?: unknown;
-} & DispatchOptions;
-
 export type DispatchOptions = {
 	bubbles?: boolean;
 	cancelable?: boolean;
 	composed?: boolean;
+	detail?: unknown;
 };
 
 export type EventPosition = {

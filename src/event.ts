@@ -1,9 +1,5 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import type {
-	CustomDispatchOptions,
-	DispatchOptions,
-	EventPosition,
-} from './models';
+import type {DispatchOptions, EventPosition} from './models';
 
 /**
  * Remove the current event listener
@@ -61,33 +57,15 @@ export function dispatch<Type extends keyof HTMLElementEventMap>(
 /**
  * Dispatch an event for a target
  */
-export function dispatch<Type extends keyof HTMLElementEventMap>(
-	target: EventTarget,
-	type: Type,
-	options?: CustomDispatchOptions,
-): void;
-
-/**
- * Dispatch an event for a target
- */
 export function dispatch(
 	target: EventTarget,
 	type: string,
 	options?: DispatchOptions,
 ): void;
 
-/**
- * Dispatch an event for a target
- */
-export function dispatch(
+export function dispatch<Type extends keyof HTMLElementEventMap>(
 	target: EventTarget,
-	type: string,
-	options?: CustomDispatchOptions,
-): void;
-
-export function dispatch(
-	target: EventTarget,
-	type: string,
+	type: Type | string,
 	options?: DispatchOptions,
 ): void {
 	target.dispatchEvent(createEvent(type, options));
