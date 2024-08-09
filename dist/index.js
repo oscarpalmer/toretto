@@ -147,6 +147,66 @@ function setData(element, first, second) {
 function updateDataAttribute(element, key, value2) {
   updateElementValue(element, `data-${key}`, value2, element.setAttribute, element.removeAttribute, true);
 }
+// src/event.ts
+function createDispatchOptions(options) {
+  return {
+    bubbles: getBoolean(options?.bubbles),
+    cancelable: getBoolean(options?.cancelable),
+    composed: getBoolean(options?.composed)
+  };
+}
+function createEvent(type, options) {
+  const hasOptions = isPlainObject(options);
+  if (hasOptions && "detail" in options) {
+    return new CustomEvent(type, {
+      ...createDispatchOptions(options),
+      detail: options?.detail
+    });
+  }
+  return new Event(type, createDispatchOptions(hasOptions ? options : {}));
+}
+function createEventOptions(options) {
+  if (isPlainObject(options)) {
+    return {
+      capture: getBoolean(options.capture),
+      once: getBoolean(options.once),
+      passive: getBoolean(options.passive, true)
+    };
+  }
+  return {
+    capture: getBoolean(options),
+    once: false,
+    passive: true
+  };
+}
+function dispatch(target, type, options) {
+  target.dispatchEvent(createEvent(type, options));
+}
+function getBoolean(value2, defaultValue) {
+  return typeof value2 === "boolean" ? value2 : defaultValue ?? false;
+}
+function getPosition(event) {
+  let x;
+  let y;
+  if (event instanceof MouseEvent) {
+    x = event.clientX;
+    y = event.clientY;
+  } else if (event instanceof TouchEvent) {
+    x = event.touches[0]?.clientX;
+    y = event.touches[0]?.clientY;
+  }
+  return typeof x === "number" && typeof y === "number" ? { x, y } : undefined;
+}
+function off(target, type, listener, options) {
+  target.removeEventListener(type, listener, createEventOptions(options));
+}
+function on(target, type, listener, options) {
+  const extended = createEventOptions(options);
+  target.addEventListener(type, listener, extended);
+  return () => {
+    target.removeEventListener(type, listener, extended);
+  };
+}
 // src/find.ts
 function calculateDistance(origin, target) {
   if (origin === target || origin.parentElement === target) {
@@ -542,6 +602,8 @@ export {
   setAttributes,
   setAttribute,
   sanitise,
+  on,
+  off,
   isTabbable,
   isInvalidBooleanAttribute,
   isFocusable,
@@ -553,6 +615,7 @@ export {
   getTabbable,
   getStyles,
   getStyle,
+  getPosition,
   getFocusable,
   getElementUnderPointer,
   getData,
@@ -560,6 +623,7 @@ export {
   findElements,
   findElement,
   findAncestor,
+  dispatch,
   booleanAttributes,
   findElements as $$,
   findElement as $
