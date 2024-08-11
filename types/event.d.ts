@@ -1,4 +1,4 @@
-import type { DispatchOptions, EventPosition } from './models';
+import type { EventPosition } from './models';
 /**
  * Remove the current event listener
  */
@@ -6,11 +6,11 @@ type RemoveEventListener = () => void;
 /**
  * Dispatch an event for a target
  */
-export declare function dispatch<Type extends keyof HTMLElementEventMap>(target: EventTarget, type: Type, options?: DispatchOptions): void;
+export declare function dispatch<Type extends keyof HTMLElementEventMap>(target: EventTarget, type: Type, options?: CustomEventInit): void;
 /**
  * Dispatch an event for a target
  */
-export declare function dispatch(target: EventTarget, type: string, options?: DispatchOptions): void;
+export declare function dispatch(target: EventTarget, type: string, options?: CustomEventInit): void;
 /**
  * Get the X- and Y-coordinates from a pointer event
  */

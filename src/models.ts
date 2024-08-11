@@ -3,13 +3,6 @@ export type Attribute<Value = unknown> = {
 	value: Value;
 };
 
-export type DispatchOptions = {
-	bubbles?: boolean;
-	cancelable?: boolean;
-	composed?: boolean;
-	detail?: unknown;
-};
-
 export type EventPosition = {
 	x: number;
 	y: number;

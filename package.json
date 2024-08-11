@@ -80,15 +80,8 @@
 			"require": "./dist/style.js"
 		}
 	},
-	"files": [
-		"dist",
-		"src",
-		"types"
-	],
-	"keywords": [
-		"dom",
-		"utility"
-	],
+	"files": ["dist", "src", "types"],
+	"keywords": ["dom", "utility"],
 	"license": "MIT",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
@@ -109,5 +102,5 @@
 	},
 	"type": "module",
 	"types": "types/index.d.cts",
-	"version": "0.12.0"
+	"version": "0.12.1"
 }

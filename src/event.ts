@@ -1,12 +1,12 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import type {DispatchOptions, EventPosition} from './models';
+import type {EventPosition} from './models';
 
 /**
  * Remove the current event listener
  */
 type RemoveEventListener = () => void;
 
-function createDispatchOptions(options: DispatchOptions): DispatchOptions {
+function createDispatchOptions(options: EventInit): EventInit {
 	return {
 		bubbles: getBoolean(options?.bubbles),
 		cancelable: getBoolean(options?.cancelable),
@@ -14,7 +14,7 @@ function createDispatchOptions(options: DispatchOptions): DispatchOptions {
 	};
 }
 
-function createEvent(type: string, options?: DispatchOptions): Event {
+function createEvent(type: string, options?: CustomEventInit): Event {
 	const hasOptions = isPlainObject(options);
 
 	if (hasOptions && 'detail' in options) {
@@ -51,7 +51,7 @@ function createEventOptions(
 export function dispatch<Type extends keyof HTMLElementEventMap>(
 	target: EventTarget,
 	type: Type,
-	options?: DispatchOptions,
+	options?: CustomEventInit,
 ): void;
 
 /**
@@ -60,13 +60,13 @@ export function dispatch<Type extends keyof HTMLElementEventMap>(
 export function dispatch(
 	target: EventTarget,
 	type: string,
-	options?: DispatchOptions,
+	options?: CustomEventInit,
 ): void;
 
 export function dispatch<Type extends keyof HTMLElementEventMap>(
 	target: EventTarget,
 	type: Type | string,
-	options?: DispatchOptions,
+	options?: CustomEventInit,
 ): void {
 	target.dispatchEvent(createEvent(type, options));
 }
