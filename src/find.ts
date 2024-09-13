@@ -1,6 +1,12 @@
 import type {Selector} from './models';
 
-function calculateDistance(origin: Element, target: Element): number {
+/**
+ * Get the distance between two elements _(i.e., the amount of nodes of between them)_
+ */
+export function getDistanceBetweenElements(
+	origin: Element,
+	target: Element,
+): number {
 	if (origin === target || origin.parentElement === target) {
 		return 0;
 	}
@@ -187,7 +193,7 @@ export function findRelatives(
 
 	for (let index = 0; index < length; index += 1) {
 		const element = elements[index];
-		const distance = calculateDistance(origin, element);
+		const distance = getDistanceBetweenElements(origin, element);
 
 		if (distance < 0) {
 			continue;
@@ -286,4 +292,3 @@ function traverse(from: Element, to: Element): number {
 }
 
 export {findElement as $, findElements as $$};
-

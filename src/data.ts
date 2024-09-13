@@ -1,22 +1,23 @@
 import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {parse} from '@oscarpalmer/atoms/string';
 import {setElementValues, updateElementValue} from './internal/element-value';
+import type {HTMLOrSVGElement} from './models';
 
 /**
  * Get data values from an element
  */
 export function getData<Value extends PlainObject>(
-	element: HTMLElement,
+	element: HTMLOrSVGElement,
 	keys: string[],
 ): Value;
 
 /**
  * Get a data value from an element
  */
-export function getData(element: HTMLElement, key: string): unknown;
+export function getData(element: HTMLOrSVGElement, key: string): unknown;
 
 export function getData(
-	element: HTMLElement,
+	element: HTMLOrSVGElement,
 	keys: string | string[],
 ): unknown {
 	if (typeof keys === 'string') {
@@ -36,7 +37,7 @@ export function getData(
 	return data;
 }
 
-function getDataValue(element: HTMLElement, key: string): unknown {
+function getDataValue(element: HTMLOrSVGElement, key: string): unknown {
 	const value = element.dataset[key];
 
 	if (value != null) {
@@ -47,19 +48,19 @@ function getDataValue(element: HTMLElement, key: string): unknown {
 /**
  * Set data values on an element
  */
-export function setData(element: HTMLElement, data: PlainObject): void;
+export function setData(element: HTMLOrSVGElement, data: PlainObject): void;
 
 /**
  * Set a data value on an element
  */
 export function setData(
-	element: HTMLElement,
+	element: HTMLOrSVGElement,
 	key: string,
 	value: unknown,
 ): void;
 
 export function setData(
-	element: HTMLElement,
+	element: HTMLOrSVGElement,
 	first: PlainObject | string,
 	second?: unknown,
 ): void {
@@ -67,7 +68,7 @@ export function setData(
 }
 
 function updateDataAttribute(
-	element: HTMLElement,
+	element: HTMLOrSVGElement,
 	key: string,
 	value: unknown,
 ): void {

@@ -46,29 +46,52 @@ function isInvalidBooleanAttribute(attribute) {
   return !(normalised.length === 0 || normalised === attribute.name || attribute.name === "hidden" && normalised === "until-found");
 }
 function setAttribute(element, first, second) {
-  if (isPlainObject(first) && typeof first?.name === "string") {
-    setAttributeValue(element, first.name, first.value);
-  } else if (typeof first === "string") {
-    setAttributeValue(element, first, second);
-  }
+  updateValue(element, first, second, updateAttribute);
 }
-function setAttributeValue(element, name, value2) {
-  if (value2 == null) {
+function setAttributes(element, attributes) {
+  updateValues(element, attributes);
+}
+function setProperty(element, first, second) {
+  updateValue(element, first, second, updateProperty);
+}
+function setProperties(element, properties) {
+  updateValues(element, properties, updateProperty);
+}
+function updateAttribute(element, name, value2) {
+  const normalised = name.toLowerCase();
+  if (booleanAttributes.includes(normalised)) {
+    updateProperty(element, name, value2, false);
+  } else if (value2 == null) {
     element.removeAttribute(name);
   } else {
     element.setAttribute(name, typeof value2 === "string" ? value2 : getString(value2));
   }
 }
-function setAttributes(element, attributes) {
-  const isArray = Array.isArray(attributes);
-  const entries = Object.entries(attributes);
+function updateProperty(element, name, value2, validate) {
+  const actual = validate ?? true ? name.toLowerCase() : name;
+  if (actual === "hidden") {
+    element.hidden = typeof value2 === "string" && value2.toLowerCase() === "until-found" ? "until-found" : value2 === "" || value2 === true;
+  } else {
+    element[actual] = value2 === "" || typeof value2 === "string" && value2.toLowerCase() === actual || value2 === true;
+  }
+}
+function updateValue(element, first, second, callback) {
+  if (isPlainObject(first) && typeof first?.name === "string") {
+    callback(element, first.name, first.value);
+  } else if (typeof first === "string") {
+    callback(element, first, second);
+  }
+}
+function updateValues(element, values, callback) {
+  const isArray = Array.isArray(values);
+  const entries = Object.entries(values);
   const { length } = entries;
   for (let index = 0;index < length; index += 1) {
     const entry = entries[index];
     if (isArray) {
-      setAttributeValue(element, entry[1].name, entry[1].value);
+      (callback ?? updateAttribute)(element, entry[1].name, entry[1].value);
     } else {
-      setAttributeValue(element, entry[0], entry[1]);
+      (callback ?? updateAttribute)(element, entry[0], entry[1]);
     }
   }
 }
@@ -147,6 +170,11 @@ function setData(element, first, second) {
 function updateDataAttribute(element, key, value2) {
   updateElementValue(element, `data-${key}`, value2, element.setAttribute, element.removeAttribute, true);
 }
+// src/internal/get-value.ts
+function getBoolean(value2, defaultValue) {
+  return typeof value2 === "boolean" ? value2 : defaultValue ?? false;
+}
+
 // src/event.ts
 function createDispatchOptions(options) {
   return {
@@ -166,24 +194,14 @@ function createEvent(type, options) {
   return new Event(type, createDispatchOptions(hasOptions ? options : {}));
 }
 function createEventOptions(options) {
-  if (isPlainObject(options)) {
-    return {
-      capture: getBoolean(options.capture),
-      once: getBoolean(options.once),
-      passive: getBoolean(options.passive, true)
-    };
-  }
   return {
-    capture: getBoolean(options),
-    once: false,
-    passive: true
+    capture: getBoolean(options?.capture),
+    once: getBoolean(options?.once),
+    passive: getBoolean(options?.passive, true)
   };
 }
 function dispatch(target, type, options) {
   target.dispatchEvent(createEvent(type, options));
-}
-function getBoolean(value2, defaultValue) {
-  return typeof value2 === "boolean" ? value2 : defaultValue ?? false;
 }
 function getPosition(event) {
   let x;
@@ -208,7 +226,7 @@ function on(target, type, listener, options) {
   };
 }
 // src/find.ts
-function calculateDistance(origin, target) {
+function getDistanceBetweenElements(origin, target) {
   if (origin === target || origin.parentElement === target) {
     return 0;
   }
@@ -295,7 +313,7 @@ function findRelatives(origin, selector, context) {
   let minimum = null;
   for (let index = 0;index < length; index += 1) {
     const element = elements[index];
-    const distance = calculateDistance(origin, element);
+    const distance = getDistanceBetweenElements(origin, element);
     if (distance < 0) {
       continue;
     }
@@ -407,7 +425,7 @@ function isDisabled(item) {
   if (/^(button|input|select|textarea)$/i.test(item.element.tagName) && isDisabledFromFieldset(item.element)) {
     return true;
   }
-  return (item.element.disabled ?? false) || item.element.getAttribute("aria-disabled") === "true";
+  return item.element.disabled ?? false;
 }
 function isDisabledFromFieldset(element) {
   let parent = element.parentElement;
@@ -562,6 +580,16 @@ function html(value2, sanitisation) {
   return options != null ? sanitise([...cloned.childNodes], options) : [...cloned.childNodes];
 }
 var templates = {};
+// src/is.ts
+function isChildNode(value2, ignoreDocumentType) {
+  return value2 instanceof CharacterData || (value2 instanceof DocumentType ? ignoreDocumentType !== true : false) || value2 instanceof Element;
+}
+function isHTMLOrSVGElement(value2) {
+  return value2 instanceof HTMLElement || value2 instanceof SVGElement;
+}
+function isInDocument(node, document2) {
+  return document2 == null ? node.ownerDocument?.contains(node) ?? false : node.ownerDocument === document2 && document2.contains(node);
+}
 // src/style.ts
 function getStyle(element, property) {
   return element.style[property];
@@ -598,6 +626,8 @@ function updateStyleProperty(element, key, value2) {
 export {
   setStyles,
   setStyle,
+  setProperty,
+  setProperties,
   setData,
   setAttributes,
   setAttribute,
@@ -606,8 +636,11 @@ export {
   off,
   isTabbable,
   isInvalidBooleanAttribute,
+  isInDocument,
+  isHTMLOrSVGElement,
   isFocusable,
   isEmptyNonBooleanAttribute,
+  isChildNode,
   isBooleanAttribute,
   isBadAttribute,
   html,
@@ -618,6 +651,7 @@ export {
   getPosition,
   getFocusable,
   getElementUnderPointer,
+  getDistanceBetweenElements,
   getData,
   findRelatives,
   findElements,

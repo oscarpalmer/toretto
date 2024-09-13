@@ -4,7 +4,7 @@ export * from './event';
 export * from './find';
 export * from './focusable';
 export * from './html';
+export * from './is';
 export * from './models';
 export * from './sanitise';
 export * from './style';
-

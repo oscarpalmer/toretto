@@ -8,12 +8,13 @@
 	},
 	"description": "A collection of badass DOM utilities.",
 	"devDependencies": {
-		"@biomejs/biome": "^1.8.3",
-		"@happy-dom/global-registrator": "^14.12.3",
-		"@types/bun": "^1.1.6",
-		"bun": "^1.1.22",
+		"@biomejs/biome": "^1.9.0",
+		"@happy-dom/global-registrator": "^15.7.4",
+		"@types/bun": "^1.1.9",
+		"bun": "^1.1.27",
 		"dts-bundle-generator": "^9.5.1",
-		"typescript": "^5.5.4"
+		"type-fest": "^4.26.1",
+		"typescript": "^5.6.2"
 	},
 	"exports": {
 		".": {
@@ -63,6 +64,12 @@
 			"import": "./dist/html.mjs",
 			"require": "./dist/html.js"
 		},
+		"./is": {
+			"types": "./types/is.d.ts",
+			"bun": "./src/is.ts",
+			"import": "./dist/is.mjs",
+			"require": "./dist/is.js"
+		},
 		"./models": {
 			"types": "./types/models.d.ts",
 			"bun": "./src/models.ts"
@@ -102,5 +109,5 @@
 	},
 	"type": "module",
 	"types": "types/index.d.cts",
-	"version": "0.12.1"
+	"version": "0.13.0"
 }

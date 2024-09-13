@@ -1,10 +1,6 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import type {EventPosition} from './models';
-
-/**
- * Remove the current event listener
- */
-type RemoveEventListener = () => void;
+import {getBoolean} from './internal/get-value';
+import type {EventPosition, RemovableEventListener} from './models';
 
 function createDispatchOptions(options: EventInit): EventInit {
 	return {
@@ -28,20 +24,12 @@ function createEvent(type: string, options?: CustomEventInit): Event {
 }
 
 function createEventOptions(
-	options?: boolean | AddEventListenerOptions,
+	options?: AddEventListenerOptions,
 ): AddEventListenerOptions {
-	if (isPlainObject(options)) {
-		return {
-			capture: getBoolean(options.capture),
-			once: getBoolean(options.once),
-			passive: getBoolean(options.passive, true),
-		};
-	}
-
 	return {
-		capture: getBoolean(options),
-		once: false,
-		passive: true,
+		capture: getBoolean(options?.capture),
+		once: getBoolean(options?.once),
+		passive: getBoolean(options?.passive, true),
 	};
 }
 
@@ -71,10 +59,6 @@ export function dispatch<Type extends keyof HTMLElementEventMap>(
 	target.dispatchEvent(createEvent(type, options));
 }
 
-function getBoolean(value: unknown, defaultValue?: boolean): boolean {
-	return typeof value === 'boolean' ? value : defaultValue ?? false;
-}
-
 /**
  * Get the X- and Y-coordinates from a pointer event
  */
@@ -102,7 +86,7 @@ export function off(
 	target: EventTarget,
 	type: string,
 	listener: EventListener,
-	options?: boolean | EventListenerOptions,
+	options?: EventListenerOptions,
 ): void {
 	target.removeEventListener(type, listener, createEventOptions(options));
 }
@@ -114,8 +98,8 @@ export function on<Type extends keyof HTMLElementEventMap>(
 	target: EventTarget,
 	type: Type,
 	listener: (event: HTMLElementEventMap[Type]) => void,
-	options?: boolean | AddEventListenerOptions,
-): RemoveEventListener;
+	options?: AddEventListenerOptions,
+): RemovableEventListener;
 
 /**
  * Add an event listener
@@ -124,15 +108,15 @@ export function on(
 	target: EventTarget,
 	type: string,
 	listener: EventListener,
-	options?: boolean | AddEventListenerOptions,
-): RemoveEventListener;
+	options?: AddEventListenerOptions,
+): RemovableEventListener;
 
 export function on(
 	target: EventTarget,
 	type: string,
 	listener: EventListener,
-	options?: boolean | AddEventListenerOptions,
-): RemoveEventListener {
+	options?: AddEventListenerOptions,
+): RemovableEventListener {
 	const extended = createEventOptions(options);
 
 	target.addEventListener(type, listener, extended);

@@ -240,4 +240,42 @@ test('setAttribute', () => {
 	Attribute.setAttributes(element, [{name: 'alpha', value: null}]);
 
 	expect(element.getAttribute('alpha')).toBe(null);
+
+	const properties = [
+		{name: 'hidden', value: true},
+		{name: 'multiple', value: ''},
+		{name: 'notreal', value: true},
+		{name: 'readonly', value: 'readonly'},
+		{name: 'selected', value: false},
+	];
+
+	const {length} = properties;
+
+	for (let index = 0; index < length; index += 1) {
+		if (index % 2 === 0) {
+			Attribute.setAttribute(element, properties[index]);
+		} else {
+			Attribute.setProperty(element, properties[index]);
+		}
+	}
+
+	expect(element.hidden).toBe(true);
+	expect((element as any).multiple).toBe(true);
+	expect((element as any).notreal).toBeNil();
+	expect((element as any).readonly).toBe(true);
+	expect((element as any).selected).toBe(false);
+
+	Attribute.setProperties(element, [
+		{
+			name: 'readonly',
+			value: 123,
+		},
+	]);
+
+	Attribute.setProperties(element, {
+		hidden: false,
+	});
+
+	expect(element.hidden).toBe(false);
+	expect((element as any).readonly).toBe(false);
 });

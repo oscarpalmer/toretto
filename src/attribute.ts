@@ -1,6 +1,7 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
+import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {getString} from '@oscarpalmer/atoms/string';
-import type {Attribute} from './models';
+import type {Attribute, HTMLOrSVGElement, Property} from './models';
 
 /**
  * List of boolean attributes
@@ -88,39 +89,109 @@ export function isInvalidBooleanAttribute(
 /**
  * Set an attribute on an element  _(or remove it, if the value is `null` or `undefined`)_
  */
-export function setAttribute(element: Element, attribute: Attribute): void;
+export function setAttribute(
+	element: HTMLOrSVGElement,
+	attribute: Attribute,
+): void;
 
 /**
  * Set an attribute on an element  _(or remove it, if the value is `null` or `undefined`)_
  */
 export function setAttribute(
-	element: Element,
+	element: HTMLOrSVGElement,
 	name: string,
 	value?: unknown,
 ): void;
 
 export function setAttribute(
-	element: Element,
+	element: HTMLOrSVGElement,
 	first: unknown,
 	second?: unknown,
 ): void {
-	if (isPlainObject(first) && typeof (first as Attribute)?.name === 'string') {
-		setAttributeValue(
-			element,
-			(first as Attribute).name,
-			(first as Attribute).value,
-		);
-	} else if (typeof first === 'string') {
-		setAttributeValue(element, first, second);
-	}
+	updateValue(element, first, second, updateAttribute);
 }
 
-function setAttributeValue(
-	element: Element,
+/**
+ * Set one or more attributes on an element _(or remove them, if their value is `null` or `undefined`)_
+ */
+export function setAttributes(
+	element: HTMLOrSVGElement,
+	attributes: Attribute[],
+): void;
+
+/**
+ * Set one or more attributes on an element _(or remove them, if their value is `null` or `undefined`)_
+ */
+export function setAttributes(
+	element: HTMLOrSVGElement,
+	attributes: Record<string, unknown>,
+): void;
+
+export function setAttributes(
+	element: HTMLOrSVGElement,
+	attributes: Attribute[] | Record<string, unknown>,
+): void {
+	updateValues(element, attributes);
+}
+
+/**
+ * Set a property on an element _(or remove it, if the value is not an empty string or does not match the name)_
+ */
+export function setProperty(
+	element: HTMLOrSVGElement,
+	property: Property,
+): void;
+
+/**
+ * Set a property on an element _(or remove it, if the value is not an empty string or does not match the name)_
+ */
+export function setProperty(
+	element: HTMLOrSVGElement,
+	name: string,
+	value: boolean | string,
+): void;
+
+export function setProperty(
+	element: HTMLOrSVGElement,
+	first: unknown,
+	second?: unknown,
+): void {
+	updateValue(element, first, second, updateProperty);
+}
+
+/**
+ * Set one or more properties on an element _(or remove them, if their value is not an empty string or does not match the name)_
+ */
+export function setProperties(
+	element: HTMLOrSVGElement,
+	properties: Property[],
+): void;
+
+/**
+ * Set one or more properties on an element _(or remove them, if their value is not an empty string or does not match the name)_
+ */
+export function setProperties(
+	element: HTMLOrSVGElement,
+	properties: Record<string, unknown>,
+): void;
+
+export function setProperties(
+	element: HTMLOrSVGElement,
+	properties: Property[] | Record<string, unknown>,
+): void {
+	updateValues(element, properties, updateProperty);
+}
+
+function updateAttribute(
+	element: HTMLOrSVGElement,
 	name: string,
 	value: unknown,
 ): void {
-	if (value == null) {
+	const normalised = name.toLowerCase();
+
+	if (booleanAttributes.includes(normalised)) {
+		updateProperty(element, name, value, false);
+	} else if (value == null) {
 		element.removeAttribute(name);
 	} else {
 		element.setAttribute(
@@ -130,38 +201,60 @@ function setAttributeValue(
 	}
 }
 
-/**
- * Set one or more attributes on an element  _(or remove them, if their value is `null` or `undefined`)_
- */
-export function setAttributes(element: Element, attributes: Attribute[]): void;
-
-/**
- * Set one or more attributes on an element  _(or remove them, if their value is `null` or `undefined`)_
- */
-export function setAttributes(
-	element: Element,
-	attributes: Record<string, unknown>,
-): void;
-
-export function setAttributes(
-	element: Element,
-	attributes: Attribute[] | Record<string, unknown>,
+function updateProperty(
+	element: HTMLOrSVGElement,
+	name: string,
+	value: unknown,
+	validate?: boolean,
 ): void {
-	const isArray = Array.isArray(attributes);
-	const entries = Object.entries(attributes);
+	const actual = validate ?? true ? name.toLowerCase() : name;
+
+	if (actual === 'hidden') {
+		(element as unknown as PlainObject).hidden =
+			typeof value === 'string' && value.toLowerCase() === 'until-found'
+				? 'until-found'
+				: value === '' || value === true;
+	} else {
+		(element as unknown as PlainObject)[actual] =
+			value === '' ||
+			(typeof value === 'string' && value.toLowerCase() === actual) ||
+			value === true;
+	}
+}
+
+function updateValue(
+	element: HTMLOrSVGElement,
+	first: unknown,
+	second: unknown,
+	callback: (element: HTMLOrSVGElement, name: string, value: unknown) => void,
+): void {
+	if (isPlainObject(first) && typeof (first as Attribute)?.name === 'string') {
+		callback(element, (first as Attribute).name, (first as Attribute).value);
+	} else if (typeof first === 'string') {
+		callback(element, first, second);
+	}
+}
+
+function updateValues(
+	element: HTMLOrSVGElement,
+	values: Attribute[] | Record<string, unknown>,
+	callback?: (element: HTMLOrSVGElement, name: string, value: unknown) => void,
+): void {
+	const isArray = Array.isArray(values);
+	const entries = Object.entries(values);
 	const {length} = entries;
 
 	for (let index = 0; index < length; index += 1) {
 		const entry = entries[index];
 
 		if (isArray) {
-			setAttributeValue(
+			(callback ?? updateAttribute)(
 				element,
 				(entry[1] as Attribute).name,
 				(entry[1] as Attribute).value,
 			);
 		} else {
-			setAttributeValue(element, entry[0], entry[1]);
+			(callback ?? updateAttribute)(element, entry[0], entry[1]);
 		}
 	}
 }

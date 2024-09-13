@@ -124,10 +124,7 @@ function isDisabled(item: ElementWithTabIndex): boolean {
 		return true;
 	}
 
-	return (
-		((item.element as HTMLInputElement).disabled ?? false) ||
-		item.element.getAttribute('aria-disabled') === 'true'
-	);
+	return (item.element as HTMLInputElement).disabled ?? false;
 }
 
 function isDisabledFromFieldset(element: Element): boolean {

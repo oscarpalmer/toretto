@@ -1,11 +1,12 @@
 import {isNullableOrWhitespace, isPlainObject} from '@oscarpalmer/atoms/is';
 import type {PlainObject} from '@oscarpalmer/atoms/models';
+import type {HTMLOrSVGElement} from '../models';
 
 export function setElementValues(
-	element: HTMLElement,
+	element: HTMLOrSVGElement,
 	first: PlainObject | string,
 	second: unknown,
-	callback: (element: HTMLElement, key: string, value: unknown) => void,
+	callback: (element: HTMLOrSVGElement, key: string, value: unknown) => void,
 ): void {
 	if (isPlainObject(first)) {
 		const entries = Object.entries(first);
@@ -22,7 +23,7 @@ export function setElementValues(
 }
 
 export function updateElementValue(
-	element: HTMLElement,
+	element: HTMLOrSVGElement,
 	key: string,
 	value: unknown,
 	set: (key: string, value: string) => void,

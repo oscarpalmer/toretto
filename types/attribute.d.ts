@@ -1,4 +1,4 @@
-import type { Attribute } from './models';
+import type { Attribute, HTMLOrSVGElement, Property } from './models';
 /**
  * List of boolean attributes
  */
@@ -23,16 +23,32 @@ export declare function isInvalidBooleanAttribute(attribute: Attribute<string>):
 /**
  * Set an attribute on an element  _(or remove it, if the value is `null` or `undefined`)_
  */
-export declare function setAttribute(element: Element, attribute: Attribute): void;
+export declare function setAttribute(element: HTMLOrSVGElement, attribute: Attribute): void;
 /**
  * Set an attribute on an element  _(or remove it, if the value is `null` or `undefined`)_
  */
-export declare function setAttribute(element: Element, name: string, value?: unknown): void;
+export declare function setAttribute(element: HTMLOrSVGElement, name: string, value?: unknown): void;
 /**
- * Set one or more attributes on an element  _(or remove them, if their value is `null` or `undefined`)_
+ * Set one or more attributes on an element _(or remove them, if their value is `null` or `undefined`)_
  */
-export declare function setAttributes(element: Element, attributes: Attribute[]): void;
+export declare function setAttributes(element: HTMLOrSVGElement, attributes: Attribute[]): void;
 /**
- * Set one or more attributes on an element  _(or remove them, if their value is `null` or `undefined`)_
+ * Set one or more attributes on an element _(or remove them, if their value is `null` or `undefined`)_
  */
-export declare function setAttributes(element: Element, attributes: Record<string, unknown>): void;
+export declare function setAttributes(element: HTMLOrSVGElement, attributes: Record<string, unknown>): void;
+/**
+ * Set a property on an element _(or remove it, if the value is not an empty string or does not match the name)_
+ */
+export declare function setProperty(element: HTMLOrSVGElement, property: Property): void;
+/**
+ * Set a property on an element _(or remove it, if the value is not an empty string or does not match the name)_
+ */
+export declare function setProperty(element: HTMLOrSVGElement, name: string, value: boolean | string): void;
+/**
+ * Set one or more properties on an element _(or remove them, if their value is not an empty string or does not match the name)_
+ */
+export declare function setProperties(element: HTMLOrSVGElement, properties: Property[]): void;
+/**
+ * Set one or more properties on an element _(or remove them, if their value is not an empty string or does not match the name)_
+ */
+export declare function setProperties(element: HTMLOrSVGElement, properties: Record<string, unknown>): void;

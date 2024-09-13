@@ -1,8 +1,4 @@
-import type { EventPosition } from './models';
-/**
- * Remove the current event listener
- */
-type RemoveEventListener = () => void;
+import type { EventPosition, RemovableEventListener } from './models';
 /**
  * Dispatch an event for a target
  */
@@ -18,13 +14,12 @@ export declare function getPosition(event: MouseEvent | TouchEvent): EventPositi
 /**
  * Remove an event listener
  */
-export declare function off(target: EventTarget, type: string, listener: EventListener, options?: boolean | EventListenerOptions): void;
+export declare function off(target: EventTarget, type: string, listener: EventListener, options?: EventListenerOptions): void;
 /**
  * Add an event listener
  */
-export declare function on<Type extends keyof HTMLElementEventMap>(target: EventTarget, type: Type, listener: (event: HTMLElementEventMap[Type]) => void, options?: boolean | AddEventListenerOptions): RemoveEventListener;
+export declare function on<Type extends keyof HTMLElementEventMap>(target: EventTarget, type: Type, listener: (event: HTMLElementEventMap[Type]) => void, options?: AddEventListenerOptions): RemovableEventListener;
 /**
  * Add an event listener
  */
-export declare function on(target: EventTarget, type: string, listener: EventListener, options?: boolean | AddEventListenerOptions): RemoveEventListener;
-export {};
+export declare function on(target: EventTarget, type: string, listener: EventListener, options?: AddEventListenerOptions): RemovableEventListener;

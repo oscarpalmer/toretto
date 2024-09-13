@@ -1,11 +1,11 @@
 import {setElementValues, updateElementValue} from './internal/element-value';
-import type {TextDirection} from './models';
+import type {HTMLOrSVGElement, TextDirection} from './models';
 
 /**
  * Get a style from an element
  */
 export function getStyle(
-	element: HTMLElement,
+	element: HTMLOrSVGElement,
 	property: keyof CSSStyleDeclaration,
 ): string {
 	return element.style[property as never];
@@ -15,7 +15,7 @@ export function getStyle(
  * Get styles from an element
  */
 export function getStyles<Property extends keyof CSSStyleDeclaration>(
-	element: HTMLElement,
+	element: HTMLOrSVGElement,
 	properties: Property[],
 ): Pick<CSSStyleDeclaration, Property> {
 	const styles = {} as Pick<CSSStyleDeclaration, Property>;
@@ -49,7 +49,7 @@ export function getTextDirection(element: Element): TextDirection {
  * Set a style on an element
  */
 export function setStyle(
-	element: HTMLElement,
+	element: HTMLOrSVGElement,
 	property: keyof CSSStyleDeclaration,
 	value?: string,
 ): void {
@@ -60,14 +60,14 @@ export function setStyle(
  * Set styles on an element
  */
 export function setStyles(
-	element: HTMLElement,
+	element: HTMLOrSVGElement,
 	styles: Partial<CSSStyleDeclaration>,
 ): void {
-	setElementValues(element, styles as string, null, updateStyleProperty);
+	setElementValues(element, styles as never, null, updateStyleProperty);
 }
 
 function updateStyleProperty(
-	element: HTMLElement,
+	element: HTMLOrSVGElement,
 	key: string,
 	value: unknown,
 ): void {
@@ -75,10 +75,10 @@ function updateStyleProperty(
 		element,
 		key,
 		value,
-		function (this: HTMLElement, property: string, value: string) {
+		function (this: HTMLOrSVGElement, property: string, value: string) {
 			this.style[property as never] = value;
 		},
-		function (this: HTMLElement, property: string) {
+		function (this: HTMLOrSVGElement, property: string) {
 			this.style[property as never] = '';
 		},
 		false,

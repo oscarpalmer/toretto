@@ -1,5 +1,9 @@
 import type { Selector } from './models';
 /**
+ * Get the distance between two elements _(i.e., the amount of nodes of between them)_
+ */
+export declare function getDistanceBetweenElements(origin: Element, target: Element): number;
+/**
  * - Find the closest ancestor element that matches the selector
  * - Matches may be found by a query string or a callback
  * - If no match is found, `null` is returned

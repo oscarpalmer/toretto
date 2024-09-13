@@ -113,16 +113,14 @@ test('on & off', () => {
 		values[1] += 1;
 	}
 
-	function onTwo() {
-		values[2] += 1;
-	}
-
 	const target = document.createElement('div');
 
 	on(target, 'click', onOnce, {once: true});
-	on(target, 'click', onOne, true);
+	on(target, 'click', onOne);
 
-	const remove = on(target, 'click', onTwo);
+	const remove = on(target, 'click', () => {
+		values[2] += 1;
+	});
 
 	for (let index = 0; index < 10; index += 1) {
 		dispatch(target, 'click');
@@ -130,7 +128,7 @@ test('on & off', () => {
 
 	expect(values).toEqual([1, 10, 10]);
 
-	off(target, 'click', onOne, true);
+	off(target, 'click', onOne);
 	remove();
 
 	for (let index = 0; index < 10; index += 1) {
