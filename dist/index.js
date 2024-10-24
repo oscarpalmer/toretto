@@ -1,100 +1,35 @@
 // node_modules/@oscarpalmer/atoms/dist/js/string/index.mjs
-function getString(value2) {
-  if (typeof value2 === "string") {
-    return value2;
+function getString(value) {
+  if (typeof value === "string") {
+    return value;
   }
-  if (typeof value2 !== "object" || value2 == null) {
-    return String(value2);
+  if (typeof value !== "object" || value == null) {
+    return String(value);
   }
-  const valueOff = value2.valueOf?.() ?? value2;
+  const valueOff = value.valueOf?.() ?? value;
   const asString = valueOff?.toString?.() ?? String(valueOff);
-  return asString.startsWith("[object ") ? JSON.stringify(value2) : asString;
+  return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
 }
-function parse(value2, reviver) {
+function parse(value, reviver) {
   try {
-    return JSON.parse(value2, reviver);
+    return JSON.parse(value, reviver);
   } catch {
   }
 }
+
 // node_modules/@oscarpalmer/atoms/dist/js/is.mjs
-function isNullableOrWhitespace(value2) {
-  return value2 == null || /^\s*$/.test(getString(value2));
+function isNullableOrWhitespace(value) {
+  return value == null || /^\s*$/.test(getString(value));
 }
-function isPlainObject(value2) {
-  if (typeof value2 !== "object" || value2 === null) {
+function isPlainObject(value) {
+  if (typeof value !== "object" || value === null) {
     return false;
   }
-  const prototype = Object.getPrototypeOf(value2);
-  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value2) && !(Symbol.iterator in value2);
+  const prototype = Object.getPrototypeOf(value);
+  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
 }
 
 // src/attribute.ts
-function isBadAttribute(attribute) {
-  return onPrefix.test(attribute.name) || sourcePrefix.test(attribute.name) && valuePrefix.test(attribute.value);
-}
-function isBooleanAttribute(name) {
-  return booleanAttributes.includes(name.toLowerCase());
-}
-function isEmptyNonBooleanAttribute(attribute) {
-  return !booleanAttributes.includes(attribute.name) && attribute.value.trim().length === 0;
-}
-function isInvalidBooleanAttribute(attribute) {
-  if (!booleanAttributes.includes(attribute.name)) {
-    return true;
-  }
-  const normalised = attribute.value.toLowerCase().trim();
-  return !(normalised.length === 0 || normalised === attribute.name || attribute.name === "hidden" && normalised === "until-found");
-}
-function setAttribute(element, first, second) {
-  updateValue(element, first, second, updateAttribute);
-}
-function setAttributes(element, attributes) {
-  updateValues(element, attributes);
-}
-function setProperty(element, first, second) {
-  updateValue(element, first, second, updateProperty);
-}
-function setProperties(element, properties) {
-  updateValues(element, properties, updateProperty);
-}
-function updateAttribute(element, name, value2) {
-  const normalised = name.toLowerCase();
-  if (booleanAttributes.includes(normalised)) {
-    updateProperty(element, name, value2, false);
-  } else if (value2 == null) {
-    element.removeAttribute(name);
-  } else {
-    element.setAttribute(name, typeof value2 === "string" ? value2 : getString(value2));
-  }
-}
-function updateProperty(element, name, value2, validate) {
-  const actual = validate ?? true ? name.toLowerCase() : name;
-  if (actual === "hidden") {
-    element.hidden = typeof value2 === "string" && value2.toLowerCase() === "until-found" ? "until-found" : value2 === "" || value2 === true;
-  } else {
-    element[actual] = value2 === "" || typeof value2 === "string" && value2.toLowerCase() === actual || value2 === true;
-  }
-}
-function updateValue(element, first, second, callback) {
-  if (isPlainObject(first) && typeof first?.name === "string") {
-    callback(element, first.name, first.value);
-  } else if (typeof first === "string") {
-    callback(element, first, second);
-  }
-}
-function updateValues(element, values, callback) {
-  const isArray = Array.isArray(values);
-  const entries = Object.entries(values);
-  const { length } = entries;
-  for (let index = 0;index < length; index += 1) {
-    const entry = entries[index];
-    if (isArray) {
-      (callback ?? updateAttribute)(element, entry[1].name, entry[1].value);
-    } else {
-      (callback ?? updateAttribute)(element, entry[0], entry[1]);
-    }
-  }
-}
 var booleanAttributes = Object.freeze([
   "async",
   "autofocus",
@@ -124,24 +59,90 @@ var booleanAttributes = Object.freeze([
 var onPrefix = /^on/i;
 var sourcePrefix = /^(href|src|xlink:href)$/i;
 var valuePrefix = /(data:text\/html|javascript:)/i;
+function isBadAttribute(attribute) {
+  return onPrefix.test(attribute.name) || sourcePrefix.test(attribute.name) && valuePrefix.test(attribute.value);
+}
+function isBooleanAttribute(name) {
+  return booleanAttributes.includes(name.toLowerCase());
+}
+function isEmptyNonBooleanAttribute(attribute) {
+  return !booleanAttributes.includes(attribute.name) && attribute.value.trim().length === 0;
+}
+function isInvalidBooleanAttribute(attribute) {
+  if (!booleanAttributes.includes(attribute.name)) {
+    return true;
+  }
+  const normalised = attribute.value.toLowerCase().trim();
+  return !(normalised.length === 0 || normalised === attribute.name || attribute.name === "hidden" && normalised === "until-found");
+}
+function setAttribute(element, first, second) {
+  updateValue(element, first, second, updateAttribute);
+}
+function setAttributes(element, attributes) {
+  updateValues(element, attributes);
+}
+function setProperty(element, first, second) {
+  updateValue(element, first, second, updateProperty);
+}
+function setProperties(element, properties) {
+  updateValues(element, properties, updateProperty);
+}
+function updateAttribute(element, name, value) {
+  const normalised = name.toLowerCase();
+  if (booleanAttributes.includes(normalised)) {
+    updateProperty(element, name, value, false);
+  } else if (value == null) {
+    element.removeAttribute(name);
+  } else {
+    element.setAttribute(name, typeof value === "string" ? value : getString(value));
+  }
+}
+function updateProperty(element, name, value, validate) {
+  const actual = validate ?? true ? name.toLowerCase() : name;
+  if (actual === "hidden") {
+    element.hidden = typeof value === "string" && value.toLowerCase() === "until-found" ? "until-found" : value === "" || value === true;
+  } else {
+    element[actual] = value === "" || typeof value === "string" && value.toLowerCase() === actual || value === true;
+  }
+}
+function updateValue(element, first, second, callback) {
+  if (isPlainObject(first) && typeof first?.name === "string") {
+    callback(element, first.name, first.value);
+  } else if (typeof first === "string") {
+    callback(element, first, second);
+  }
+}
+function updateValues(element, values, callback) {
+  const isArray = Array.isArray(values);
+  const entries = Object.entries(values);
+  const { length } = entries;
+  for (let index = 0;index < length; index += 1) {
+    const entry = entries[index];
+    if (isArray) {
+      (callback ?? updateAttribute)(element, entry[1].name, entry[1].value);
+    } else {
+      (callback ?? updateAttribute)(element, entry[0], entry[1]);
+    }
+  }
+}
 // src/internal/element-value.ts
 function setElementValues(element, first, second, callback) {
   if (isPlainObject(first)) {
     const entries = Object.entries(first);
     const { length } = entries;
     for (let index = 0;index < length; index += 1) {
-      const [key, value2] = entries[index];
-      callback(element, key, value2);
+      const [key, value] = entries[index];
+      callback(element, key, value);
     }
   } else if (first != null) {
     callback(element, first, second);
   }
 }
-function updateElementValue(element, key, value2, set3, remove, json) {
-  if (isNullableOrWhitespace(value2)) {
+function updateElementValue(element, key, value, set2, remove, json) {
+  if (isNullableOrWhitespace(value)) {
     remove.call(element, key);
   } else {
-    set3.call(element, key, json ? JSON.stringify(value2) : String(value2));
+    set2.call(element, key, json ? JSON.stringify(value) : String(value));
   }
 }
 
@@ -159,20 +160,20 @@ function getData(element, keys) {
   return data;
 }
 function getDataValue(element, key) {
-  const value2 = element.dataset[key];
-  if (value2 != null) {
-    return parse(value2);
+  const value = element.dataset[key];
+  if (value != null) {
+    return parse(value);
   }
 }
 function setData(element, first, second) {
   setElementValues(element, first, second, updateDataAttribute);
 }
-function updateDataAttribute(element, key, value2) {
-  updateElementValue(element, `data-${key}`, value2, element.setAttribute, element.removeAttribute, true);
+function updateDataAttribute(element, key, value) {
+  updateElementValue(element, `data-${key}`, value, element.setAttribute, element.removeAttribute, true);
 }
 // src/internal/get-value.ts
-function getBoolean(value2, defaultValue) {
-  return typeof value2 === "boolean" ? value2 : defaultValue ?? false;
+function getBoolean(value, defaultValue) {
+  return typeof value === "boolean" ? value : defaultValue ?? false;
 }
 
 // src/event.ts
@@ -197,7 +198,8 @@ function createEventOptions(options) {
   return {
     capture: getBoolean(options?.capture),
     once: getBoolean(options?.once),
-    passive: getBoolean(options?.passive, true)
+    passive: getBoolean(options?.passive, true),
+    signal: options?.signal
   };
 }
 function dispatch(target, type, options) {
@@ -275,16 +277,16 @@ function findElementOrElements(selector, context, single) {
   if (typeof selector === "string") {
     const { length: length2 } = contexts;
     for (let index = 0;index < length2; index += 1) {
-      const value2 = callback.call(contexts[index], selector);
+      const value = callback.call(contexts[index], selector);
       if (single) {
-        if (value2 == null) {
+        if (value == null) {
           continue;
         }
-        return value2;
+        return value;
       }
-      result.push(...Array.from(value2));
+      result.push(...Array.from(value));
     }
-    return single ? undefined : result.filter((value2, index, array2) => array2.indexOf(value2) === index);
+    return single ? undefined : result.filter((value, index, array) => array.indexOf(value) === index);
   }
   const nodes = Array.isArray(selector) ? selector : selector instanceof NodeList ? Array.from(selector) : [selector];
   const { length } = nodes;
@@ -370,6 +372,25 @@ function traverse(from, to) {
   return -1e6;
 }
 // src/focusable.ts
+var focusableFilters = [isDisabled, isInert, isHidden, isSummarised];
+var selector = [
+  '[contenteditable]:not([contenteditable="false"])',
+  "[tabindex]:not(slot)",
+  "a[href]",
+  "audio[controls]",
+  "button",
+  "details",
+  "details > summary:first-of-type",
+  "input",
+  "select",
+  "textarea",
+  "video[controls]"
+].map((selector2) => `${selector2}:not([inert])`).join(",");
+var tabbableFilters = [
+  isNotTabbable,
+  isNotTabbableRadio,
+  ...focusableFilters
+];
 function getFocusable(parent) {
   return getValidElements(parent, focusableFilters, false);
 }
@@ -496,39 +517,20 @@ function isValidElement(element, filters, tabbable) {
   const item = getItem(element, tabbable);
   return !filters.some((filter2) => filter2(item));
 }
-var focusableFilters = [isDisabled, isInert, isHidden, isSummarised];
-var selector = [
-  '[contenteditable]:not([contenteditable="false"])',
-  "[tabindex]:not(slot)",
-  "a[href]",
-  "audio[controls]",
-  "button",
-  "details",
-  "details > summary:first-of-type",
-  "input",
-  "select",
-  "textarea",
-  "video[controls]"
-].map((selector2) => `${selector2}:not([inert])`).join(",");
-var tabbableFilters = [
-  isNotTabbable,
-  isNotTabbableRadio,
-  ...focusableFilters
-];
 // src/sanitise.ts
-function sanitise(value2, options) {
-  return sanitiseNodes(Array.isArray(value2) ? value2 : [value2], {
+function sanitise(value, options) {
+  return sanitiseNodes(Array.isArray(value) ? value : [value], {
     sanitiseBooleanAttributes: options?.sanitiseBooleanAttributes ?? true
   });
 }
 function sanitiseAttributes(element, attributes, options) {
   const { length } = attributes;
   for (let index = 0;index < length; index += 1) {
-    const attribute2 = attributes[index];
-    if (isBadAttribute(attribute2) || isEmptyNonBooleanAttribute(attribute2)) {
-      element.removeAttribute(attribute2.name);
-    } else if (options.sanitiseBooleanAttributes && isInvalidBooleanAttribute(attribute2)) {
-      element.setAttribute(attribute2.name, "");
+    const attribute = attributes[index];
+    if (isBadAttribute(attribute) || isEmptyNonBooleanAttribute(attribute)) {
+      element.removeAttribute(attribute.name);
+    } else if (options.sanitiseBooleanAttributes && isInvalidBooleanAttribute(attribute)) {
+      element.setAttribute(attribute.name, "");
     }
   }
 }
@@ -545,28 +547,29 @@ function sanitiseNodes(nodes, options) {
 }
 
 // src/html.ts
+var templates = {};
 function createTemplate(html) {
   const template2 = document.createElement("template");
   template2.innerHTML = html;
   templates[html] = template2;
   return template2;
 }
-function getTemplate(value2) {
-  if (value2.trim().length === 0) {
+function getTemplate(value) {
+  if (value.trim().length === 0) {
     return;
   }
   let template2;
-  if (/^[\w-]+$/.test(value2)) {
-    template2 = document.querySelector(`#${value2}`);
+  if (/^[\w-]+$/.test(value)) {
+    template2 = document.querySelector(`#${value}`);
   }
   if (template2 instanceof HTMLTemplateElement) {
     return template2;
   }
-  return templates[value2] ?? createTemplate(value2);
+  return templates[value] ?? createTemplate(value);
 }
-function html(value2, sanitisation) {
+function html(value, sanitisation) {
   const options = sanitisation == null || sanitisation === true ? {} : isPlainObject(sanitisation) ? { ...sanitisation } : null;
-  const template2 = value2 instanceof HTMLTemplateElement ? value2 : typeof value2 === "string" ? getTemplate(value2) : null;
+  const template2 = value instanceof HTMLTemplateElement ? value : typeof value === "string" ? getTemplate(value) : null;
   if (template2 == null) {
     return [];
   }
@@ -579,13 +582,12 @@ function html(value2, sanitisation) {
   cloned.normalize();
   return options != null ? sanitise([...cloned.childNodes], options) : [...cloned.childNodes];
 }
-var templates = {};
 // src/is.ts
-function isChildNode(value2, ignoreDocumentType) {
-  return value2 instanceof CharacterData || (value2 instanceof DocumentType ? ignoreDocumentType !== true : false) || value2 instanceof Element;
+function isChildNode(value, ignoreDocumentType) {
+  return value instanceof CharacterData || (value instanceof DocumentType ? ignoreDocumentType !== true : false) || value instanceof Element;
 }
-function isHTMLOrSVGElement(value2) {
-  return value2 instanceof HTMLElement || value2 instanceof SVGElement;
+function isHTMLOrSVGElement(value) {
+  return value instanceof HTMLElement || value instanceof SVGElement;
 }
 function isInDocument(node, document2) {
   return document2 == null ? node.ownerDocument?.contains(node) ?? false : node.ownerDocument === document2 && document2.contains(node);
@@ -610,15 +612,15 @@ function getTextDirection(element) {
   }
   return getComputedStyle?.(element)?.direction === "rtl" ? "rtl" : "ltr";
 }
-function setStyle(element, property, value2) {
-  setElementValues(element, property, value2, updateStyleProperty);
+function setStyle(element, property, value) {
+  setElementValues(element, property, value, updateStyleProperty);
 }
 function setStyles(element, styles) {
   setElementValues(element, styles, null, updateStyleProperty);
 }
-function updateStyleProperty(element, key, value2) {
-  updateElementValue(element, key, value2, function(property, value3) {
-    this.style[property] = value3;
+function updateStyleProperty(element, key, value) {
+  updateElementValue(element, key, value, function(property, value2) {
+    this.style[property] = value2;
   }, function(property) {
     this.style[property] = "";
   }, false);

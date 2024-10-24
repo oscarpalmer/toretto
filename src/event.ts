@@ -30,6 +30,7 @@ function createEventOptions(
 		capture: getBoolean(options?.capture),
 		once: getBoolean(options?.once),
 		passive: getBoolean(options?.passive, true),
+		signal: options?.signal,
 	};
 }
 
