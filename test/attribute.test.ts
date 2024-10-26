@@ -1,4 +1,4 @@
-import {expect, test} from 'bun:test';
+import {expect, test} from 'vitest';
 import * as Attribute from '../src/attribute';
 
 const nonBooleanAttributes = [
@@ -261,7 +261,7 @@ test('setAttribute', () => {
 
 	expect(element.hidden).toBe(true);
 	expect((element as any).multiple).toBe(true);
-	expect((element as any).notreal).toBeNil();
+	expect((element as any).notreal == null).toBe(true);
 	expect((element as any).readonly).toBe(true);
 	expect((element as any).selected).toBe(false);
 
@@ -278,4 +278,32 @@ test('setAttribute', () => {
 
 	expect(element.hidden).toBe(false);
 	expect((element as any).readonly).toBe(false);
+});
+
+test('setProperty', () => {
+	const element = document.createElement('option');
+
+	Attribute.setProperty(element, 'hidden', true);
+
+	expect(element.hidden).toBe(true);
+
+	Attribute.setProperty(element, 'hidden', false);
+
+	expect(element.hidden).toBe(false);
+
+	Attribute.setProperty(element, 'hidden', 'abc123');
+
+	expect(element.hidden).toBe(false);
+
+	Attribute.setProperties(element, {
+		selected: true,
+	});
+
+	expect(element.selected).toBe(true);
+
+	Attribute.setProperties(element, {
+		selected: false,
+	});
+
+	expect(element.selected).toBe(false);
 });

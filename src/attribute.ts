@@ -1,7 +1,7 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
 import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {getString} from '@oscarpalmer/atoms/string';
-import type {Attribute, HTMLOrSVGElement, Property} from './models';
+import type {Attribute, HTMLOrSVGElement, Property} from '~/models';
 
 /**
  * List of boolean attributes
@@ -79,11 +79,7 @@ export function isInvalidBooleanAttribute(
 
 	const normalised = attribute.value.toLowerCase().trim();
 
-	return !(
-		normalised.length === 0 ||
-		normalised === attribute.name ||
-		(attribute.name === 'hidden' && normalised === 'until-found')
-	);
+	return !(normalised.length === 0 || normalised === attribute.name);
 }
 
 /**
@@ -207,13 +203,10 @@ function updateProperty(
 	value: unknown,
 	validate?: boolean,
 ): void {
-	const actual = validate ?? true ? name.toLowerCase() : name;
+	const actual = (validate ?? true) ? name.toLowerCase() : name;
 
 	if (actual === 'hidden') {
-		(element as unknown as PlainObject).hidden =
-			typeof value === 'string' && value.toLowerCase() === 'until-found'
-				? 'until-found'
-				: value === '' || value === true;
+		(element as unknown as PlainObject).hidden = value === '' || value === true;
 	} else {
 		(element as unknown as PlainObject)[actual] =
 			value === '' ||
@@ -230,8 +223,8 @@ function updateValue(
 ): void {
 	if (isPlainObject(first) && typeof (first as Attribute)?.name === 'string') {
 		callback(element, (first as Attribute).name, (first as Attribute).value);
-	} else if (typeof first === 'string') {
-		callback(element, first, second);
+	} else {
+		callback(element, first as string, second);
 	}
 }
 

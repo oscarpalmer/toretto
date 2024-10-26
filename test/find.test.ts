@@ -1,4 +1,4 @@
-import {afterAll, expect, test} from 'bun:test';
+import {afterAll, expect, test} from 'vitest';
 import * as Find from '../src/find';
 
 document.body.innerHTML = `<div>
@@ -88,7 +88,6 @@ test('findElements', () => {
 
 	expect(
 		Find.findElements(
-			// @ts-expect-error Testing invalid input
 			[123, 'a', document.body, ...origin, ...children],
 			document,
 		).length,

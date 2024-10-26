@@ -1,5 +1,5 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import {type SanitiseOptions, sanitise} from './sanitise';
+import {type SanitiseOptions, sanitise} from '~/sanitise';
 
 const templates: Record<string, HTMLTemplateElement> = {};
 
@@ -14,7 +14,7 @@ function createTemplate(html: string): HTMLTemplateElement {
 }
 
 function getTemplate(value: string): HTMLTemplateElement | undefined {
-	if (value.trim().length === 0) {
+	if (typeof value !== 'string' || value.trim().length === 0) {
 		return;
 	}
 
@@ -64,11 +64,7 @@ export function html(
 				: null;
 
 	const template =
-		value instanceof HTMLTemplateElement
-			? value
-			: typeof value === 'string'
-				? getTemplate(value)
-				: null;
+		value instanceof HTMLTemplateElement ? value : getTemplate(value);
 
 	if (template == null) {
 		return [];

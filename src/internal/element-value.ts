@@ -1,6 +1,6 @@
 import {isNullableOrWhitespace, isPlainObject} from '@oscarpalmer/atoms/is';
 import type {PlainObject} from '@oscarpalmer/atoms/models';
-import type {HTMLOrSVGElement} from '../models';
+import type {HTMLOrSVGElement} from '~/models';
 
 export function setElementValues(
 	element: HTMLOrSVGElement,
@@ -17,7 +17,7 @@ export function setElementValues(
 
 			callback(element, key, value);
 		}
-	} else if (first != null) {
+	} else if (typeof first === 'string') {
 		callback(element, first, second);
 	}
 }

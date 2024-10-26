@@ -1,4 +1,4 @@
-import type {HTMLOrSVGElement} from './models';
+import type {HTMLOrSVGElement} from '~/models';
 
 /**
  * Is the value a child node?
@@ -44,6 +44,8 @@ export function isInDocument(node: Node, document: Document): boolean;
 
 export function isInDocument(node: Node, document?: Document): boolean {
 	return document == null
-		? node.ownerDocument?.contains(node) ?? false
-		: node.ownerDocument === document && document.contains(node);
+		? (node.ownerDocument?.contains(node) ?? true)
+		: node.ownerDocument == null
+			? node === document
+			: node.ownerDocument === document && document.contains(node);
 }

@@ -2,7 +2,7 @@ import {
 	isBadAttribute,
 	isEmptyNonBooleanAttribute,
 	isInvalidBooleanAttribute,
-} from './attribute';
+} from '~/attribute';
 
 export type SanitiseOptions = {
 	/**

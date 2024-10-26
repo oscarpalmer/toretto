@@ -1,6 +1,6 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import {getBoolean} from './internal/get-value';
-import type {EventPosition, RemovableEventListener} from './models';
+import {getBoolean} from '~/internal/get-value';
+import type {EventPosition, RemovableEventListener} from '~/models';
 
 function createDispatchOptions(options: EventInit): EventInit {
 	return {
@@ -13,14 +13,17 @@ function createDispatchOptions(options: EventInit): EventInit {
 function createEvent(type: string, options?: CustomEventInit): Event {
 	const hasOptions = isPlainObject(options);
 
-	if (hasOptions && 'detail' in options) {
+	if (hasOptions && 'detail' in (options as CustomEventInit)) {
 		return new CustomEvent(type, {
-			...createDispatchOptions(options),
+			...createDispatchOptions(options as CustomEventInit),
 			detail: options?.detail,
 		});
 	}
 
-	return new Event(type, createDispatchOptions(hasOptions ? options : {}));
+	return new Event(
+		type,
+		createDispatchOptions(hasOptions ? (options as CustomEventInit) : {}),
+	);
 }
 
 function createEventOptions(

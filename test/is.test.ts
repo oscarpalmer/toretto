@@ -1,4 +1,4 @@
-import {expect, test} from 'bun:test';
+import {expect, test} from 'vitest';
 import * as Is from '../src/is';
 
 const values = [
@@ -37,28 +37,32 @@ test('isHTMLOrSVGElement', () => {
 	}
 });
 
-test('isInDocument', done => {
-	const nodes = values.slice(7) as Node[];
-	const {length} = nodes;
+test('isInDocument', () =>
+	new Promise<void>(done => {
+		const nodes = values.slice(7) as Node[];
+		const {length} = nodes;
 
-	for (let index = 0; index < length; index += 1) {
-		const node = nodes[index];
-
-		expect(Is.isInDocument(node)).toBe(false);
-
-		document.append(nodes[index]);
-	}
-
-	setTimeout(() => {
 		for (let index = 0; index < length; index += 1) {
 			const node = nodes[index];
 
-			expect(Is.isInDocument(node)).toBe(index >= 1);
-			expect(Is.isInDocument(node, document)).toBe(index >= 1);
+			expect(Is.isInDocument(node)).toBe(false);
 
-			node.parentNode?.removeChild(node);
+			document.append(nodes[index]);
 		}
 
-		done();
-	}, 125);
-});
+		expect(Is.isInDocument(document)).toBe(true);
+		expect(Is.isInDocument(document, document)).toBe(true);
+
+		setTimeout(() => {
+			for (let index = 0; index < length; index += 1) {
+				const node = nodes[index];
+
+				expect(Is.isInDocument(node)).toBe(index >= 1);
+				expect(Is.isInDocument(node, document)).toBe(index >= 1);
+
+				node.parentNode?.removeChild(node);
+			}
+
+			done();
+		}, 125);
+	}));

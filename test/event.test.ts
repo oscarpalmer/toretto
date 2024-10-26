@@ -1,4 +1,4 @@
-import {expect, test} from 'bun:test';
+import {expect, test} from 'vitest';
 import {dispatch, getPosition, off, on} from '../src/event';
 
 test('dispatch', () => {
@@ -103,7 +103,8 @@ test('getPosition', () => {
 });
 
 test('on & off', () => {
-	const values = [0, 0, 0];
+	const abortController = new AbortController();
+	const values = [0, 0, 0, 0];
 
 	function onOnce() {
 		values[0] += 1;
@@ -118,6 +119,17 @@ test('on & off', () => {
 	on(target, 'click', onOnce, {once: true});
 	on(target, 'click', onOne);
 
+	on(
+		target,
+		'click',
+		() => {
+			if (!abortController.signal.aborted) {
+				values[3] += 1;
+			}
+		},
+		{signal: abortController.signal},
+	);
+
 	const remove = on(target, 'click', () => {
 		values[2] += 1;
 	});
@@ -126,7 +138,9 @@ test('on & off', () => {
 		dispatch(target, 'click');
 	}
 
-	expect(values).toEqual([1, 10, 10]);
+	expect(values).toEqual([1, 10, 10, 10]);
+
+	abortController.abort();
 
 	off(target, 'click', onOne);
 	remove();
@@ -135,5 +149,5 @@ test('on & off', () => {
 		dispatch(target, 'click');
 	}
 
-	expect(values).toEqual([1, 10, 10]);
+	expect(values).toEqual([1, 10, 10, 10]);
 });

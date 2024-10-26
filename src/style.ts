@@ -1,5 +1,5 @@
-import {setElementValues, updateElementValue} from './internal/element-value';
-import type {HTMLOrSVGElement, TextDirection} from './models';
+import {setElementValues, updateElementValue} from '~/internal/element-value';
+import type {HTMLOrSVGElement, TextDirection} from '~/models';
 
 /**
  * Get a style from an element

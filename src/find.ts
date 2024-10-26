@@ -1,4 +1,4 @@
-import type {Selector} from './models';
+import type {Selector} from '~/models';
 
 /**
  * Get the distance between two elements _(i.e., the amount of nodes of between them)_
@@ -14,10 +14,11 @@ export function getDistanceBetweenElements(
 	const comparison = origin.compareDocumentPosition(target);
 	const children = [...(origin.parentElement?.children ?? [])];
 
-	switch (true) {
-		case children.includes(target):
-			return Math.abs(children.indexOf(origin) - children.indexOf(target));
+	if (children.includes(target)) {
+		return Math.abs(children.indexOf(origin) - children.indexOf(target));
+	}
 
+	switch (true) {
 		case !!(comparison & 2 || comparison & 8):
 			// Target element is before or holds the origin element
 			return traverse(origin, target);
@@ -27,7 +28,7 @@ export function getDistanceBetweenElements(
 			return traverse(target, origin);
 
 		default:
-			return -1;
+			return Number.NaN;
 	}
 }
 
@@ -288,7 +289,7 @@ function traverse(from: Element, to: Element): number {
 		parent = parent.parentElement;
 	}
 
-	return -1_000_000;
+	return Number.NaN;
 }
 
 export {findElement as $, findElements as $$};

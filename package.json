@@ -1,120 +1,152 @@
 {
 	"author": {
 		"name": "Oscar Palmér",
-		"url": "https://osacrpalmer.se"
+		"url": "https://oscarpalmer.se"
 	},
 	"dependencies": {
-		"@oscarpalmer/atoms": "0.70.1"
+		"@oscarpalmer/atoms": "^0.77"
 	},
 	"description": "A collection of badass DOM utilities.",
 	"devDependencies": {
-		"@biomejs/biome": "^1.9.4",
-		"@happy-dom/global-registrator": "^15.7.4",
-		"@types/bun": "^1.1.12",
-		"bun": "^1.1.33",
-		"dts-bundle-generator": "^9.5.1",
-		"type-fest": "^4.26.1",
-		"typescript": "^5.6.3"
+		"@biomejs/biome": "^1.9",
+		"@types/node": "^22.7",
+		"@vitest/coverage-istanbul": "^2.1",
+		"dts-bundle-generator": "^9.5",
+		"glob": "^11",
+		"happy-dom": "^15.7",
+		"typescript": "^5.6",
+		"vite": "^5.4",
+		"vitest": "^2.1"
 	},
 	"exports": {
 		".": {
-			"bun": "./src/index.ts",
 			"import": {
 				"types": "./types/index.d.ts",
-				"default": "./dist/index.mjs"
+				"default": "./dist/index.js"
 			},
 			"require": {
 				"types": "./types/index.d.cts",
-				"default": "./dist/index.js"
+				"default": "./dist/index.cjs"
 			}
 		},
 		"./attribute": {
-			"types": "./types/attribute.d.ts",
-			"bun": "./src/attribute.ts",
-			"import": "./dist/attribute.mjs",
-			"require": "./dist/attribute.js"
+			"import": {
+				"types": "./types/attribute.d.ts",
+				"default": "./dist/attribute.js"
+			},
+			"require": {
+				"types": "./types/attribute.d.cts",
+				"default": "./dist/attribute.cjs"
+			}
 		},
 		"./data": {
-			"types": "./types/data.d.ts",
-			"bun": "./src/data.ts",
-			"import": "./dist/data.mjs",
-			"require": "./dist/data.js"
+			"import": {
+				"types": "./types/data.d.ts",
+				"default": "./dist/data.js"
+			},
+			"require": {
+				"types": "./types/data.d.cts",
+				"default": "./dist/data.cjs"
+			}
 		},
 		"./event": {
-			"types": "./types/event.d.ts",
-			"bun": "./src/event.ts",
-			"import": "./dist/event.mjs",
-			"require": "./dist/event.js"
+			"import": {
+				"types": "./types/event.d.ts",
+				"default": "./dist/event.js"
+			},
+			"require": {
+				"types": "./types/event.d.cts",
+				"default": "./dist/event.cjs"
+			}
 		},
 		"./find": {
-			"types": "./types/find.d.ts",
-			"bun": "./src/find.ts",
-			"import": "./dist/find.mjs",
-			"require": "./dist/find.js"
+			"import": {
+				"types": "./types/find.d.ts",
+				"default": "./dist/find.js"
+			},
+			"require": {
+				"types": "./types/find.d.cts",
+				"default": "./dist/find.cjs"
+			}
 		},
 		"./focusable": {
-			"types": "./types/focusable.d.ts",
-			"bun": "./src/focusable.ts",
-			"import": "./dist/focusable.mjs",
-			"require": "./dist/focusable.js"
+			"import": {
+				"types": "./types/focusable.d.ts",
+				"default": "./dist/focusable.js"
+			},
+			"require": {
+				"types": "./types/focusable.d.cts",
+				"default": "./dist/focusable.cjs"
+			}
 		},
 		"./html": {
-			"types": "./types/html.d.ts",
-			"bun": "./src/html.ts",
-			"import": "./dist/html.mjs",
-			"require": "./dist/html.js"
+			"import": {
+				"types": "./types/html.d.ts",
+				"default": "./dist/html.js"
+			},
+			"require": {
+				"types": "./types/html.d.cts",
+				"default": "./dist/html.cjs"
+			}
 		},
 		"./is": {
-			"types": "./types/is.d.ts",
-			"bun": "./src/is.ts",
-			"import": "./dist/is.mjs",
-			"require": "./dist/is.js"
+			"import": {
+				"types": "./types/is.d.ts",
+				"default": "./dist/is.js"
+			},
+			"require": {
+				"types": "./types/is.d.cts",
+				"default": "./dist/is.cjs"
+			}
 		},
 		"./models": {
-			"types": "./types/models.d.ts",
-			"bun": "./src/models.ts"
+			"import": {
+				"types": "./types/models.d.ts"
+			},
+			"require": {
+				"types": "./types/models.d.cts"
+			}
 		},
 		"./sanitise": {
-			"types": "./types/sanitise.d.ts",
-			"bun": "./src/sanitise.ts",
-			"import": "./dist/sanitise.mjs",
-			"require": "./dist/sanitise.js"
+			"import": {
+				"types": "./types/sanitise.d.ts",
+				"default": "./dist/sanitise.js"
+			},
+			"require": {
+				"types": "./types/sanitise.d.cts",
+				"default": "./dist/sanitise.cjs"
+			}
 		},
 		"./style": {
-			"types": "./types/style.d.ts",
-			"bun": "./src/style.ts",
-			"import": "./dist/style.mjs",
-			"require": "./dist/style.js"
+			"import": {
+				"types": "./types/style.d.ts",
+				"default": "./dist/style.js"
+			},
+			"require": {
+				"types": "./types/style.d.cts",
+				"default": "./dist/style.cjs"
+			}
 		}
 	},
-	"files": [
-		"dist",
-		"src",
-		"types"
-	],
-	"keywords": [
-		"dom",
-		"utility"
-	],
+	"files": ["dist", "src", "types"],
+	"keywords": ["dom", "utility"],
 	"license": "MIT",
-	"main": "dist/index.js",
-	"module": "dist/index.mjs",
+	"main": "dist/index.cjs",
+	"module": "dist/index.js",
 	"name": "@oscarpalmer/toretto",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/oscarpalmer/toretto.git"
 	},
 	"scripts": {
-		"build": "bun run clean && bun run compile && bun run types",
+		"build": "npm run clean && npm run compile",
+		"compile": "npx vite build && npm run types",
 		"clean": "rm -rf ./dist && rm -rf ./types && rm -f ./tsconfig.tsbuildinfo",
-		"compile": "bunx bun ./.bun.ts && bunx bun ./.bun.ts --mjs",
-		"test": "bun test",
-		"types": "bun run types:cjs && bun run types:esm",
-		"types:cjs": "bunx dts-bundle-generator --out-file ./types/index.d.cts --external-inlines '@oscarpalmer/atoms' 'type-fest' --no-check --silent ./src/index.ts",
-		"types:esm": "bunx tsc -p ./tsconfig.json",
-		"watch": "bun build ./src/index.ts --outfile ./dist/index.js --watch"
+		"test": "npx vitest --coverage",
+		"types": "npx tsc && npx dts-bundle-generator --config ./dts.config.ts --silent",
+		"watch": "npx vite build --watch"
 	},
 	"type": "module",
 	"types": "types/index.d.cts",
-	"version": "0.14.0"
+	"version": "0.15.0"
 }
