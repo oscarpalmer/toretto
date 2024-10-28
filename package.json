@@ -128,8 +128,15 @@
 			}
 		}
 	},
-	"files": ["dist", "src", "types"],
-	"keywords": ["dom", "utility"],
+	"files": [
+		"dist",
+		"src",
+		"types"
+	],
+	"keywords": [
+		"dom",
+		"utility"
+	],
 	"license": "MIT",
 	"main": "dist/index.cjs",
 	"module": "dist/index.js",
@@ -148,5 +155,5 @@
 	},
 	"type": "module",
 	"types": "types/index.d.cts",
-	"version": "0.15.0"
+	"version": "0.15.1"
 }
