@@ -1,6 +1,6 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import {getBoolean} from '~/internal/get-value';
-import type {EventPosition, RemovableEventListener} from '~/models';
+import {getBoolean} from './internal/get-value';
+import type {EventPosition, RemovableEventListener} from './models';
 
 function createDispatchOptions(options: EventInit): EventInit {
 	return {

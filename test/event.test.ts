@@ -41,11 +41,11 @@ test('dispatch', () => {
 	on(target, 'dblclick', custom);
 	on(target, 'hello', custom);
 
-	// expect(target.textContent).toBe('Hello, world!');
+	expect(target.textContent).toBe('Hello, world!');
 
 	dispatch(target, 'click');
 
-	// expect(target.textContent).toBe('1');
+	expect(target.textContent).toBe('1');
 
 	dispatch(target, 'focus', {
 		bubbles: true,
@@ -53,7 +53,7 @@ test('dispatch', () => {
 		composed: true,
 	});
 
-	// expect(target.textContent).toBe('2');
+	expect(target.textContent).toBe('2');
 
 	dispatch(target, 'dblclick', {
 		bubbles: true,
@@ -62,11 +62,11 @@ test('dispatch', () => {
 		detail: {a: {b: 'c'}},
 	});
 
-	// expect(target.textContent).toBe('3');
+	expect(target.textContent).toBe('3');
 
 	dispatch(target, 'hello');
 
-	// expect(target.textContent).toBe('4');
+	expect(target.textContent).toBe('4');
 });
 
 test('getPosition', () => {

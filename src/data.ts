@@ -1,7 +1,7 @@
 import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {parse} from '@oscarpalmer/atoms/string';
 import {setElementValues, updateElementValue} from './internal/element-value';
-import type {HTMLOrSVGElement} from '~/models';
+import type {HTMLOrSVGElement} from './models';
 
 /**
  * Get data values from an element

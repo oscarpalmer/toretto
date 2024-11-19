@@ -1,6 +1,6 @@
 import {isNullableOrWhitespace, isPlainObject} from '@oscarpalmer/atoms/is';
 import type {PlainObject} from '@oscarpalmer/atoms/models';
-import type {HTMLOrSVGElement} from '~/models';
+import type {HTMLOrSVGElement} from '../models';
 
 export function setElementValues(
 	element: HTMLOrSVGElement,

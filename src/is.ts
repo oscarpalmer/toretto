@@ -1,4 +1,4 @@
-import type {HTMLOrSVGElement} from '~/models';
+import type {HTMLOrSVGElement} from './models';
 
 /**
  * Is the value a child node?

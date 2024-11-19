@@ -1,7 +1,7 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
 import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {getString} from '@oscarpalmer/atoms/string';
-import type {Attribute, HTMLOrSVGElement, Property} from '~/models';
+import type {Attribute, HTMLOrSVGElement, Property} from './models';
 
 /**
  * List of boolean attributes

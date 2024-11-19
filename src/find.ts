@@ -1,4 +1,4 @@
-import type {Selector} from '~/models';
+import type {Selector} from './models';
 
 /**
  * Get the distance between two elements _(i.e., the amount of nodes of between them)_

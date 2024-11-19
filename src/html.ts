@@ -1,5 +1,5 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import {type SanitiseOptions, sanitise} from '~/sanitise';
+import {type SanitiseOptions, sanitise} from './sanitise';
 
 const templates: Record<string, HTMLTemplateElement> = {};
 
