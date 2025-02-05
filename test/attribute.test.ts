@@ -191,9 +191,7 @@ test('isInvalidBooleanAttribute', () => {
 	for (let index = 0; index < length; index += 1) {
 		const name = nonBooleanAttributes[index];
 
-		expect(Attribute.isInvalidBooleanAttribute({name, value: ''})).toBe(true);
-		expect(Attribute.isInvalidBooleanAttribute({name, value: name})).toBe(true);
-		expect(Attribute.isInvalidBooleanAttribute({name, value: '!'})).toBe(true);
+		expect(Attribute.isInvalidBooleanAttribute({name, value: name})).toBe(false);
 	}
 });
 

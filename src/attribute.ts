@@ -74,7 +74,7 @@ export function isInvalidBooleanAttribute(
 	attribute: Attribute<string>,
 ): boolean {
 	if (!booleanAttributes.includes(attribute.name)) {
-		return true;
+		return false;
 	}
 
 	const normalised = attribute.value.toLowerCase().trim();

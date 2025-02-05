@@ -56,7 +56,9 @@ function sanitiseNodes(nodes: Node[], options: SanitiseOptions): Node[] {
 			sanitiseAttributes(node, [...node.attributes], options);
 		}
 
-		sanitiseNodes([...node.childNodes], options);
+		if (node.hasChildNodes()) {
+			sanitiseNodes([...node.childNodes], options);
+		}
 	}
 
 	return nodes;

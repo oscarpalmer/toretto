@@ -2,12 +2,20 @@ import {expect, test} from 'vitest';
 import {html} from '../src/html';
 
 test('html', () => {
-	const original = `<div hidden="hmm" onclick="alert('!')">
-	<p href="data:text/html,hmm" src="javascript:console.log" xlink:href="javascript:console.log">Hello</p>
+	const original = `<div onclick="alert('!')">
+	<p>
+		<a href="data:text/html,hmm">One</a>
+		<a xlink:href="javascript:console.log">Two</a>
+		<img src="javascript:console.log" />
+	</p>
 </div><script>alert('!')</script>`;
 
-	let sanitised = `<div hidden="hmm" onclick="alert('!')">
-	<p href="data:text/html,hmm" src="javascript:console.log" xlink:href="javascript:console.log">Hello</p>
+	let sanitised = `<div onclick="alert('!')">
+	<p>
+		<a href="data:text/html,hmm">One</a>
+		<a xlink:href="javascript:console.log">Two</a>
+		<img src="javascript:console.log">
+	</p>
 </div>`;
 
 	const expectedNodes = html(original, false);
@@ -17,8 +25,12 @@ test('html', () => {
 
 	//
 
-	sanitised = `<div hidden="">
-	<p>Hello</p>
+	sanitised = `<div>
+	<p>
+		<a>One</a>
+		<a>Two</a>
+		<img>
+	</p>
 </div>`;
 
 	const sanitisedOne = html(original);
@@ -39,7 +51,7 @@ test('html', () => {
 	template.id = 'tpl';
 	template.innerHTML = '<p>Hello</p>';
 
-	document.append(template);
+	document.body.append(template);
 
 	let external = html('tpl');
 

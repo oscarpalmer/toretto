@@ -7,7 +7,11 @@ afterAll(() => {
 
 test('sanitise', () => {
 	const original = `<div hidden="hmm" onclick="alert('!')">
-	<p href="data:text/html,hmm" src="javascript:console.log" xlink:href="javascript:console.log">Hello</p>
+	<p>
+		<a href="data:text/html,hmm">One</a>
+		<a xlink:href="javascript:console.log">Two</a>
+		<img src="javascript:console.log">
+	</p>
 </div>`;
 
 	document.body.innerHTML = original;
@@ -17,7 +21,11 @@ test('sanitise', () => {
 	expect(nodes.length).toBe(1);
 
 	expect(nodes.join()).toBe(`<body><div hidden="">
-	<p>Hello</p>
+	<p>
+		<a>One</a>
+		<a>Two</a>
+		<img>
+	</p>
 </div></body>`);
 
 	document.body.innerHTML = original;
@@ -27,6 +35,10 @@ test('sanitise', () => {
 	expect(nodes.length).toBe(1);
 
 	expect(nodes.join()).toBe(`<body><div hidden="hmm">
-	<p>Hello</p>
+	<p>
+		<a>One</a>
+		<a>Two</a>
+		<img>
+	</p>
 </div></body>`);
 });

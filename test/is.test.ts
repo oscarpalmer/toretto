@@ -47,7 +47,7 @@ test('isInDocument', () =>
 
 			expect(Is.isInDocument(node)).toBe(false);
 
-			document.append(nodes[index]);
+			document.body.append(nodes[index]);
 		}
 
 		expect(Is.isInDocument(document)).toBe(true);
