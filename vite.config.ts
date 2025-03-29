@@ -21,7 +21,11 @@ export default defineConfig({
 		minify: false,
 		outDir: './dist',
 		rollupOptions: {
-			external: ['@oscarpalmer/atoms/is', '@oscarpalmer/atoms/string'],
+			external: [
+				'@oscarpalmer/atoms/function',
+				'@oscarpalmer/atoms/is',
+				'@oscarpalmer/atoms/string',
+			],
 			input: Object.fromEntries(files),
 			output: {
 				generatedCode: 'es2015',

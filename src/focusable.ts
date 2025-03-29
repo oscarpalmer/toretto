@@ -8,6 +8,10 @@ type ElementWithTabIndex = {
 type Filter = (item: ElementWithTabIndex) => boolean;
 type InertElement = Element & {inert: boolean};
 
+const disableablePattern = /^(button|input|select|textarea)$/i;
+
+const firstSummary = 'details > summary:first-of-type';
+
 const focusableFilters = [isDisabled, isInert, isHidden, isSummarised];
 
 const selector = [
@@ -17,7 +21,7 @@ const selector = [
 	'audio[controls]',
 	'button',
 	'details',
-	'details > summary:first-of-type',
+	firstSummary,
 	'input',
 	'select',
 	'textarea',
@@ -26,11 +30,17 @@ const selector = [
 	.map(selector => `${selector}:not([inert])`)
 	.join(',');
 
+const specialTabIndexPattern = /^(audio|details|video)$/i;
+
+const summaryPattern = /^summary$/i;
+
 const tabbableFilters = [
 	isNotTabbable,
 	isNotTabbableRadio,
 	...focusableFilters,
 ];
+
+const trueishPattern = /^(|true)$/i;
 
 /**
  * Get a list of focusable elements within a parent element
@@ -58,7 +68,7 @@ function getTabIndex(element: Element): number {
 
 	if (
 		tabIndex < 0 &&
-		(/^(audio|details|video)$/i.test(element.tagName) || isEditable(element)) &&
+		(specialTabIndexPattern.test(element.tagName) || isEditable(element)) &&
 		!hasTabIndex(element)
 	) {
 		return 0;
@@ -71,7 +81,11 @@ function getValidElements(
 	parent: Element,
 	filters: Filter[],
 	tabbable: boolean,
-): Array<Element> {
+): Element[] {
+	if (!(parent instanceof Element)) {
+		return [];
+	}
+
 	const elements = [...parent.querySelectorAll(selector)];
 	const items: ElementWithTabIndex[] = [];
 
@@ -89,8 +103,8 @@ function getValidElements(
 		return items.map(item => item.element);
 	}
 
-	const indiced: Array<Array<Element>> = [];
-	const zeroed: Array<Element> = [];
+	const indiced: Element[][] = [];
+	const zeroed: Element[] = [];
 
 	length = items.length;
 
@@ -118,7 +132,7 @@ function hasTabIndex(element: Element): boolean {
 
 function isDisabled(item: ElementWithTabIndex): boolean {
 	if (
-		/^(button|input|select|textarea)$/i.test(item.element.tagName) &&
+		disableablePattern.test(item.element.tagName) &&
 		isDisabledFromFieldset(item.element)
 	) {
 		return true;
@@ -155,14 +169,16 @@ function isDisabledFromFieldset(element: Element): boolean {
 }
 
 function isEditable(element: Element): boolean {
-	return /^(|true)$/i.test(element.getAttribute('contenteditable') as string);
+	return trueishPattern.test(element.getAttribute('contenteditable') as string);
 }
 
 /**
  * Is the element focusable?
  */
 export function isFocusable(element: Element): boolean {
-	return isValidElement(element, focusableFilters, false);
+	return element instanceof Element
+		? isValidElement(element, focusableFilters, false)
+		: false;
 }
 
 function isHidden(item: ElementWithTabIndex) {
@@ -173,9 +189,7 @@ function isHidden(item: ElementWithTabIndex) {
 		return true;
 	}
 
-	const isDirectSummary = item.element.matches(
-		'details > summary:first-of-type',
-	);
+	const isDirectSummary = item.element.matches(firstSummary);
 
 	const nodeUnderDetails = isDirectSummary
 		? item.element.parentElement
@@ -199,7 +213,7 @@ function isHidden(item: ElementWithTabIndex) {
 function isInert(item: ElementWithTabIndex): boolean {
 	return (
 		((item.element as InertElement).inert ?? false) ||
-		/^(|true)$/i.test(item.element.getAttribute('inert') as string) ||
+		trueishPattern.test(item.element.getAttribute('inert') as string) ||
 		(item.element.parentElement != null &&
 			isInert({
 				element: item.element.parentElement,
@@ -229,11 +243,11 @@ function isNotTabbableRadio(item: ElementWithTabIndex): boolean {
 
 	const realName = CSS?.escape?.(item.element.name) ?? item.element.name;
 
-	const radios = Array.from(
-		(parent as Element).querySelectorAll(
+	const radios = [
+		...(parent as Element).querySelectorAll(
 			`input[type="radio"][name="${realName}"]`,
 		),
-	) as HTMLInputElement[];
+	] as HTMLInputElement[];
 
 	const checked = radios.find(radio => radio.checked);
 
@@ -243,9 +257,7 @@ function isNotTabbableRadio(item: ElementWithTabIndex): boolean {
 function isSummarised(item: ElementWithTabIndex) {
 	return (
 		item.element instanceof HTMLDetailsElement &&
-		Array.from(item.element.children).some(child =>
-			/^summary$/i.test(child.tagName),
-		)
+		[...item.element.children].some(child => summaryPattern.test(child.tagName))
 	);
 }
 
@@ -253,7 +265,9 @@ function isSummarised(item: ElementWithTabIndex) {
  * Is the element tabbable?
  */
 export function isTabbable(element: Element): boolean {
-	return isValidElement(element, tabbableFilters, true);
+	return element instanceof Element
+		? isValidElement(element, tabbableFilters, true)
+		: false;
 }
 
 function isValidElement(

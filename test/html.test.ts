@@ -68,4 +68,21 @@ test('html', () => {
 	//
 
 	expect(html('')).toEqual([]);
+
+	const values = [
+		null,
+		undefined,
+		0,
+		1,
+		true,
+		false,
+		{},
+		[],
+		() => {},
+		document.createElement('div'),
+	];
+
+	for (let index = 0; index < values.length; index += 1) {
+		expect(html(values[index] as never)).toEqual([]);
+	}
 });

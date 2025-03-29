@@ -1,6 +1,7 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
 import {type SanitiseOptions, sanitise} from './sanitise';
 
+const idPattern = /^[a-z][\w-]*$/i;
 const templates: Record<string, HTMLTemplateElement> = {};
 
 function createTemplate(html: string): HTMLTemplateElement {
@@ -18,17 +19,20 @@ function getTemplate(value: string): HTMLTemplateElement | undefined {
 		return;
 	}
 
+	if (value in templates) {
+		return templates[value];
+	}
+
 	let template: unknown;
 
-	if (/^[\w-]+$/.test(value)) {
+	if (idPattern.test(value)) {
 		template = document.querySelector(`#${value}`);
 	}
 
-	if (template instanceof HTMLTemplateElement) {
-		return template;
-	}
+	templates[value] =
+		template instanceof HTMLTemplateElement ? template : createTemplate(value);
 
-	return templates[value] ?? createTemplate(value);
+	return templates[value];
 }
 
 /**
@@ -56,6 +60,10 @@ export function html(
 	value: string | HTMLTemplateElement,
 	sanitisation?: boolean | SanitiseOptions,
 ): Node[] {
+	if (typeof value !== 'string' && !(value instanceof HTMLTemplateElement)) {
+		return [];
+	}
+
 	const options =
 		sanitisation == null || sanitisation === true
 			? {}

@@ -13,6 +13,9 @@ test('getStyle(s) & setStyle(s)', () =>
 			backgroundColor: 'green',
 			position: 'absolute',
 		});
+	
+		expect(Style.getStyle(123 as never, 'color')).toBeUndefined();
+		expect(Style.getStyles(123 as never, ['color'])).toEqual({});
 
 		setTimeout(() => {
 			expect(
@@ -30,13 +33,13 @@ test('getStyle(s) & setStyle(s)', () =>
 			});
 
 			Style.setStyle(div, 'display');
-
-			setTimeout(() => {
-				expect(Style.getStyle(div, 'display')).toBe('');
-
-				done();
-			}, 125);
 		}, 125);
+
+		setTimeout(() => {
+			expect(Style.getStyle(div, 'display')).toBe('');
+
+			done();
+		}, 250);
 	}));
 
 test('getTextDirection', () => {
@@ -73,4 +76,6 @@ test('getTextDirection', () => {
 
 	// Should be inherited from parent and be 'rtl', but does not seem to be; Happy DOM?
 	expect(Style.getTextDirection(innerElement)).toBe('ltr');
+
+	expect(Style.getTextDirection(123 as never)).toBeUndefined();
 });

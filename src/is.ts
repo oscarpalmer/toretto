@@ -25,6 +25,15 @@ export function isChildNode(
 	);
 }
 
+export function isEventTarget(value: unknown): value is EventTarget {
+	return (
+		value instanceof EventTarget ||
+		value instanceof Document ||
+		value instanceof Window ||
+		value instanceof Element
+	);
+}
+
 /**
  * Is the value an HTML or SVG element?
  */
@@ -43,9 +52,11 @@ export function isInDocument(node: Node): boolean;
 export function isInDocument(node: Node, document: Document): boolean;
 
 export function isInDocument(node: Node, document?: Document): boolean {
-	return document == null
-		? (node.ownerDocument?.contains(node) ?? true)
-		: node.ownerDocument == null
-			? node === document
-			: node.ownerDocument === document && document.contains(node);
+	return node instanceof Node
+		? document instanceof Document
+			? node.ownerDocument == null
+				? node === document
+				: node.ownerDocument === document && document.contains(node)
+			: (node.ownerDocument?.contains(node) ?? true)
+		: false;
 }

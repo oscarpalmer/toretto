@@ -47,10 +47,11 @@ function sanitiseAttributes(
 }
 
 function sanitiseNodes(nodes: Node[], options: SanitiseOptions): Node[] {
+	const actual = nodes.filter(node => node instanceof Node);
 	const {length} = nodes;
 
 	for (let index = 0; index < length; index += 1) {
-		const node = nodes[index];
+		const node = actual[index];
 
 		if (node instanceof Element) {
 			sanitiseAttributes(node, [...node.attributes], options);

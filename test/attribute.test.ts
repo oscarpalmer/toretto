@@ -126,6 +126,10 @@ test('isBadAttribute', () => {
 
 		expect(Attribute.isBadAttribute({name, value})).toBe(index < 4);
 	}
+
+	expect(Attribute.isBadAttribute(123 as never)).toBe(true);
+	expect(Attribute.isBadAttribute({name: 123 as never, value: ''})).toBe(true);
+	expect(Attribute.isBadAttribute({name: '', value: 123 as never})).toBe(true);
 });
 
 test('isBooleanAttribute', () => {
@@ -140,6 +144,8 @@ test('isBooleanAttribute', () => {
 			index < Attribute.booleanAttributes.length,
 		);
 	}
+
+	expect(Attribute.isBooleanAttribute(123 as never)).toBe(false);
 });
 
 test('isEmptyNonBooleanAttribute', () => {
@@ -169,6 +175,16 @@ test('isEmptyNonBooleanAttribute', () => {
 			false,
 		);
 	}
+
+	expect(Attribute.isEmptyNonBooleanAttribute(123 as never)).toBe(false);
+
+	expect(
+		Attribute.isEmptyNonBooleanAttribute({name: 123 as never, value: ''}),
+	).toBe(false);
+
+	expect(
+		Attribute.isEmptyNonBooleanAttribute({name: '', value: 123 as never}),
+	).toBe(false);
 });
 
 test('isInvalidBooleanAttribute', () => {
@@ -191,8 +207,20 @@ test('isInvalidBooleanAttribute', () => {
 	for (let index = 0; index < length; index += 1) {
 		const name = nonBooleanAttributes[index];
 
-		expect(Attribute.isInvalidBooleanAttribute({name, value: name})).toBe(false);
+		expect(Attribute.isInvalidBooleanAttribute({name, value: name})).toBe(
+			false,
+		);
 	}
+
+	expect(Attribute.isInvalidBooleanAttribute(123 as never)).toBe(true);
+
+	expect(
+		Attribute.isInvalidBooleanAttribute({name: 123 as never, value: ''}),
+	).toBe(true);
+
+	expect(
+		Attribute.isInvalidBooleanAttribute({name: '', value: 123 as never}),
+	).toBe(true);
 });
 
 test('setAttribute', () => {
@@ -263,19 +291,13 @@ test('setAttribute', () => {
 	expect((element as any).readonly).toBe(true);
 	expect((element as any).selected).toBe(false);
 
-	Attribute.setProperties(element, [
-		{
-			name: 'readonly',
-			value: 123,
-		},
-	]);
+	expect(Attribute.setAttribute(123 as never, {name: 'x', value: 'y'})).toBe(
+		undefined,
+	);
 
-	Attribute.setProperties(element, {
-		hidden: false,
-	});
+	expect(Attribute.setAttribute(element, 123 as never, 'blah')).toBe(undefined);
 
-	expect(element.hidden).toBe(false);
-	expect((element as any).readonly).toBe(false);
+	expect(Attribute.setAttributes(123 as never, [])).toBe(undefined);
 });
 
 test('setProperty', () => {

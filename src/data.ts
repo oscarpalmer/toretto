@@ -1,6 +1,7 @@
 import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {parse} from '@oscarpalmer/atoms/string';
 import {setElementValues, updateElementValue} from './internal/element-value';
+import {isHTMLOrSVGElement} from './is';
 import type {HTMLOrSVGElement} from './models';
 
 /**
@@ -20,6 +21,10 @@ export function getData(
 	element: HTMLOrSVGElement,
 	keys: string | string[],
 ): unknown {
+	if (!isHTMLOrSVGElement(element)) {
+		return;
+	}
+
 	if (typeof keys === 'string') {
 		return getDataValue(element, keys);
 	}

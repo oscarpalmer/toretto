@@ -12,6 +12,11 @@ test('getData & setData', () =>
 			bar: {baz: true},
 		});
 
+		expect(Data.getData(123 as never, 'blah')).toBe(undefined);
+
+		Data.setData(123 as never, 'noop', undefined);
+		Data.setData(div, 123 as never, 'noop');
+
 		div.dataset.badJson = '""?""';
 
 		setTimeout(() => {

@@ -1,5 +1,7 @@
+import {noop} from '@oscarpalmer/atoms/function';
 import {isPlainObject} from '@oscarpalmer/atoms/is';
 import {getBoolean} from './internal/get-value';
+import {isEventTarget} from './is';
 import type {EventPosition, RemovableEventListener} from './models';
 
 function createDispatchOptions(options: EventInit): EventInit {
@@ -60,7 +62,9 @@ export function dispatch<Type extends keyof HTMLElementEventMap>(
 	type: Type | string,
 	options?: CustomEventInit,
 ): void {
-	target.dispatchEvent(createEvent(type, options));
+	if (isEventTarget(target) && typeof type === 'string') {
+		target.dispatchEvent(createEvent(type, options));
+	}
 }
 
 /**
@@ -92,7 +96,13 @@ export function off(
 	listener: EventListener,
 	options?: EventListenerOptions,
 ): void {
-	target.removeEventListener(type, listener, createEventOptions(options));
+	if (
+		isEventTarget(target) &&
+		typeof type === 'string' &&
+		typeof listener === 'function'
+	) {
+		target.removeEventListener(type, listener, createEventOptions(options));
+	}
 }
 
 /**
@@ -121,6 +131,14 @@ export function on(
 	listener: EventListener,
 	options?: AddEventListenerOptions,
 ): RemovableEventListener {
+	if (
+		!isEventTarget(target) ||
+		typeof type !== 'string' ||
+		typeof listener !== 'function'
+	) {
+		return noop;
+	}
+
 	const extended = createEventOptions(options);
 
 	target.addEventListener(type, listener, extended);

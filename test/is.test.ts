@@ -53,6 +53,9 @@ test('isInDocument', () =>
 		expect(Is.isInDocument(document)).toBe(true);
 		expect(Is.isInDocument(document, document)).toBe(true);
 
+		expect(Is.isInDocument(123 as never)).toBe(false);
+		expect(Is.isInDocument(document, 123 as never)).toBe(true);
+
 		setTimeout(() => {
 			for (let index = 0; index < length; index += 1) {
 				const node = nodes[index];

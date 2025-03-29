@@ -16,6 +16,10 @@ afterAll(() => {
 	document.body.innerHTML = '';
 });
 
+test('getElementUnderPointer', () => {
+	// TODO: find a way to test hover, etc.
+});
+
 test('findAncestor', () => {
 	const hidden = document.querySelector('[hidden]');
 	const origin = document.getElementById('origin');
@@ -42,8 +46,8 @@ test('findAncestor', () => {
 		null,
 	);
 
-	// @ts-expect-error Testing invalid input
-	expect(Find.findAncestor(null, 'span')).toBe(null);
+	expect(Find.findAncestor(123 as never, 'span')).toBe(null);
+	expect(Find.findAncestor(origin, 123 as never)).toBe(null);
 });
 
 test('findElement', () => {
@@ -57,11 +61,14 @@ test('findElement', () => {
 	expect(origin).toBeInstanceOf(HTMLDivElement);
 	expect(origin?.id).toBe('origin');
 
-	const child = Find.$('*', origin);
+	const child = Find.$('*', origin ?? undefined);
+	const notFound = Find.$('not-found', origin ?? undefined);
 
 	expect(child).toBeInstanceOf(HTMLSpanElement);
 	expect(child?.id).toBe('hover');
 	expect(child?.textContent).toBe('hello');
+
+	expect(notFound).toBe(null);
 });
 
 test('findElements', () => {
@@ -75,7 +82,7 @@ test('findElements', () => {
 	expect(origin.length).toBe(1);
 	expect(origin[0].id).toBe('origin');
 
-	origin = Find.findElements(origin, Find.findElement('.target'));
+	origin = Find.findElements(origin, Find.findElement('.target') ?? undefined);
 
 	expect(origin.length).toBe(1);
 	expect(origin[0].id).toBe('origin');
@@ -88,7 +95,7 @@ test('findElements', () => {
 
 	expect(
 		Find.findElements(
-			[123, 'a', document.body, ...origin, ...children],
+			[123, 'a', document.body, ...origin, ...children] as never,
 			document,
 		).length,
 	).toBe(3);
@@ -174,8 +181,7 @@ test('findRelatives', () => {
 	);
 
 	expect(Find.findRelatives(liOrigin, '.not-found').length).toBe(0);
-});
 
-test('getElementUnderPointer', () => {
-	// TODO: find a way to test hover, etc.
+	expect(Find.findRelatives(123 as never, 'blah')).toEqual([]);
+	expect(Find.findRelatives(divOrigin, 123 as never)).toEqual([]);
 });

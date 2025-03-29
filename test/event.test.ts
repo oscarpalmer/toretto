@@ -1,3 +1,4 @@
+import {noop} from '@oscarpalmer/atoms/function';
 import {expect, test} from 'vitest';
 import {dispatch, getPosition, off, on} from '../src/event';
 
@@ -44,6 +45,8 @@ test('dispatch', () => {
 	expect(target.textContent).toBe('Hello, world!');
 
 	dispatch(target, 'click');
+	dispatch(123 as never, 'click');
+	dispatch(target, 123 as never);
 
 	expect(target.textContent).toBe('1');
 
@@ -150,4 +153,12 @@ test('on & off', () => {
 	}
 
 	expect(values).toEqual([1, 10, 10, 10]);
+
+	const fail = on(123 as never, 'click', () => {});
+
+	expect(fail).toBe(noop);
+
+	off(123 as never, 'click', onOnce);
+	off(target, 123 as never, onOnce);
+	off(target, 'click', 123 as never);
 });

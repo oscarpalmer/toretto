@@ -1,12 +1,13 @@
 import type {Selector} from './models';
 
 /**
- * Get the distance between two elements _(i.e., the amount of nodes of between them)_
+ * - Get the distance between two elements _(i.e., the amount of nodes of between them)_
+ * - If the distance cannot be calculated, `-1` is returned
  */
-export function getDistanceBetweenElements(
+function getDistanceBetweenElements(
 	origin: Element,
 	target: Element,
-): number {
+): number | undefined {
 	if (origin === target || origin.parentElement === target) {
 		return 0;
 	}
@@ -18,17 +19,15 @@ export function getDistanceBetweenElements(
 		return Math.abs(children.indexOf(origin) - children.indexOf(target));
 	}
 
-	switch (true) {
-		case !!(comparison & 2 || comparison & 8):
-			// Target element is before or holds the origin element
-			return traverse(origin, target);
+	const beforeOrInside = !!(comparison & 2 || comparison & 8);
 
-		case !!(comparison & 4 || comparison & 16):
-			// Origin element is before or holds the target element
-			return traverse(target, origin);
-
-		default:
-			return Number.NaN;
+	if (beforeOrInside || !!(comparison & 4 || comparison & 16)) {
+		return (
+			traverse(
+				beforeOrInside ? origin : target,
+				beforeOrInside ? target : origin,
+			) ?? -1
+		);
 	}
 }
 
@@ -42,7 +41,7 @@ export function findAncestor(
 	origin: Element,
 	selector: string | ((element: Element) => boolean),
 ): Element | null {
-	if (origin == null || selector == null) {
+	if (!(origin instanceof Element) || selector == null) {
 		return null;
 	}
 
@@ -52,6 +51,10 @@ export function findAncestor(
 		}
 
 		return origin.closest(selector);
+	}
+
+	if (typeof selector !== 'function') {
+		return null;
 	}
 
 	if (selector(origin)) {
@@ -78,7 +81,7 @@ export function findAncestor(
 export function findElement(
 	selector: string,
 	context?: Selector,
-): Element | undefined {
+): Element | null {
 	return findElementOrElements(selector, context, true) as never;
 }
 
@@ -86,7 +89,7 @@ function findElementOrElements(
 	selector: Selector,
 	context: Selector | undefined,
 	single: boolean,
-): Element | Element[] | undefined {
+): Element | Element[] | null {
 	const callback = single ? document.querySelector : document.querySelectorAll;
 
 	const contexts =
@@ -117,15 +120,17 @@ function findElementOrElements(
 		}
 
 		return single
-			? undefined
+			? null
 			: result.filter((value, index, array) => array.indexOf(value) === index);
 	}
 
-	const nodes = Array.isArray(selector)
-		? selector
-		: selector instanceof NodeList
-			? Array.from(selector)
-			: [selector];
+	const nodes = (
+		Array.isArray(selector)
+			? selector
+			: selector instanceof Node
+				? [selector]
+				: [...selector]
+	).filter(node => node instanceof Node);
 
 	const {length} = nodes;
 
@@ -177,11 +182,21 @@ export function findRelatives(
 	selector: string,
 	context?: Document | Element,
 ): Element[] {
+	if (!(origin instanceof Element) || typeof selector !== 'string') {
+		return [];
+	}
+
 	if (origin.matches(selector)) {
 		return [origin];
 	}
 
-	const elements = [...(context ?? document).querySelectorAll(selector)];
+	const elements = [
+		...(context instanceof Document || context instanceof Element
+			? context
+			: document
+		).querySelectorAll(selector),
+	];
+
 	const {length} = elements;
 
 	if (length === 0) {
@@ -190,24 +205,22 @@ export function findRelatives(
 
 	const distances = [];
 
-	let minimum: number | null = null;
+	let minimum: number | undefined;
 
 	for (let index = 0; index < length; index += 1) {
 		const element = elements[index];
-		const distance = getDistanceBetweenElements(origin, element);
+		const distance = getDistanceBetweenElements(origin, element) ?? -1;
 
-		if (distance < 0) {
-			continue;
+		if (distance > -1) {
+			if (minimum == null || distance < minimum) {
+				minimum = distance;
+			}
+
+			distances.push({
+				distance,
+				element,
+			});
 		}
-
-		if (minimum == null || distance < minimum) {
-			minimum = distance;
-		}
-
-		distances.push({
-			distance,
-			element,
-		});
 	}
 
 	return minimum == null
@@ -222,9 +235,7 @@ export function findRelatives(
  * - Ignores elements with `pointer-events: none` and `visibility: hidden`
  * - If `skipIgnore` is `true`, no elements are ignored
  */
-export function getElementUnderPointer(
-	skipIgnore?: boolean,
-): Element | undefined {
+export function getElementUnderPointer(skipIgnore?: boolean): Element | null {
 	const elements = [...document.querySelectorAll(':hover')];
 	const {length} = elements;
 
@@ -233,7 +244,7 @@ export function getElementUnderPointer(
 	for (let index = 0; index < length; index += 1) {
 		const element = elements[index];
 
-		if (/^head$/i.test(element.tagName)) {
+		if (element.tagName === 'HEAD') {
 			continue;
 		}
 
@@ -247,14 +258,14 @@ export function getElementUnderPointer(
 		}
 	}
 
-	return returned.at(-1);
+	return returned.at(-1) ?? null;
 }
 
-function traverse(from: Element, to: Element): number {
-	const children = [...to.children];
+function traverse(from: Element, to: Element): number | undefined {
+	let index = [...to.children].indexOf(from);
 
-	if (children.includes(from)) {
-		return children.indexOf(from) + 1;
+	if (index > -1) {
+		return index + 1;
 	}
 
 	let current = from;
@@ -274,22 +285,20 @@ function traverse(from: Element, to: Element): number {
 			);
 		}
 
-		const index = children.findIndex(child => child.contains(to));
+		index = children.findIndex(child => child.contains(to));
 
 		if (index > -1) {
-			return (
-				distance +
-				Math.abs(index - children.indexOf(current)) +
-				traverse(to, children[index])
-			);
+			const traversed = traverse(current, children[index]) ?? -1;
+
+			return traversed === -1
+				? -1
+				: distance + Math.abs(index - children.indexOf(current)) + traversed;
 		}
 
 		current = parent;
 		distance += 1;
 		parent = parent.parentElement;
 	}
-
-	return Number.NaN;
 }
 
 export {findElement as $, findElements as $$};

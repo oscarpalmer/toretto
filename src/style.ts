@@ -1,4 +1,5 @@
 import {setElementValues, updateElementValue} from './internal/element-value';
+import {isHTMLOrSVGElement} from './is';
 import type {HTMLOrSVGElement, TextDirection} from './models';
 
 /**
@@ -8,7 +9,9 @@ export function getStyle(
 	element: HTMLOrSVGElement,
 	property: keyof CSSStyleDeclaration,
 ): string {
-	return element.style[property as never];
+	return isHTMLOrSVGElement(element)
+		? element.style[property as never]
+		: (undefined as never);
 }
 
 /**
@@ -18,6 +21,10 @@ export function getStyles<Property extends keyof CSSStyleDeclaration>(
 	element: HTMLOrSVGElement,
 	properties: Property[],
 ): Pick<CSSStyleDeclaration, Property> {
+	if (!isHTMLOrSVGElement(element) || !Array.isArray(properties)) {
+		return {} as Pick<CSSStyleDeclaration, Property>;
+	}
+
 	const styles = {} as Pick<CSSStyleDeclaration, Property>;
 	const {length} = properties;
 
@@ -34,6 +41,10 @@ export function getStyles<Property extends keyof CSSStyleDeclaration>(
  * Get the text direction of an element
  */
 export function getTextDirection(element: Element): TextDirection {
+	if (!(element instanceof Element)) {
+		return undefined as never;
+	}
+
 	const direction = element.getAttribute('dir');
 
 	if (direction != null && /^(ltr|rtl)$/i.test(direction)) {

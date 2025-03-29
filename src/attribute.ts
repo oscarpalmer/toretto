@@ -1,6 +1,7 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
 import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {getString} from '@oscarpalmer/atoms/string';
+import {isHTMLOrSVGElement} from './is';
 import type {Attribute, HTMLOrSVGElement, Property} from './models';
 
 /**
@@ -37,11 +38,21 @@ const onPrefix = /^on/i;
 const sourcePrefix = /^(href|src|xlink:href)$/i;
 const valuePrefix = /(data:text\/html|javascript:)/i;
 
+function isAttribute(value: unknown): value is Attribute<string> {
+	return (
+		value instanceof Attr ||
+		(isPlainObject(value) &&
+			typeof (value as PlainObject).name === 'string' &&
+			typeof (value as PlainObject).value === 'string')
+	);
+}
+
 /**
  * Is the attribute considered bad and potentially harmful?
  */
 export function isBadAttribute(attribute: Attribute<string>): boolean {
 	return (
+		!isAttribute(attribute) ||
 		onPrefix.test(attribute.name) ||
 		(sourcePrefix.test(attribute.name) && valuePrefix.test(attribute.value))
 	);
@@ -51,7 +62,9 @@ export function isBadAttribute(attribute: Attribute<string>): boolean {
  * Is the attribute a boolean attribute?
  */
 export function isBooleanAttribute(name: string): boolean {
-	return booleanAttributes.includes(name.toLowerCase());
+	return (
+		typeof name === 'string' && booleanAttributes.includes(name.toLowerCase())
+	);
 }
 
 /**
@@ -61,6 +74,7 @@ export function isEmptyNonBooleanAttribute(
 	attribute: Attribute<string>,
 ): boolean {
 	return (
+		isAttribute(attribute) &&
 		!booleanAttributes.includes(attribute.name) &&
 		attribute.value.trim().length === 0
 	);
@@ -73,6 +87,10 @@ export function isEmptyNonBooleanAttribute(
 export function isInvalidBooleanAttribute(
 	attribute: Attribute<string>,
 ): boolean {
+	if (!isAttribute(attribute)) {
+		return true;
+	}
+
 	if (!booleanAttributes.includes(attribute.name)) {
 		return false;
 	}
@@ -80,6 +98,12 @@ export function isInvalidBooleanAttribute(
 	const normalised = attribute.value.toLowerCase().trim();
 
 	return !(normalised.length === 0 || normalised === attribute.name);
+}
+
+function isProperty(value: unknown): value is Property {
+	return (
+		isPlainObject(value) && typeof (value as PlainObject).name === 'string'
+	);
 }
 
 /**
@@ -206,7 +230,7 @@ function updateProperty(
 	const actual = (validate ?? true) ? name.toLowerCase() : name;
 
 	if (actual === 'hidden') {
-		(element as unknown as PlainObject).hidden = value === '' || value === true;
+		(element as HTMLElement).hidden = value === '' || value === true;
 	} else {
 		(element as unknown as PlainObject)[actual] =
 			value === '' ||
@@ -221,9 +245,13 @@ function updateValue(
 	second: unknown,
 	callback: (element: HTMLOrSVGElement, name: string, value: unknown) => void,
 ): void {
-	if (isPlainObject(first) && typeof (first as Attribute)?.name === 'string') {
+	if (!isHTMLOrSVGElement(element)) {
+		return;
+	}
+
+	if (isProperty(first)) {
 		callback(element, (first as Attribute).name, (first as Attribute).value);
-	} else {
+	} else if (typeof first === 'string') {
 		callback(element, first as string, second);
 	}
 }
@@ -233,6 +261,10 @@ function updateValues(
 	values: Attribute[] | Record<string, unknown>,
 	callback?: (element: HTMLOrSVGElement, name: string, value: unknown) => void,
 ): void {
+	if (!isHTMLOrSVGElement(element)) {
+		return;
+	}
+
 	const isArray = Array.isArray(values);
 	const entries = Object.entries(values);
 	const {length} = entries;
