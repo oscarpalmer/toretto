@@ -3,6 +3,8 @@ export type Attribute<Value = unknown> = {
 	value: Value;
 };
 
+export type CustomEventListener = (event: CustomEvent) => void;
+
 export type EventPosition = {
 	x: number;
 	y: number;

@@ -2,7 +2,11 @@ import {noop} from '@oscarpalmer/atoms/function';
 import {isPlainObject} from '@oscarpalmer/atoms/is';
 import {getBoolean} from './internal/get-value';
 import {isEventTarget} from './is';
-import type {EventPosition, RemovableEventListener} from './models';
+import type {
+	CustomEventListener,
+	EventPosition,
+	RemovableEventListener,
+} from './models';
 
 function createDispatchOptions(options: EventInit): EventInit {
 	return {
@@ -93,7 +97,7 @@ export function getPosition(
 export function off(
 	target: EventTarget,
 	type: string,
-	listener: EventListener,
+	listener: EventListener | CustomEventListener,
 	options?: EventListenerOptions,
 ): void {
 	if (
@@ -101,7 +105,11 @@ export function off(
 		typeof type === 'string' &&
 		typeof listener === 'function'
 	) {
-		target.removeEventListener(type, listener, createEventOptions(options));
+		target.removeEventListener(
+			type,
+			listener as EventListener,
+			createEventOptions(options),
+		);
 	}
 }
 
@@ -121,14 +129,14 @@ export function on<Type extends keyof HTMLElementEventMap>(
 export function on(
 	target: EventTarget,
 	type: string,
-	listener: EventListener,
+	listener: EventListener | CustomEventListener,
 	options?: AddEventListenerOptions,
 ): RemovableEventListener;
 
 export function on(
 	target: EventTarget,
 	type: string,
-	listener: EventListener,
+	listener: EventListener | CustomEventListener,
 	options?: AddEventListenerOptions,
 ): RemovableEventListener {
 	if (
@@ -141,9 +149,9 @@ export function on(
 
 	const extended = createEventOptions(options);
 
-	target.addEventListener(type, listener, extended);
+	target.addEventListener(type, listener as EventListener, extended);
 
 	return () => {
-		target.removeEventListener(type, listener, extended);
+		target.removeEventListener(type, listener as EventListener, extended);
 	};
 }

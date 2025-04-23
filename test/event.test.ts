@@ -72,6 +72,35 @@ test('dispatch', () => {
 	expect(target.textContent).toBe('4');
 });
 
+test('dispatch:global', () =>
+	new Promise<void>(done => {
+		let fromDocument: string | undefined;
+		let fromWindow: string | undefined;
+
+		on(document, 'fromDocument', (event: CustomEvent) => {
+			fromDocument = 'fromDocument';
+		});
+
+		on(window, 'fromWindow', (event: CustomEvent) => {
+			fromWindow = event.detail;
+		});
+
+		dispatch(document, 'fromDocument', {
+			detail: 'fromDocument',
+		});
+
+		dispatch(window, 'fromWindow', {
+			detail: 'fromWindow',
+		});
+
+		setTimeout(() => {
+			expect(fromDocument).toBe('fromDocument');
+			expect(fromWindow).toBe('fromWindow');
+
+			done();
+		}, 125);
+	}));
+
 test('getPosition', () => {
 	const event = new MouseEvent('click', {
 		clientX: 10,

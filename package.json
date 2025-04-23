@@ -4,19 +4,19 @@
 		"url": "https://oscarpalmer.se"
 	},
 	"dependencies": {
-		"@oscarpalmer/atoms": "^0.89"
+		"@oscarpalmer/atoms": "^0.95"
 	},
 	"description": "A collection of badass DOM utilities.",
 	"devDependencies": {
 		"@biomejs/biome": "^1.9",
-		"@types/node": "^22.13",
-		"@vitest/coverage-istanbul": "^3",
+		"@types/node": "^22.14",
+		"@vitest/coverage-istanbul": "^3.1",
 		"dts-bundle-generator": "^9.5",
 		"glob": "^11",
 		"happy-dom": "^17.4",
 		"typescript": "^5.8",
-		"vite": "^6.2",
-		"vitest": "^3"
+		"vite": "^6.3",
+		"vitest": "^3.1"
 	},
 	"exports": {
 		".": {
@@ -148,5 +148,5 @@
 	},
 	"type": "module",
 	"types": "types/index.d.cts",
-	"version": "0.18.0"
+	"version": "0.19.0"
 }

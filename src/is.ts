@@ -27,10 +27,11 @@ export function isChildNode(
 
 export function isEventTarget(value: unknown): value is EventTarget {
 	return (
-		value instanceof EventTarget ||
-		value instanceof Document ||
-		value instanceof Window ||
-		value instanceof Element
+		typeof value === 'object' &&
+		value != null &&
+		typeof (value as EventTarget).addEventListener === 'function' &&
+		typeof (value as EventTarget).removeEventListener === 'function' &&
+		typeof (value as EventTarget).dispatchEvent === 'function'
 	);
 }
 
