@@ -1,6 +1,12 @@
 import {expect, test} from 'vitest';
 import {html} from '../src/html';
 
+function join(nodes: Node[]): string {
+	return nodes
+		.map(node => (node instanceof Element ? node.outerHTML : node.textContent))
+		.join();
+}
+
 test('html', () => {
 	const original = `<div onclick="alert('!')">
 	<p>
@@ -21,7 +27,7 @@ test('html', () => {
 	const expectedNodes = html(original, false);
 
 	expect(expectedNodes.length).toBe(1);
-	expect(expectedNodes.join()).toBe(sanitised);
+	expect(join(expectedNodes)).toBe(sanitised);
 
 	//
 
@@ -38,11 +44,11 @@ test('html', () => {
 	const sanitisedThree = html(original, {});
 
 	expect(sanitisedOne.length).toBe(1);
-	expect(sanitisedOne.join()).toBe(sanitised);
+	expect(join(sanitisedOne)).toBe(sanitised);
 	expect(sanitisedTwo.length).toBe(1);
-	expect(sanitisedTwo.join()).toBe(sanitised);
+	expect(join(sanitisedTwo)).toBe(sanitised);
 	expect(sanitisedThree.length).toBe(1);
-	expect(sanitisedThree.join()).toBe(sanitised);
+	expect(join(sanitisedThree)).toBe(sanitised);
 
 	//
 
@@ -58,12 +64,12 @@ test('html', () => {
 	template.remove();
 
 	expect(external.length).toBe(1);
-	expect(external.join()).toBe('<p>Hello</p>');
+	expect(join(external)).toBe('<p>Hello</p>');
 
 	external = html(template);
 
 	expect(external.length).toBe(1);
-	expect(external.join()).toBe('<p>Hello</p>');
+	expect(join(external)).toBe('<p>Hello</p>');
 
 	//
 

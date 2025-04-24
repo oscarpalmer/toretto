@@ -74,7 +74,7 @@ test('getTextDirection', () => {
 	expect(Style.getTextDirection(outerElement)).toBe('rtl');
 	expect(Style.getTextDirection(textElement)).toBe('ltr');
 
-	// Should be inherited from parent and be 'rtl', but does not seem to be; Happy DOM?
+	// Should be inherited from parent and be 'rtl', but does not seem to be; JSDOM?
 	expect(Style.getTextDirection(innerElement)).toBe('ltr');
 
 	expect(Style.getTextDirection(123 as never)).toBeUndefined();

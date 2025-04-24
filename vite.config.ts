@@ -39,7 +39,7 @@ export default defineConfig({
 			include: ['src/**/*.ts'],
 			provider: 'istanbul',
 		},
-		environment: 'happy-dom',
+		environment: 'jsdom',
 		watch: false,
 	},
 });

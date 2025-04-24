@@ -61,8 +61,8 @@ test('findElement', () => {
 	expect(origin).toBeInstanceOf(HTMLDivElement);
 	expect(origin?.id).toBe('origin');
 
-	const child = Find.$('*', origin ?? undefined);
-	const notFound = Find.$('not-found', origin ?? undefined);
+	const child = Find.$('*', origin);
+	const notFound = Find.$('not-found', origin);
 
 	expect(child).toBeInstanceOf(HTMLSpanElement);
 	expect(child?.id).toBe('hover');
@@ -82,7 +82,7 @@ test('findElements', () => {
 	expect(origin.length).toBe(1);
 	expect(origin[0].id).toBe('origin');
 
-	origin = Find.findElements(origin, Find.findElement('.target') ?? undefined);
+	origin = Find.findElements(origin, Find.findElement('.target'));
 
 	expect(origin.length).toBe(1);
 	expect(origin[0].id).toBe('origin');

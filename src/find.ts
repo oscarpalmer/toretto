@@ -1,3 +1,4 @@
+import type {PlainObject} from '@oscarpalmer/atoms/models';
 import type {Selector} from './models';
 
 /**
@@ -79,23 +80,25 @@ export function findAncestor(
  * - `context` is optional and defaults to `document`
  */
 export function findElement(
-	selector: string,
-	context?: Selector,
-): Element | null {
-	return findElementOrElements(selector, context, true) as never;
-}
+		selector: string,
+		context?: Selector | null,
+	): Element | null {
+		return findElementOrElements(selector, context, true) as never;
+	}
 
 function findElementOrElements(
 	selector: Selector,
-	context: Selector | undefined,
+	context: Selector | null | undefined,
 	single: boolean,
 ): Element | Element[] | null {
-	const callback = single ? document.querySelector : document.querySelectorAll;
+	const callback = single ? 'querySelector' : 'querySelectorAll';
 
 	const contexts =
 		context == null
 			? [document]
-			: (findElementOrElements(context, undefined, false) as Element[]);
+			: (findElementOrElements(context, undefined, false) as Element[]).filter(
+					isContext,
+				);
 
 	const result: Element[] = [];
 
@@ -103,10 +106,9 @@ function findElementOrElements(
 		const {length} = contexts;
 
 		for (let index = 0; index < length; index += 1) {
-			const value = callback.call(contexts[index], selector) as
-				| Element
-				| Element[]
-				| null;
+			const value = (
+				contexts[index][callback] as (selector: string) => Node | null
+			)(selector) as Element | Element[] | null;
 
 			if (single) {
 				if (value == null) {
@@ -166,11 +168,11 @@ function findElementOrElements(
  * - `context` is optional and defaults to `document`
  */
 export function findElements(
-	selector: Selector,
-	context?: Selector,
-): Element[] {
-	return findElementOrElements(selector, context, false) as never;
-}
+		selector: Selector,
+		context?: Selector | null,
+	): Element[] {
+		return findElementOrElements(selector, context, false) as never;
+	}
 
 /**
  * - Finds the closest elements to the origin element that matches the selector
@@ -259,6 +261,13 @@ export function getElementUnderPointer(skipIgnore?: boolean): Element | null {
 	}
 
 	return returned.at(-1) ?? null;
+}
+
+function isContext(value: unknown): boolean {
+	return (
+		typeof (value as PlainObject)?.querySelector === 'function' &&
+		typeof (value as PlainObject)?.querySelectorAll === 'function'
+	);
 }
 
 function traverse(from: Element, to: Element): number | undefined {

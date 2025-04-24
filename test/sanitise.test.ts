@@ -1,6 +1,12 @@
 import {afterAll, expect, test} from 'vitest';
 import {sanitise} from '../src/sanitise';
 
+function join(nodes: Node[]): string {
+	return nodes
+		.map(node => (node instanceof Element ? node.outerHTML : node.textContent))
+		.join();
+}
+
 afterAll(() => {
 	document.body.innerHTML = '';
 });
@@ -20,7 +26,7 @@ test('sanitise', () => {
 
 	expect(nodes.length).toBe(1);
 
-	expect(nodes.join()).toBe(`<body><div hidden="">
+	expect(join(nodes)).toBe(`<body><div hidden="">
 	<p>
 		<a>One</a>
 		<a>Two</a>
@@ -34,7 +40,7 @@ test('sanitise', () => {
 
 	expect(nodes.length).toBe(1);
 
-	expect(nodes.join()).toBe(`<body><div hidden="hmm">
+	expect(join(nodes)).toBe(`<body><div hidden="hmm">
 	<p>
 		<a>One</a>
 		<a>Two</a>

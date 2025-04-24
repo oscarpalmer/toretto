@@ -2,6 +2,27 @@ import {noop} from '@oscarpalmer/atoms/function';
 import {expect, test} from 'vitest';
 import {dispatch, getPosition, off, on} from '../src/event';
 
+class FakeTouch {
+	clientX: number;
+	clientY: number;
+	identifier: number;
+	target: EventTarget;
+
+	constructor(init: FakeTouchInit) {
+		this.clientX = init.clientX;
+		this.clientY = init.clientY;
+		this.identifier = init.identifier;
+		this.target = init.target;
+	}
+}
+
+type FakeTouchInit = {
+	clientX: number;
+	clientY: number;
+	identifier: number;
+	target: EventTarget;
+};
+
 test('dispatch', () => {
 	let value = 0;
 
@@ -109,12 +130,12 @@ test('getPosition', () => {
 
 	const touchEvent = new TouchEvent('touchstart', {
 		touches: [
-			new Touch({
+			new FakeTouch({
 				clientX: 20,
 				clientY: 10,
 				identifier: -1,
 				target: document.body,
-			}),
+			}) as unknown as Touch,
 		],
 	});
 

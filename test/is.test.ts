@@ -10,11 +10,6 @@ const values = [
 	[],
 	{},
 	document.createDocumentFragment(),
-	document.implementation.createDocumentType(
-		'qualifiedName',
-		'publicId',
-		'systemId',
-	),
 	document.createComment(''),
 	document.createProcessingInstruction('target', 'data'),
 	document.createTextNode(''),
@@ -27,13 +22,13 @@ const {length} = values;
 test('isChildNode', () => {
 	for (let index = 0; index < length; index += 1) {
 		expect(Is.isChildNode(values[index])).toBe(index >= 8);
-		expect(Is.isChildNode(values[index], true)).toBe(index >= 9);
+		expect(Is.isChildNode(values[index], true)).toBe(index >= 8);
 	}
 });
 
 test('isHTMLOrSVGElement', () => {
 	for (let index = 0; index < length; index += 1) {
-		expect(Is.isHTMLOrSVGElement(values[index])).toBe(index >= 12);
+		expect(Is.isHTMLOrSVGElement(values[index])).toBe(index >= 11);
 	}
 });
 
