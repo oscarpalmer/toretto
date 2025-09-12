@@ -108,6 +108,151 @@ const nonBooleanAttributes = [
 	'wrap',
 ];
 
+test('getAttribute + setAttribute', () => {
+	const element = document.createElement('div');
+
+	Attribute.setAttribute(element, 'id', 'test');
+
+	Attribute.setAttribute(element, {
+		name: 'keyed',
+		value: 'keyed',
+	});
+
+	Attribute.setAttribute(element, 'data-a', 123);
+	Attribute.setAttribute(element, 'data-b', 'hello, world!');
+
+	expect(Attribute.getAttribute(element, 'id')).toBe('test');
+	expect(Attribute.getAttribute(element, 'keyed')).toBe('keyed');
+
+	expect(Attribute.getAttribute(element, 'data-a')).toBe(123);
+	expect(Attribute.getAttribute(element, 'data-a', false)).toBe('123');
+	expect(Attribute.getAttribute(element, 'data-b')).toBe('hello, world!');
+	expect(Attribute.getAttribute(element, 'data-b', false)).toBe(
+		'hello, world!',
+	);
+
+	let first = Attribute.getAttributes(element, [
+		'data-a',
+		'data-b',
+		'id',
+		'keyed',
+	]);
+
+	expect(first['data-a']).toBe(123);
+	expect(first['data-b']).toBe('hello, world!');
+	expect(first.id).toBe('test');
+	expect(first.keyed).toBe('keyed');
+
+	Attribute.setAttribute(element, 'id');
+	Attribute.setAttribute(element, {name: 'keyed', value: null});
+
+	expect(Attribute.getAttribute(element, 'id')).toBe(undefined);
+	expect(Attribute.getAttribute(element, 'keyed')).toBe(undefined);
+
+	first = Attribute.getAttributes(
+		element,
+		['data-a', 'data-b', 'id', 'keyed'],
+		false,
+	);
+
+	expect(first['data-a']).toBe('123');
+	expect(first['data-b']).toBe('hello, world!');
+	expect(first.id).toBe(undefined);
+	expect(first.keyed).toBe(undefined);
+
+	Attribute.setAttributes(element, {
+		alpha: 123,
+		beta: 'hello',
+		gamma: true,
+	});
+
+	expect(Attribute.getAttribute(element, 'alpha')).toBe('123');
+	expect(Attribute.getAttribute(element, 'beta')).toBe('hello');
+	expect(Attribute.getAttribute(element, 'gamma')).toBe('true');
+
+	let second = Attribute.getAttributes(element, ['alpha', 'beta', 'gamma']);
+
+	expect(second.alpha).toBe('123');
+	expect(second.beta).toBe('hello');
+	expect(second.gamma).toBe('true');
+
+	Attribute.setAttributes(element, [{name: 'beta', value: null}]);
+
+	expect(Attribute.getAttribute(element, 'alpha')).toBe('123');
+	expect(Attribute.getAttribute(element, 'beta')).toBe(undefined);
+	expect(Attribute.getAttribute(element, 'gamma')).toBe('true');
+
+	second = Attribute.getAttributes(element, ['alpha', 'beta', 'gamma']);
+
+	expect(second.alpha).toBe('123');
+	expect(second.beta).toBe(undefined);
+	expect(second.gamma).toBe('true');
+
+	Attribute.setAttributes(element, [
+		{name: 'alpha', value: 456},
+		{name: 'gamma', value: false},
+	]);
+
+	expect(Attribute.getAttribute(element, 'alpha')).toBe('456');
+	expect(Attribute.getAttribute(element, 'beta')).toBe(undefined);
+	expect(Attribute.getAttribute(element, 'gamma')).toBe('false');
+
+	second = Attribute.getAttributes(element, ['alpha', 'beta', 'gamma']);
+
+	expect(second.alpha).toBe('456');
+	expect(second.beta).toBe(undefined);
+	expect(second.gamma).toBe('false');
+
+	Attribute.setAttributes(element, [{name: 'alpha', value: null}]);
+
+	expect(Attribute.getAttribute(element, 'alpha')).toBe(undefined);
+	expect(Attribute.getAttribute(element, 'beta')).toBe(undefined);
+	expect(Attribute.getAttribute(element, 'gamma')).toBe('false');
+
+	second = Attribute.getAttributes(element, ['alpha', 'beta', 'gamma']);
+
+	expect(second.alpha).toBe(undefined);
+	expect(second.beta).toBe(undefined);
+	expect(second.gamma).toBe('false');
+
+	const properties = [
+		{name: 'hidden', value: true},
+		{name: 'multiple', value: ''},
+		{name: 'notreal', value: true},
+		{name: 'readonly', value: 'readonly'},
+		{name: 'selected', value: false},
+	];
+
+	const {length} = properties;
+
+	for (let index = 0; index < length; index += 1) {
+		if (index % 2 === 0) {
+			Attribute.setAttribute(element, properties[index]);
+		} else {
+			Attribute.setProperty(element, properties[index]);
+		}
+	}
+
+	expect(element.hidden).toBe(true);
+	expect((element as any).multiple).toBe(true);
+	expect((element as any).notreal == null).toBe(true);
+	expect((element as any).readonly).toBe(true);
+	expect((element as any).selected).toBe(false);
+
+	expect(Attribute.getAttribute('blah' as never, '')).toBe(undefined);
+	expect(Attribute.getAttribute(element, [] as never)).toBe(undefined);
+	expect(Attribute.getAttributes('blah' as never, [])).toEqual({});
+	expect(Attribute.getAttributes(element, 'blah' as never)).toEqual({});
+
+	expect(Attribute.setAttribute(123 as never, {name: 'x', value: 'y'})).toBe(
+		undefined,
+	);
+
+	expect(Attribute.setAttribute(element, 123 as never, 'blah')).toBe(undefined);
+
+	expect(Attribute.setAttributes(123 as never, [])).toBe(undefined);
+});
+
 test('isBadAttribute', () => {
 	const attributes = [
 		['onclick', 'alert()'],
@@ -221,83 +366,6 @@ test('isInvalidBooleanAttribute', () => {
 	expect(
 		Attribute.isInvalidBooleanAttribute({name: '', value: 123 as never}),
 	).toBe(true);
-});
-
-test('setAttribute', () => {
-	const element = document.createElement('div');
-
-	Attribute.setAttribute(element, 'id', 'test');
-
-	Attribute.setAttribute(element, {
-		name: 'keyed',
-		value: 'keyed',
-	});
-
-	expect(element.getAttribute('id')).toBe('test');
-	expect(element.getAttribute('keyed')).toBe('keyed');
-
-	Attribute.setAttribute(element, 'id');
-	Attribute.setAttribute(element, {name: 'keyed', value: null});
-
-	expect(element.getAttribute('id')).toBe(null);
-
-	Attribute.setAttributes(element, {
-		alpha: 123,
-		beta: 'hello',
-		gamma: true,
-	});
-
-	expect(element.getAttribute('alpha')).toBe('123');
-	expect(element.getAttribute('beta')).toBe('hello');
-	expect(element.getAttribute('gamma')).toBe('true');
-
-	Attribute.setAttributes(element, [{name: 'beta', value: null}]);
-
-	expect(element.getAttribute('beta')).toBe(null);
-
-	Attribute.setAttributes(element, [
-		{name: 'alpha', value: 456},
-		{name: 'gamma', value: false},
-	]);
-
-	expect(element.getAttribute('alpha')).toBe('456');
-	expect(element.getAttribute('gamma')).toBe('false');
-
-	Attribute.setAttributes(element, [{name: 'alpha', value: null}]);
-
-	expect(element.getAttribute('alpha')).toBe(null);
-
-	const properties = [
-		{name: 'hidden', value: true},
-		{name: 'multiple', value: ''},
-		{name: 'notreal', value: true},
-		{name: 'readonly', value: 'readonly'},
-		{name: 'selected', value: false},
-	];
-
-	const {length} = properties;
-
-	for (let index = 0; index < length; index += 1) {
-		if (index % 2 === 0) {
-			Attribute.setAttribute(element, properties[index]);
-		} else {
-			Attribute.setProperty(element, properties[index]);
-		}
-	}
-
-	expect(element.hidden).toBe(true);
-	expect((element as any).multiple).toBe(true);
-	expect((element as any).notreal == null).toBe(true);
-	expect((element as any).readonly).toBe(true);
-	expect((element as any).selected).toBe(false);
-
-	expect(Attribute.setAttribute(123 as never, {name: 'x', value: 'y'})).toBe(
-		undefined,
-	);
-
-	expect(Attribute.setAttribute(element, 123 as never, 'blah')).toBe(undefined);
-
-	expect(Attribute.setAttributes(123 as never, [])).toBe(undefined);
 });
 
 test('setProperty', () => {

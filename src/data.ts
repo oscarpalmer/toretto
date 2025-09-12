@@ -1,32 +1,50 @@
 import type {PlainObject} from '@oscarpalmer/atoms/models';
-import {parse} from '@oscarpalmer/atoms/string';
+import {kebabCase, parse} from '@oscarpalmer/atoms/string';
 import {setElementValues, updateElementValue} from './internal/element-value';
 import {isHTMLOrSVGElement} from './is';
 import type {HTMLOrSVGElement} from './models';
 
 /**
- * Get data values from an element
+ * Get a keyed data value from an element
+ * @param element Element to get data from
+ * @param key Data key
+ * @param parse Parse values? _(defaults to `true`)_
+ * @returns Data value
  */
-export function getData<Value extends PlainObject>(
-	element: HTMLOrSVGElement,
-	keys: string[],
-): Value;
+export function getData(
+		element: HTMLOrSVGElement,
+		key: string,
+		parse?: boolean,
+	): unknown;
 
 /**
- * Get a data value from an element
+ * Get keyed data values from an element
+ * @param element Element to get data from
+ * @param keys Keys of the data values to get
+ * @param parse Parse values? _(defaults to `true`)_
+ * @returns Keyed data values
  */
-export function getData(element: HTMLOrSVGElement, key: string): unknown;
+export function getData<Key extends string>(
+	element: HTMLOrSVGElement,
+	keys: Key[],
+	parse?: boolean,
+): Record<Key, unknown>;
 
 export function getData(
 	element: HTMLOrSVGElement,
 	keys: string | string[],
+	parseValues?: boolean,
 ): unknown {
 	if (!isHTMLOrSVGElement(element)) {
 		return;
 	}
 
+	const shouldParse = parseValues !== false;
+
 	if (typeof keys === 'string') {
-		return getDataValue(element, keys);
+		const value = element.dataset[keys];
+
+		return value == null ? undefined : shouldParse ? parse(value) : value;
 	}
 
 	const {length} = keys;
@@ -35,28 +53,30 @@ export function getData(
 
 	for (let index = 0; index < length; index += 1) {
 		const key = keys[index];
+		const value = element.dataset[key];
 
-		data[key] = getDataValue(element, key);
+		data[key] = value == null ? undefined : shouldParse ? parse(value) : value;
 	}
 
 	return data;
 }
 
-function getDataValue(element: HTMLOrSVGElement, key: string): unknown {
-	const value = element.dataset[key];
-
-	if (value != null) {
-		return parse(value);
-	}
+function getName(original: string): string {
+	return `data-${kebabCase(original).replace(dataPrefix, '')}`;
 }
 
 /**
  * Set data values on an element
+ * @param element Element to set data on
+ * @param data Data to set
  */
 export function setData(element: HTMLOrSVGElement, data: PlainObject): void;
 
 /**
  * Set a data value on an element
+ * @param element Element to set data on
+ * @param key Data key
+ * @param value Data value
  */
 export function setData(
 	element: HTMLOrSVGElement,
@@ -79,10 +99,12 @@ function updateDataAttribute(
 ): void {
 	updateElementValue(
 		element,
-		`data-${key}`,
+		getName(key),
 		value,
 		element.setAttribute,
 		element.removeAttribute,
 		true,
 	);
 }
+
+const dataPrefix = /^data-/i;

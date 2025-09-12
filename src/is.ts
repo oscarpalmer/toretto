@@ -2,29 +2,18 @@ import type {HTMLOrSVGElement} from './models';
 
 /**
  * Is the value a child node?
+ * @param value Value to check
+ * @returns `true` if it's a child node, otherwise `false`
  */
-export function isChildNode(value: unknown): value is ChildNode;
-
-/**
- * - Is the value a child node?
- * - Ignores `DocumentType`-nodes
- */
-export function isChildNode(
-	value: unknown,
-	ignoreDocumentType: true,
-): value is ChildNode;
-
-export function isChildNode(
-	value: unknown,
-	ignoreDocumentType?: boolean,
-): value is ChildNode {
-	return (
-		value instanceof CharacterData ||
-		(value instanceof DocumentType ? ignoreDocumentType !== true : false) ||
-		value instanceof Element
-	);
+export function isChildNode(value: unknown): value is ChildNode {
+	return value instanceof Node && childNodeTypes.has(value.nodeType);
 }
 
+/**
+ * Is the value an event target?
+ * @param value Value to check
+ * @returns `true` if it's an event target, otherwise `false`
+ */
 export function isEventTarget(value: unknown): value is EventTarget {
 	return (
 		typeof value === 'object' &&
@@ -37,6 +26,8 @@ export function isEventTarget(value: unknown): value is EventTarget {
 
 /**
  * Is the value an HTML or SVG element?
+ * @param value Value to check
+ * @returns `true` if it's an HTML or SVG element, otherwise `false`
  */
 export function isHTMLOrSVGElement(value: unknown): value is HTMLOrSVGElement {
 	return value instanceof HTMLElement || value instanceof SVGElement;
@@ -44,11 +35,16 @@ export function isHTMLOrSVGElement(value: unknown): value is HTMLOrSVGElement {
 
 /**
  * Is the node inside a document?
+ * @param node Node to check
+ * @returns `true` if it's inside a document, otherwise `false`
  */
 export function isInDocument(node: Node): boolean;
 
 /**
  * Is the node inside a specific document?
+ * @param node Node to check
+ * @param document Document to check within
+ * @returns `true` if it's inside the document, otherwise `false`
  */
 export function isInDocument(node: Node, document: Document): boolean;
 
@@ -61,3 +57,13 @@ export function isInDocument(node: Node, document?: Document): boolean {
 			: (node.ownerDocument?.contains(node) ?? true)
 		: false;
 }
+
+//
+
+const childNodeTypes = new Set<unknown>([
+	1, // Node.ELEMENT_NODE,
+	3, // Node.TEXT_NODE,
+	7, // Node.PROCESSING_INSTRUCTION_NODE,
+	8, // Node.COMMENT_NODE,
+	10, // Node.DOCUMENT_TYPE_NODE,
+]);

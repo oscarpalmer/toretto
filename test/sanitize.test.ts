@@ -1,5 +1,5 @@
 import {afterAll, expect, test} from 'vitest';
-import {sanitise} from '../src/sanitise';
+import {sanitize} from '../src/sanitize';
 
 function join(nodes: Node[]): string {
 	return nodes
@@ -11,7 +11,7 @@ afterAll(() => {
 	document.body.innerHTML = '';
 });
 
-test('sanitise', () => {
+test('sanitize', () => {
 	const original = `<div hidden="hmm" onclick="alert('!')">
 	<p>
 		<a href="data:text/html,hmm">One</a>
@@ -22,7 +22,7 @@ test('sanitise', () => {
 
 	document.body.innerHTML = original;
 
-	let nodes = sanitise(document.body);
+	let nodes = sanitize(document.body);
 
 	expect(nodes.length).toBe(1);
 
@@ -36,7 +36,9 @@ test('sanitise', () => {
 
 	document.body.innerHTML = original;
 
-	nodes = sanitise(document.body, {sanitiseBooleanAttributes: false});
+	nodes = sanitize(document.body, {
+		sanitizeBooleanAttributes: false,
+	});
 
 	expect(nodes.length).toBe(1);
 

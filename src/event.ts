@@ -26,10 +26,7 @@ function createEvent(type: string, options?: CustomEventInit): Event {
 		});
 	}
 
-	return new Event(
-		type,
-		createDispatchOptions(hasOptions ? (options as CustomEventInit) : {}),
-	);
+	return new Event(type, createDispatchOptions(hasOptions ? options : {}));
 }
 
 function createEventOptions(
@@ -45,6 +42,9 @@ function createEventOptions(
 
 /**
  * Dispatch an event for a target
+ * @param target Event target
+ * @param type Type of event
+ * @param options Options for event
  */
 export function dispatch<Type extends keyof HTMLElementEventMap>(
 	target: EventTarget,
@@ -54,6 +54,9 @@ export function dispatch<Type extends keyof HTMLElementEventMap>(
 
 /**
  * Dispatch an event for a target
+ * @param target Event target
+ * @param type Type of event
+ * @param options Options for event
  */
 export function dispatch(
 	target: EventTarget,
@@ -73,6 +76,8 @@ export function dispatch<Type extends keyof HTMLElementEventMap>(
 
 /**
  * Get the X- and Y-coordinates from a pointer event
+ * @param event Pointer event
+ * @returns X- and Y-coordinates
  */
 export function getPosition(
 	event: MouseEvent | TouchEvent,
@@ -93,6 +98,10 @@ export function getPosition(
 
 /**
  * Remove an event listener
+ * @param target Event target
+ * @param type Type of event
+ * @param listener Event listener
+ * @param options Options for event
  */
 export function off(
 	target: EventTarget,
@@ -115,6 +124,10 @@ export function off(
 
 /**
  * Add an event listener
+ * @param target Event target
+ * @param type Type of event
+ * @param listener Event listener
+ * @param options Options for event
  */
 export function on<Type extends keyof HTMLElementEventMap>(
 	target: EventTarget,
@@ -125,6 +138,10 @@ export function on<Type extends keyof HTMLElementEventMap>(
 
 /**
  * Add an event listener
+ * @param target Event target
+ * @param type Type of event
+ * @param listener Event listener
+ * @param options Options for event
  */
 export function on(
 	target: EventTarget,

@@ -6,5 +6,5 @@ export * from './focusable';
 export * from './html';
 export * from './is';
 export * from './models';
-export * from './sanitise';
+export * from './sanitize';
 export * from './style';

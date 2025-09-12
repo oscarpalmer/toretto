@@ -1,37 +1,57 @@
 import {setElementValues, updateElementValue} from './internal/element-value';
+import {getStyleValue} from './internal/get-value';
 import {isHTMLOrSVGElement} from './is';
 import type {HTMLOrSVGElement, TextDirection} from './models';
 
 /**
  * Get a style from an element
+ * @param element Element to get the style from
+ * @param property Style name
+ * @param computed Get the computed style? _(defaults to `false`)_
+ * @returns Style value
  */
 export function getStyle(
 	element: HTMLOrSVGElement,
 	property: keyof CSSStyleDeclaration,
-): string {
-	return isHTMLOrSVGElement(element)
-		? element.style[property as never]
-		: (undefined as never);
+	computed?: boolean,
+): string | undefined {
+	if (!isHTMLOrSVGElement(element) || typeof property !== 'string') {
+		return undefined;
+	}
+
+	return getStyleValue(element, property, computed === true);
 }
 
 /**
  * Get styles from an element
+ * @param element Element to get the styles from
+ * @param properties Styles to get
+ * @param computed Get the computed styles? _(defaults to `false`)_
+ * @returns Style values
  */
 export function getStyles<Property extends keyof CSSStyleDeclaration>(
 	element: HTMLOrSVGElement,
 	properties: Property[],
-): Pick<CSSStyleDeclaration, Property> {
+	computed?: boolean,
+): Record<Property, string | undefined> {
+	const styles = {} as Record<Property, string | undefined>;
+
 	if (!isHTMLOrSVGElement(element) || !Array.isArray(properties)) {
-		return {} as Pick<CSSStyleDeclaration, Property>;
+		return styles;
 	}
 
-	const styles = {} as Pick<CSSStyleDeclaration, Property>;
 	const {length} = properties;
 
 	for (let index = 0; index < length; index += 1) {
 		const property = properties[index];
 
-		styles[property] = element.style[property as never] as never;
+		if (typeof property === 'string') {
+			styles[property] = getStyleValue(
+				element,
+				property,
+				computed === true,
+			) as never;
+		}
 	}
 
 	return styles;
@@ -39,8 +59,14 @@ export function getStyles<Property extends keyof CSSStyleDeclaration>(
 
 /**
  * Get the text direction of an element
+ * @param element Element to get the text direction from
+ * @param computed Get the computed text direction? _(defaults to `false`)_
+ * @returns Text direction
  */
-export function getTextDirection(element: Element): TextDirection {
+export function getTextDirection(
+	element: HTMLOrSVGElement,
+	computed?: boolean,
+): TextDirection {
 	if (!(element instanceof Element)) {
 		return undefined as never;
 	}
@@ -51,13 +77,16 @@ export function getTextDirection(element: Element): TextDirection {
 		return direction.toLowerCase() as TextDirection;
 	}
 
-	return (
-		getComputedStyle?.(element)?.direction === 'rtl' ? 'rtl' : 'ltr'
-	) as TextDirection;
+	return getStyleValue(element, 'direction', computed === true) === 'rtl'
+		? 'rtl'
+		: 'ltr';
 }
 
 /**
  * Set a style on an element
+ * @param element Element to set the style on
+ * @param property Style name
+ * @param value Style value
  */
 export function setStyle(
 	element: HTMLOrSVGElement,
@@ -69,6 +98,8 @@ export function setStyle(
 
 /**
  * Set styles on an element
+ * @param element Element to set the styles on
+ * @param styles Styles to set
  */
 export function setStyles(
 	element: HTMLOrSVGElement,

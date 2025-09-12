@@ -37,6 +37,9 @@ function getDistanceBetweenElements(
  * - Matches may be found by a query string or a callback
  * - If no match is found, `null` is returned
  * - _(If you want to search upwards, downwards, and sideways, use `findRelative`)_
+ * @param origin Element to start from
+ * @param selector Selector to match
+ * @returns Found ancestor or `null`
  */
 export function findAncestor(
 	origin: Element,
@@ -76,15 +79,19 @@ export function findAncestor(
 }
 
 /**
- * - Find the first element that matches the selector
- * - `context` is optional and defaults to `document`
+ * Find the first element that matches the selector
+ *
+ * _(`context` is optional and defaults to `document`)_
+ * @param selector Selector to find
+ * @param context Context to search within
+ * @returns Found element or `null`
  */
 export function findElement(
-		selector: string,
-		context?: Selector | null,
-	): Element | null {
-		return findElementOrElements(selector, context, true) as never;
-	}
+	selector: string,
+	context?: Selector,
+): Element | null {
+	return findElementOrElements(selector, context, true) as never;
+}
 
 function findElementOrElements(
 	selector: Selector,
@@ -165,19 +172,26 @@ function findElementOrElements(
 /**
  * - Find elements that match the selector
  * - If `selector` is a node or a list of nodes, they are filtered and returned
- * - `context` is optional and defaults to `document`
+ * - _(`context` is optional and defaults to `document`)_
+ * @param selector Selector to find
+ * @param context Context to search within
+ * @returns Found elements
  */
 export function findElements(
-		selector: Selector,
-		context?: Selector | null,
-	): Element[] {
-		return findElementOrElements(selector, context, false) as never;
-	}
+	selector: Selector,
+	context?: Selector,
+): Element[] {
+	return findElementOrElements(selector, context, false) as never;
+}
 
 /**
  * - Finds the closest elements to the origin element that matches the selector
  * - Traverses up, down, and sideways in the _DOM_-tree
  * - _(If you only want to traverse up, use `findAncestor`)_
+ * @param origin Element to start from
+ * @param selector Selector to match
+ * @param context Context to search within
+ * @returns Found elements
  */
 export function findRelatives(
 	origin: Element,
@@ -235,7 +249,9 @@ export function findRelatives(
 /**
  * - Get the most specific element under the pointer
  * - Ignores elements with `pointer-events: none` and `visibility: hidden`
- * - If `skipIgnore` is `true`, no elements are ignored
+ * - _(If `skipIgnore` is `true`, no elements are ignored)_
+ * @param skipIgnore Skip ignored elements?
+ * @returns Found element or `null`
  */
 export function getElementUnderPointer(skipIgnore?: boolean): Element | null {
 	const elements = [...document.querySelectorAll(':hover')];

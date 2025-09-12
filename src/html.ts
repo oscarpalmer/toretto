@@ -1,8 +1,5 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import {type SanitiseOptions, sanitise} from './sanitise';
-
-const idPattern = /^[a-z][\w-]*$/i;
-const templates: Record<string, HTMLTemplateElement> = {};
+import {type SanitizeOptions, sanitize} from './sanitize';
 
 function createTemplate(html: string): HTMLTemplateElement {
 	const template = document.createElement('template');
@@ -36,39 +33,40 @@ function getTemplate(value: string): HTMLTemplateElement | undefined {
 }
 
 /**
- * - Create nodes from a string of _HTML_ or a template element
- * - If `value` looks like an _ID_, it will be treated as an _ID_ before falling back to being treated as _HTML_
- * - If `sanitisation` is not provided, `true`, or an options object, bad markup will be sanitised or removed
- * - Regardless of the value of `sanitisation`, script tags will always be removed
+ * Create nodes from an HTML string or a template element
+ * @param value HTML string or id for a template element
+ * @param sanitization Sanitization options
+ * @returns Created nodes
  */
 export function html(
 	value: string,
-	sanitisation?: boolean | SanitiseOptions,
+	sanitization?: boolean | SanitizeOptions,
 ): Node[];
 
 /**
- * - Create nodes from a template element
- * - If `sanitisation` is not provided, `true`, or an options object, bad markup will be sanitised or removed
- * - Regardless of the value of `sanitisation`, script tags will always be removed
+ * Create nodes from a template element
+ * @param template Template element
+ * @param sanitization Sanitization options
+ * @returns Created nodes
  */
 export function html(
-	value: HTMLTemplateElement,
-	sanitisation?: boolean | SanitiseOptions,
+	template: HTMLTemplateElement,
+	sanitization?: boolean | SanitizeOptions,
 ): Node[];
 
 export function html(
 	value: string | HTMLTemplateElement,
-	sanitisation?: boolean | SanitiseOptions,
+	sanitization?: boolean | SanitizeOptions,
 ): Node[] {
 	if (typeof value !== 'string' && !(value instanceof HTMLTemplateElement)) {
 		return [];
 	}
 
 	const options =
-		sanitisation == null || sanitisation === true
+		sanitization == null || sanitization === true
 			? {}
-			: isPlainObject(sanitisation)
-				? {...sanitisation}
+			: isPlainObject(sanitization)
+				? {...sanitization}
 				: null;
 
 	const template =
@@ -89,6 +87,12 @@ export function html(
 	cloned.normalize();
 
 	return options != null
-		? sanitise([...cloned.childNodes], options)
+		? sanitize([...cloned.childNodes], options)
 		: [...cloned.childNodes];
 }
+
+//
+
+const idPattern = /^[a-z][\w-]*$/i;
+
+const templates: Record<string, HTMLTemplateElement> = {};

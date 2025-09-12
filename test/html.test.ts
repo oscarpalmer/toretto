@@ -16,7 +16,7 @@ test('html', () => {
 	</p>
 </div><script>alert('!')</script>`;
 
-	let sanitised = `<div onclick="alert('!')">
+	let sanitized = `<div onclick="alert('!')">
 	<p>
 		<a href="data:text/html,hmm">One</a>
 		<a xlink:href="javascript:console.log">Two</a>
@@ -27,11 +27,11 @@ test('html', () => {
 	const expectedNodes = html(original, false);
 
 	expect(expectedNodes.length).toBe(1);
-	expect(join(expectedNodes)).toBe(sanitised);
+	expect(join(expectedNodes)).toBe(sanitized);
 
 	//
 
-	sanitised = `<div>
+	sanitized = `<div>
 	<p>
 		<a>One</a>
 		<a>Two</a>
@@ -39,16 +39,16 @@ test('html', () => {
 	</p>
 </div>`;
 
-	const sanitisedOne = html(original);
-	const sanitisedTwo = html(original, true);
-	const sanitisedThree = html(original, {});
+	const sanitizedOne = html(original);
+	const sanitizedTwo = html(original, true);
+	const sanitizedThree = html(original, {});
 
-	expect(sanitisedOne.length).toBe(1);
-	expect(join(sanitisedOne)).toBe(sanitised);
-	expect(sanitisedTwo.length).toBe(1);
-	expect(join(sanitisedTwo)).toBe(sanitised);
-	expect(sanitisedThree.length).toBe(1);
-	expect(join(sanitisedThree)).toBe(sanitised);
+	expect(sanitizedOne.length).toBe(1);
+	expect(join(sanitizedOne)).toBe(sanitized);
+	expect(sanitizedTwo.length).toBe(1);
+	expect(join(sanitizedTwo)).toBe(sanitized);
+	expect(sanitizedThree.length).toBe(1);
+	expect(join(sanitizedThree)).toBe(sanitized);
 
 	//
 

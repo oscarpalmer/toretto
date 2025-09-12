@@ -8,42 +8,12 @@ type ElementWithTabIndex = {
 type Filter = (item: ElementWithTabIndex) => boolean;
 type InertElement = Element & {inert: boolean};
 
-const disableablePattern = /^(button|input|select|textarea)$/i;
-
-const firstSummary = 'details > summary:first-of-type';
-
-const focusableFilters = [isDisabled, isInert, isHidden, isSummarised];
-
-const selector = [
-	'[contenteditable]:not([contenteditable="false"])',
-	'[tabindex]:not(slot)',
-	'a[href]',
-	'audio[controls]',
-	'button',
-	'details',
-	firstSummary,
-	'input',
-	'select',
-	'textarea',
-	'video[controls]',
-]
-	.map(selector => `${selector}:not([inert])`)
-	.join(',');
-
-const specialTabIndexPattern = /^(audio|details|video)$/i;
-
-const summaryPattern = /^summary$/i;
-
-const tabbableFilters = [
-	isNotTabbable,
-	isNotTabbableRadio,
-	...focusableFilters,
-];
-
-const trueishPattern = /^(|true)$/i;
+//
 
 /**
  * Get a list of focusable elements within a parent element
+ * @param parent Parent element
+ * @returns Focusable elements
  */
 export function getFocusable(parent: Element): Element[] {
 	return getValidElements(parent, focusableFilters, false);
@@ -58,6 +28,8 @@ function getItem(element: Element, tabbable: boolean): ElementWithTabIndex {
 
 /**
  * Get a list of tabbable elements within a parent element
+ * @param parent Parent element
+ * @returns Tabbable elements
  */
 export function getTabbable(parent: Element): Element[] {
 	return getValidElements(parent, tabbableFilters, true);
@@ -174,6 +146,8 @@ function isEditable(element: Element): boolean {
 
 /**
  * Is the element focusable?
+ * @param element Element to check
+ * @returns `true` if focusable, otherwise `false`
  */
 export function isFocusable(element: Element): boolean {
 	return element instanceof Element
@@ -263,6 +237,8 @@ function isSummarised(item: ElementWithTabIndex) {
 
 /**
  * Is the element tabbable?
+ * @param element Element to check
+ * @returns `true` if tabbable, otherwise `false`
  */
 export function isTabbable(element: Element): boolean {
 	return element instanceof Element
@@ -279,3 +255,39 @@ function isValidElement(
 
 	return !filters.some(filter => filter(item));
 }
+
+//
+
+const disableablePattern = /^(button|input|select|textarea)$/i;
+
+const firstSummary = 'details > summary:first-of-type';
+
+const focusableFilters = [isDisabled, isInert, isHidden, isSummarised];
+
+const selector = [
+	'[contenteditable]:not([contenteditable="false"])',
+	'[tabindex]:not(slot)',
+	'a[href]',
+	'audio[controls]',
+	'button',
+	'details',
+	firstSummary,
+	'input',
+	'select',
+	'textarea',
+	'video[controls]',
+]
+	.map(selector => `${selector}:not([inert])`)
+	.join(',');
+
+const specialTabIndexPattern = /^(audio|details|video)$/i;
+
+const summaryPattern = /^summary$/i;
+
+const tabbableFilters = [
+	isNotTabbable,
+	isNotTabbableRadio,
+	...focusableFilters,
+];
+
+const trueishPattern = /^(|true)$/i;

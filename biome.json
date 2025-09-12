@@ -1,7 +1,10 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.2.3/schema.json",
 	"files": {
-		"ignore": ["./dist/**/*"]
+		"includes": [
+			"./src/**/*",
+			"./test/**/*"
+		]
 	},
 	"javascript": {
 		"formatter": {
@@ -15,8 +18,5 @@
 		"rules": {
 			"recommended": true
 		}
-	},
-	"organizeImports": {
-		"enabled": true
 	}
 }

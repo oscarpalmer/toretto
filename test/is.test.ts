@@ -22,7 +22,6 @@ const {length} = values;
 test('isChildNode', () => {
 	for (let index = 0; index < length; index += 1) {
 		expect(Is.isChildNode(values[index])).toBe(index >= 8);
-		expect(Is.isChildNode(values[index], true)).toBe(index >= 8);
 	}
 });
 

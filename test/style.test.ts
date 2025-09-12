@@ -13,7 +13,7 @@ test('getStyle(s) & setStyle(s)', () =>
 			backgroundColor: 'green',
 			position: 'absolute',
 		});
-	
+
 		expect(Style.getStyle(123 as never, 'color')).toBeUndefined();
 		expect(Style.getStyles(123 as never, ['color'])).toEqual({});
 
@@ -24,11 +24,33 @@ test('getStyle(s) & setStyle(s)', () =>
 					'display',
 					'backgroundColor',
 					'position',
+					123 as never,
+					(() => {}) as never,
 				]),
 			).toEqual({
 				color: 'red',
 				display: 'none',
 				backgroundColor: 'green',
+				position: 'absolute',
+			});
+
+			expect(
+				Style.getStyles(
+					div,
+					[
+						'color',
+						'display',
+						'backgroundColor',
+						'position',
+						123 as never,
+						(() => {}) as never,
+					],
+					true,
+				),
+			).toEqual({
+				color: 'rgb(255, 0, 0)',
+				display: 'none',
+				backgroundColor: 'rgb(0, 128, 0)',
 				position: 'absolute',
 			});
 
