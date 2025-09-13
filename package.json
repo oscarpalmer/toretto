@@ -23,6 +23,7 @@
 		"vitest": "^3.2"
 	},
 	"exports": {
+		"./package.json": "./package.json",
 		".": {
 			"import": {
 				"types": "./types/index.d.ts",
@@ -159,5 +160,5 @@
 	},
 	"type": "module",
 	"types": "types/index.d.cts",
-	"version": "0.21.0"
+	"version": "0.22.0"
 }
