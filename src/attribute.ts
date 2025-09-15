@@ -1,5 +1,5 @@
+import type {PlainObject} from '@oscarpalmer/atoms';
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {getString} from '@oscarpalmer/atoms/string';
 import {getAttributeValue} from './internal/get-value';
 import {isHTMLOrSVGElement} from './is';
@@ -186,27 +186,27 @@ export function isInvalidBooleanAttribute(attribute: Attr | Attribute): boolean;
 export function isInvalidBooleanAttribute(name: string, value: string): boolean;
 
 export function isInvalidBooleanAttribute(
-		first: string | Attr | Attribute,
-		second?: string,
-	): boolean {
-		return validateAttribute(
-			attribute => {
-				if (attribute == null) {
-					return true;
-				}
+	first: string | Attr | Attribute,
+	second?: string,
+): boolean {
+	return validateAttribute(
+		attribute => {
+			if (attribute == null) {
+				return true;
+			}
 
-				if (!booleanAttributes.includes(attribute.name)) {
-					return false;
-				}
+			if (!booleanAttributes.includes(attribute.name)) {
+				return false;
+			}
 
-				const normalized = String(attribute.value).toLowerCase().trim();
+			const normalized = String(attribute.value).toLowerCase().trim();
 
-				return !(normalized.length === 0 || normalized === attribute.name);
-			},
-			first,
-			second,
-		);
-	}
+			return !(normalized.length === 0 || normalized === attribute.name);
+		},
+		first,
+		second,
+	);
+}
 
 function isProperty(value: unknown): value is Property {
 	return (
@@ -222,9 +222,9 @@ function isProperty(value: unknown): value is Property {
  * @param attribute Attribute to set
  */
 export function setAttribute(
-		element: HTMLOrSVGElement,
-		attribute: Attr | Attribute,
-	): void;
+	element: HTMLOrSVGElement,
+	attribute: Attr | Attribute,
+): void;
 
 /**
  * Set an attribute on an element
@@ -256,9 +256,9 @@ export function setAttribute(
  * @param attributes Attributes to set
  */
 export function setAttributes(
-		element: HTMLOrSVGElement,
-		attributes: Array<Attr | Attribute>,
-	): void;
+	element: HTMLOrSVGElement,
+	attributes: Array<Attr | Attribute>,
+): void;
 
 /**
  * Set one or more attributes on an element

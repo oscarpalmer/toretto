@@ -1,4 +1,4 @@
-import type {PlainObject} from '@oscarpalmer/atoms/models';
+import type {PlainObject} from '@oscarpalmer/atoms';
 import {kebabCase, parse} from '@oscarpalmer/atoms/string';
 import {setElementValues, updateElementValue} from './internal/element-value';
 import {isHTMLOrSVGElement} from './is';
@@ -12,10 +12,10 @@ import type {HTMLOrSVGElement} from './models';
  * @returns Data value
  */
 export function getData(
-		element: HTMLOrSVGElement,
-		key: string,
-		parse?: boolean,
-	): unknown;
+	element: HTMLOrSVGElement,
+	key: string,
+	parse?: boolean,
+): unknown;
 
 /**
  * Get keyed data values from an element

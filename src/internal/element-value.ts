@@ -1,5 +1,5 @@
+import type {PlainObject} from '@oscarpalmer/atoms';
 import {isNullableOrWhitespace, isPlainObject} from '@oscarpalmer/atoms/is';
-import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {isHTMLOrSVGElement} from '../is';
 import type {HTMLOrSVGElement} from '../models';
 

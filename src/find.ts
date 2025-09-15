@@ -1,4 +1,4 @@
-import type {PlainObject} from '@oscarpalmer/atoms/models';
+import type {PlainObject} from '@oscarpalmer/atoms';
 import type {Selector} from './models';
 
 /**
@@ -327,3 +327,4 @@ function traverse(from: Element, to: Element): number | undefined {
 }
 
 export {findElement as $, findElements as $$};
+
