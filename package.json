@@ -4,7 +4,7 @@
 		"url": "https://oscarpalmer.se"
 	},
 	"dependencies": {
-		"@oscarpalmer/atoms": "^0.108"
+		"@oscarpalmer/atoms": "^0.109"
 	},
 	"description": "A collection of badass DOM utilities.",
 	"devDependencies": {
@@ -13,8 +13,6 @@
 		"@rollup/plugin-typescript": "^12.1",
 		"@types/node": "^24.3",
 		"@vitest/coverage-istanbul": "^3.2",
-		"dts-bundle-generator": "^9.5",
-		"glob": "^11",
 		"jsdom": "^26.1",
 		"rollup": "^4.50",
 		"tslib": "^2.8",
@@ -25,112 +23,51 @@
 	"exports": {
 		"./package.json": "./package.json",
 		".": {
-			"import": {
-				"types": "./types/index.d.ts",
-				"default": "./dist/index.js"
-			},
-			"require": {
-				"types": "./types/index.d.cts",
-				"default": "./dist/index.cjs"
-			}
+			"types": "./types/index.d.ts",
+			"default": "./dist/index.js"
 		},
 		"./attribute": {
-			"import": {
-				"types": "./types/attribute.d.ts",
-				"default": "./dist/attribute.js"
-			},
-			"require": {
-				"types": "./types/attribute.d.cts",
-				"default": "./dist/attribute.cjs"
-			}
+			"types": "./types/attribute.d.ts",
+			"default": "./dist/attribute.js"
 		},
 		"./data": {
-			"import": {
-				"types": "./types/data.d.ts",
-				"default": "./dist/data.js"
-			},
-			"require": {
-				"types": "./types/data.d.cts",
-				"default": "./dist/data.cjs"
-			}
+			"types": "./types/data.d.ts",
+			"default": "./dist/data.js"
 		},
 		"./event": {
-			"import": {
-				"types": "./types/event.d.ts",
-				"default": "./dist/event.js"
-			},
-			"require": {
-				"types": "./types/event.d.cts",
-				"default": "./dist/event.cjs"
-			}
+			"types": "./types/event.d.ts",
+			"default": "./dist/event.js"
 		},
 		"./find": {
-			"import": {
-				"types": "./types/find.d.ts",
-				"default": "./dist/find.js"
-			},
-			"require": {
-				"types": "./types/find.d.cts",
-				"default": "./dist/find.cjs"
-			}
+			"types": "./types/find.d.ts",
+			"default": "./dist/find.js"
 		},
 		"./focusable": {
-			"import": {
-				"types": "./types/focusable.d.ts",
-				"default": "./dist/focusable.js"
-			},
-			"require": {
-				"types": "./types/focusable.d.cts",
-				"default": "./dist/focusable.cjs"
-			}
+			"types": "./types/focusable.d.ts",
+			"default": "./dist/focusable.js"
 		},
 		"./html": {
-			"import": {
-				"types": "./types/html.d.ts",
-				"default": "./dist/html.js"
-			},
-			"require": {
-				"types": "./types/html.d.cts",
-				"default": "./dist/html.cjs"
-			}
+			"types": "./types/html.d.ts",
+			"default": "./dist/html.js"
 		},
 		"./is": {
-			"import": {
-				"types": "./types/is.d.ts",
-				"default": "./dist/is.js"
-			},
-			"require": {
-				"types": "./types/is.d.cts",
-				"default": "./dist/is.cjs"
-			}
+			"types": "./types/is.d.ts",
+			"default": "./dist/is.js"
 		},
 		"./models": {
-			"import": {
-				"types": "./types/models.d.ts"
-			},
-			"require": {
-				"types": "./types/models.d.cts"
-			}
+			"types": "./types/models.d.ts"
 		},
 		"./sanitize": {
-			"import": {
-				"types": "./types/sanitize.d.ts",
-				"default": "./dist/sanitize.js"
-			},
-			"require": {
-				"types": "./types/sanitize.d.cts",
-				"default": "./dist/sanitize.cjs"
-			}
+			"types": "./types/sanitize.d.ts",
+			"default": "./dist/sanitize.js"
 		},
 		"./style": {
-			"import": {
-				"types": "./types/style.d.ts",
-				"default": "./dist/style.js"
-			},
-			"require": {
-				"types": "./types/style.d.cts",
-				"default": "./dist/style.cjs"
-			}
+			"types": "./types/style.d.ts",
+			"default": "./dist/style.js"
+		},
+		"./touch": {
+			"types": "./types/touch.d.ts",
+			"default": "./dist/touch.js"
 		}
 	},
 	"files": [
@@ -143,7 +80,6 @@
 		"utility"
 	],
 	"license": "MIT",
-	"main": "dist/index.cjs",
 	"module": "dist/index.js",
 	"name": "@oscarpalmer/toretto",
 	"repository": {
@@ -151,14 +87,14 @@
 		"url": "git+https://github.com/oscarpalmer/toretto.git"
 	},
 	"scripts": {
-		"build": "npm run clean && npx vite build && npm run rollup && npm run types",
+		"build": "npm run clean && npx vite build && npm run rollup:build && npx tsc",
 		"clean": "rm -rf ./dist && rm -rf ./types && rm -f ./tsconfig.tsbuildinfo",
-		"rollup": "npx rollup -c",
+		"rollup:build": "npx rollup -c",
+		"rollup:watch": "npx rollup -c --watch",
 		"test": "npx vitest --coverage",
-		"types": "npx tsc && npx dts-bundle-generator --config ./dts.config.cts --silent",
 		"watch": "npx vite build --watch"
 	},
 	"type": "module",
-	"types": "types/index.d.cts",
-	"version": "0.22.0"
+	"types": "types/index.d.ts",
+	"version": "0.23.0"
 }
