@@ -63,10 +63,10 @@ const supportsTouch: SupporsTouch = (() => {
 	let support = getSupport();
 
 	const instance = Object.create({
-		get() {
+		get(): boolean {
 			return support;
 		},
-		update() {
+		update(): boolean {
 			support = getSupport();
 
 			return support;
@@ -74,7 +74,7 @@ const supportsTouch: SupporsTouch = (() => {
 	});
 
 	Object.defineProperty(instance, 'value', {
-		get() {
+		get(): boolean {
 			return support;
 		},
 	});

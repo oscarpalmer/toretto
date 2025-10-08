@@ -1,5 +1,40 @@
-import {isPlainObject} from '@oscarpalmer/atoms/is';
 import {type SanitizeOptions, sanitize} from './sanitize';
+
+//
+
+type Html = {
+	/**
+	 * Create nodes from an HTML string or a template element
+	 * @param value HTML string or id for a template element
+	 * @param sanitization Sanitization options
+	 * @returns Created nodes
+	 */
+	(value: string, sanitization?: boolean | SanitizeOptions): Node[];
+
+	/**
+	 * Create nodes from a template element
+	 * @param template Template element
+	 * @param sanitization Sanitization options
+	 * @returns Created nodes
+	 */
+	(
+		template: HTMLTemplateElement,
+		sanitization?: boolean | SanitizeOptions,
+	): Node[];
+
+	/**
+	 * Clear cache of template elements
+	 */
+	clear(): void;
+
+	/**
+	 * Remove cached template element for an HTML string or id
+	 * @param template HTML string or id for a template element
+	 */
+	remove(template: string): void;
+};
+
+//
 
 function createTemplate(html: string): HTMLTemplateElement {
 	const template = document.createElement('template');
@@ -16,58 +51,39 @@ function getTemplate(value: string): HTMLTemplateElement | undefined {
 		return;
 	}
 
-	if (value in templates) {
-		return templates[value];
+	let template = templates[value];
+
+	if (template != null) {
+		return template;
 	}
 
-	let template: unknown;
+	const element = EXPRESSION_ID.test(value)
+		? document.querySelector(`#${value}`)
+		: null;
 
-	if (idPattern.test(value)) {
-		template = document.querySelector(`#${value}`);
-	}
+	template =
+		element instanceof HTMLTemplateElement ? element : createTemplate(value);
 
-	templates[value] =
-		template instanceof HTMLTemplateElement ? template : createTemplate(value);
+	templates[value] = template;
 
-	return templates[value];
+	return template;
 }
 
-/**
- * Create nodes from an HTML string or a template element
- * @param value HTML string or id for a template element
- * @param sanitization Sanitization options
- * @returns Created nodes
- */
-export function html(
-	value: string,
-	sanitization?: boolean | SanitizeOptions,
-): Node[];
-
-/**
- * Create nodes from a template element
- * @param template Template element
- * @param sanitization Sanitization options
- * @returns Created nodes
- */
-export function html(
-	template: HTMLTemplateElement,
-	sanitization?: boolean | SanitizeOptions,
-): Node[];
-
-export function html(
+const html = ((
 	value: string | HTMLTemplateElement,
 	sanitization?: boolean | SanitizeOptions,
-): Node[] {
+): Node[] => {
 	if (typeof value !== 'string' && !(value instanceof HTMLTemplateElement)) {
 		return [];
 	}
 
-	const options =
-		sanitization == null || sanitization === true
-			? {}
-			: isPlainObject(sanitization)
-				? {...sanitization}
-				: null;
+	let options: SanitizeOptions | undefined;
+
+	if (sanitization == null || sanitization === true) {
+		options = {};
+	} else {
+		options = sanitization === false ? undefined : sanitization;
+	}
 
 	const template =
 		value instanceof HTMLTemplateElement ? value : getTemplate(value);
@@ -89,10 +105,24 @@ export function html(
 	return options != null
 		? sanitize([...cloned.childNodes], options)
 		: [...cloned.childNodes];
-}
+}) as Html;
+
+html.clear = (): void => {
+	templates = {};
+};
+
+html.remove = (template: string): void => {
+	if (typeof template === 'string') {
+		templates[template] = undefined;
+	}
+};
 
 //
 
-const idPattern = /^[a-z][\w-]*$/i;
+const EXPRESSION_ID = /^[a-z][\w-]*$/i;
 
-const templates: Record<string, HTMLTemplateElement> = {};
+let templates: Record<string, HTMLTemplateElement | undefined> = {};
+
+//
+
+export {html};

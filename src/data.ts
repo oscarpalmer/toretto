@@ -1,6 +1,7 @@
 import type {PlainObject} from '@oscarpalmer/atoms';
 import {kebabCase, parse} from '@oscarpalmer/atoms/string';
 import {setElementValues, updateElementValue} from './internal/element-value';
+import {EXPRESSION_DATA_PREFIX} from './internal/get-value';
 import {isHTMLOrSVGElement} from './is';
 import type {HTMLOrSVGElement} from './models';
 
@@ -44,7 +45,11 @@ export function getData(
 	if (typeof keys === 'string') {
 		const value = element.dataset[keys];
 
-		return value == null ? undefined : shouldParse ? parse(value) : value;
+		if (value === undefined) {
+			return;
+		}
+
+		return shouldParse ? parse(value) : value;
 	}
 
 	const {length} = keys;
@@ -55,14 +60,18 @@ export function getData(
 		const key = keys[index];
 		const value = element.dataset[key];
 
-		data[key] = value == null ? undefined : shouldParse ? parse(value) : value;
+		if (value == null) {
+			data[key] = undefined;
+		} else {
+			data[key] = shouldParse ? parse(value) : value;
+		}
 	}
 
 	return data;
 }
 
 function getName(original: string): string {
-	return `data-${kebabCase(original).replace(dataPrefix, '')}`;
+	return `${ATTRIBUTE_DATA_PREFIX}${kebabCase(original).replace(EXPRESSION_DATA_PREFIX, '')}`;
 }
 
 /**
@@ -107,4 +116,6 @@ function updateDataAttribute(
 	);
 }
 
-const dataPrefix = /^data-/i;
+//
+
+const ATTRIBUTE_DATA_PREFIX = 'data-';

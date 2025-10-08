@@ -1,7 +1,9 @@
+/** biome-ignore-all lint/style/noMagicNumbers: Testing */
+/** biome-ignore-all lint/suspicious/noExplicitAny: Testing */
 import {expect, test} from 'vitest';
 import * as Attribute from '../src/attribute';
 
-const nonBooleanAttributes = [
+const nonBooleanAttributes: string[] = [
 	'abbr',
 	'accept',
 	'accept-charset',

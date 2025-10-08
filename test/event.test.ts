@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/noMagicNumbers: Testing */
 import {noop} from '@oscarpalmer/atoms/function';
 import {expect, test} from 'vitest';
 import {dispatch, getPosition, off, on} from '../src/event';
@@ -26,7 +27,7 @@ type FakeTouchInit = {
 test('dispatch', () => {
 	let value = 0;
 
-	function custom(event: Event) {
+	function custom(event: Event): void {
 		value += 1;
 
 		expect(event).toBeInstanceOf(value === 3 ? CustomEvent : Event);
@@ -42,7 +43,7 @@ test('dispatch', () => {
 		target.textContent = String(value);
 	}
 
-	function native(event: Event) {
+	function native(event: Event): void {
 		value += 1;
 
 		expect(event).toBeInstanceOf(Event);
@@ -98,7 +99,7 @@ test('dispatch:global', () =>
 		let fromDocument: string | undefined;
 		let fromWindow: string | undefined;
 
-		on(document, 'fromDocument', (event: CustomEvent) => {
+		on(document, 'fromDocument', () => {
 			fromDocument = 'fromDocument';
 		});
 
@@ -159,11 +160,11 @@ test('on & off', () => {
 	const abortController = new AbortController();
 	const values = [0, 0, 0, 0];
 
-	function onOnce() {
+	function onOnce(): void {
 		values[0] += 1;
 	}
 
-	function onOne() {
+	function onOne(): void {
 		values[1] += 1;
 	}
 

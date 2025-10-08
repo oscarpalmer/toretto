@@ -19,7 +19,7 @@ function createDispatchOptions(options: EventInit): EventInit {
 function createEvent(type: string, options?: CustomEventInit): Event {
 	const hasOptions = isPlainObject(options);
 
-	if (hasOptions && 'detail' in (options as CustomEventInit)) {
+	if (hasOptions && PROPERTY_DETAIL in (options as CustomEventInit)) {
 		return new CustomEvent(type, {
 			...createDispatchOptions(options as CustomEventInit),
 			detail: options?.detail,
@@ -172,3 +172,7 @@ export function on(
 		target.removeEventListener(type, listener as EventListener, extended);
 	};
 }
+
+//
+
+const PROPERTY_DETAIL = 'detail';

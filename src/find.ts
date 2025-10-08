@@ -88,7 +88,7 @@ export function findAncestor(
  */
 export function findElement(
 	selector: string,
-	context?: Selector,
+	context?: Selector | null,
 ): Element | null {
 	return findElementOrElements(selector, context, true) as never;
 }
@@ -98,7 +98,7 @@ function findElementOrElements(
 	context: Selector | null | undefined,
 	single: boolean,
 ): Element | Element[] | null {
-	const callback = single ? 'querySelector' : 'querySelectorAll';
+	const callback = single ? QUERY_SELECTOR_SINGLE : QUERY_SELECTOR_ALL;
 
 	const contexts =
 		context == null
@@ -107,51 +107,77 @@ function findElementOrElements(
 					isContext,
 				);
 
-	const result: Element[] = [];
-
 	if (typeof selector === 'string') {
-		const {length} = contexts;
-
-		for (let index = 0; index < length; index += 1) {
-			const value = (
-				contexts[index][callback] as (selector: string) => Node | null
-			)(selector) as Element | Element[] | null;
-
-			if (single) {
-				if (value == null) {
-					continue;
-				}
-
-				return value;
-			}
-
-			result.push(...Array.from(value as Element[]));
-		}
-
-		return single
-			? null
-			: result.filter((value, index, array) => array.indexOf(value) === index);
+		return findElementOrElementsForSelector(
+			selector,
+			contexts,
+			callback,
+			single,
+		);
 	}
 
-	const nodes = (
-		Array.isArray(selector)
-			? selector
-			: selector instanceof Node
-				? [selector]
-				: [...selector]
-	).filter(node => node instanceof Node);
+	let array: unknown[];
 
+	if (Array.isArray(selector)) {
+		array = selector;
+	} else {
+		array = selector instanceof Node ? [selector] : [...selector];
+	}
+
+	return findElementOrElementsFromNodes(array, context, contexts);
+}
+
+function findElementOrElementsForSelector(
+	selector: string,
+	contexts: Array<Document | Element>,
+	callback: 'querySelector' | 'querySelectorAll',
+	single: boolean,
+): Element | Element[] | null {
+	const {length} = contexts;
+
+	const result: Element[] = [];
+
+	for (let index = 0; index < length; index += 1) {
+		const value = (
+			contexts[index][callback] as (selector: string) => Node | null
+		)(selector) as Element | Element[] | null;
+
+		if (single) {
+			if (value == null) {
+				continue;
+			}
+
+			return value;
+		}
+
+		result.push(...Array.from(value as Element[]));
+	}
+
+	return single
+		? null
+		: result.filter((value, index, array) => array.indexOf(value) === index);
+}
+
+function findElementOrElementsFromNodes(
+	array: unknown[],
+	context: unknown,
+	contexts: Array<Document | Element>,
+): Element | Element[] | null {
+	const result: Element[] = [];
+
+	const nodes = array.filter(node => node instanceof Node);
 	const {length} = nodes;
 
 	for (let index = 0; index < length; index += 1) {
 		const node = nodes[index];
 
-		const element =
-			node instanceof Document
-				? node.body
-				: node instanceof Element
-					? node
-					: undefined;
+		let element: Element | undefined;
+
+		if (node instanceof Document) {
+			element = node.body;
+		} else {
+			element = node instanceof Element ? node : undefined;
+		}
 
 		if (
 			element != null &&
@@ -179,7 +205,7 @@ function findElementOrElements(
  */
 export function findElements(
 	selector: Selector,
-	context?: Selector,
+	context?: Selector | null,
 ): Element[] {
 	return findElementOrElements(selector, context, false) as never;
 }
@@ -254,7 +280,7 @@ export function findRelatives(
  * @returns Found element or `null`
  */
 export function getElementUnderPointer(skipIgnore?: boolean): Element | null {
-	const elements = [...document.querySelectorAll(':hover')];
+	const elements = [...document.querySelectorAll(SUFFIX_HOVER)];
 	const {length} = elements;
 
 	const returned: Element[] = [];
@@ -262,7 +288,7 @@ export function getElementUnderPointer(skipIgnore?: boolean): Element | null {
 	for (let index = 0; index < length; index += 1) {
 		const element = elements[index];
 
-		if (element.tagName === 'HEAD') {
+		if (element.tagName === TAG_HEAD) {
 			continue;
 		}
 
@@ -270,7 +296,7 @@ export function getElementUnderPointer(skipIgnore?: boolean): Element | null {
 
 		if (
 			skipIgnore === true ||
-			(style.pointerEvents !== 'none' && style.visibility !== 'hidden')
+			(style.pointerEvents !== STYLE_NONE && style.visibility !== STYLE_HIDDEN)
 		) {
 			returned.push(element);
 		}
@@ -326,5 +352,20 @@ function traverse(from: Element, to: Element): number | undefined {
 	}
 }
 
-export {findElement as $, findElements as $$};
+//
 
+const QUERY_SELECTOR_ALL = 'querySelectorAll';
+
+const QUERY_SELECTOR_SINGLE = 'querySelector';
+
+const STYLE_HIDDEN = 'hidden';
+
+const STYLE_NONE = 'none';
+
+const SUFFIX_HOVER = ':hover';
+
+const TAG_HEAD = 'HEAD';
+
+//
+
+export {findElement as $, findElements as $$};

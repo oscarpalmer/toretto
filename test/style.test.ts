@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/noMagicNumbers: Testing */
 import {expect, test} from 'vitest';
 import * as Style from '../src/style';
 
@@ -100,4 +101,43 @@ test('getTextDirection', () => {
 	expect(Style.getTextDirection(innerElement)).toBe('ltr');
 
 	expect(Style.getTextDirection(123 as never)).toBeUndefined();
+});
+
+test('toggleStyles', () => {
+	const div = document.createElement('div');
+
+	const toggler = Style.toggleStyles(div, {
+		color: 'red',
+		backgroundColor: 'green',
+		position: 'absolute',
+	});
+
+	expect(toggler).toHaveProperty('set');
+	expect(toggler.set).toBeInstanceOf(Function);
+	expect(toggler).toHaveProperty('remove');
+	expect(toggler.remove).toBeInstanceOf(Function);
+
+	expect(Style.getStyles(div, ['color', 'backgroundColor', 'position'])).toEqual({
+		color: '',
+		backgroundColor: '',
+		position: '',
+	});
+
+	toggler.set();
+	toggler.set();
+
+	expect(Style.getStyles(div, ['color', 'backgroundColor', 'position'])).toEqual({
+		color: 'red',
+		backgroundColor: 'green',
+		position: 'absolute',
+	});
+
+	toggler.remove();
+	toggler.remove();
+
+	expect(Style.getStyles(div, ['color', 'backgroundColor', 'position'])).toEqual({
+		color: '',
+		backgroundColor: '',
+		position: '',
+	});
 });

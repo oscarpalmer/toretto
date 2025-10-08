@@ -27,6 +27,7 @@ export function setElementValues(
 	}
 }
 
+// biome-ignore lint/nursery/useMaxParams: Internal function, so it's fine
 export function updateElementValue(
 	element: HTMLOrSVGElement,
 	key: string,

@@ -50,7 +50,7 @@ export function getAttributes<Key extends string>(
 ): Record<Key, unknown> {
 	const attributes: Record<string, unknown> = {};
 
-	if (!isHTMLOrSVGElement(element) || !Array.isArray(names)) {
+	if (!(isHTMLOrSVGElement(element) && Array.isArray(names))) {
 		return attributes;
 	}
 
@@ -100,9 +100,9 @@ export function isBadAttribute(
 	return validateAttribute(
 		attribute =>
 			attribute == null ||
-			onPrefix.test(attribute.name) ||
-			(sourcePrefix.test(attribute.name) &&
-				valuePrefix.test(String(attribute.value))),
+			EXPRESSION_ON_PREFIX.test(attribute.name) ||
+			(EXPRESSION_SOURCE_PREFIX.test(attribute.name) &&
+				EXPRESSION_VALUE_PREFIX.test(String(attribute.value))),
 		first,
 		second,
 	);
@@ -398,7 +398,7 @@ function updateValue(
 
 function updateValues(
 	element: HTMLOrSVGElement,
-	values: Array<Attribute<unknown>> | Record<string, unknown>,
+	values: Attribute<unknown>[] | Record<string, unknown>,
 	callback?: (element: HTMLOrSVGElement, name: string, value: unknown) => void,
 ): void {
 	if (!isHTMLOrSVGElement(element)) {
@@ -442,10 +442,16 @@ function validateAttribute(
 
 //
 
+const EXPRESSION_ON_PREFIX = /^on/i;
+
+const EXPRESSION_SOURCE_PREFIX = /^(href|src|xlink:href)$/i;
+
+const EXPRESSION_VALUE_PREFIX = /(data:text\/html|javascript:)/i;
+
 /**
  * List of boolean attributes
  */
-export const booleanAttributes = Object.freeze([
+export const booleanAttributes: readonly string[] = Object.freeze([
 	'async',
 	'autofocus',
 	'autoplay',
@@ -471,9 +477,3 @@ export const booleanAttributes = Object.freeze([
 	'reversed',
 	'selected',
 ]);
-
-const onPrefix = /^on/i;
-
-const sourcePrefix = /^(href|src|xlink:href)$/i;
-
-const valuePrefix = /(data:text\/html|javascript:)/i;

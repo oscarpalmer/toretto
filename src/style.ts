@@ -3,6 +3,17 @@ import {getStyleValue} from './internal/get-value';
 import {isHTMLOrSVGElement} from './is';
 import type {HTMLOrSVGElement, TextDirection} from './models';
 
+export type StyleToggler = {
+	/**
+	 * Set the provided styles on the element
+	 */
+	set(): void;
+	/**
+	 * Remove the provided styles from the element _(and sets any previous styles)_
+	 */
+	remove(): void;
+};
+
 /**
  * Get a style from an element
  * @param element Element to get the style from
@@ -36,7 +47,7 @@ export function getStyles<Property extends keyof CSSStyleDeclaration>(
 ): Record<Property, string | undefined> {
 	const styles = {} as Record<Property, string | undefined>;
 
-	if (!isHTMLOrSVGElement(element) || !Array.isArray(properties)) {
+	if (!(isHTMLOrSVGElement(element) && Array.isArray(properties))) {
 		return styles;
 	}
 
@@ -71,15 +82,15 @@ export function getTextDirection(
 		return undefined as never;
 	}
 
-	const direction = element.getAttribute('dir');
+	const direction = element.getAttribute(ATTRIBUTE_DIRECTION);
 
-	if (direction != null && /^(ltr|rtl)$/i.test(direction)) {
+	if (direction != null && EXPRESSION_DIRECTION.test(direction)) {
 		return direction.toLowerCase() as TextDirection;
 	}
 
-	return getStyleValue(element, 'direction', computed === true) === 'rtl'
-		? 'rtl'
-		: 'ltr';
+	const value = getStyleValue(element, 'direction', computed === true);
+
+	return value === 'rtl' ? value : 'ltr';
 }
 
 /**
@@ -108,6 +119,57 @@ export function setStyles(
 	setElementValues(element, styles as never, null, updateStyleProperty);
 }
 
+/**
+ * Toggle styles for an element
+ * @param element Element to style
+ * @param styles Styles to be set or removed
+ * @returns Style toggler
+ */
+export function toggleStyles(
+	element: HTMLOrSVGElement,
+	styles: Partial<CSSStyleDeclaration>,
+): StyleToggler {
+	function toggle(set: boolean): void {
+		hasSet = set;
+
+		let next: Partial<CSSStyleDeclaration>;
+
+		if (set) {
+			values = getStyles(element, keys);
+
+			next = styles;
+		} else {
+			next = {...values};
+
+			values = {};
+
+			for (const key of keys) {
+				values[key as never] = undefined;
+			}
+		}
+
+		setStyles(element, next);
+	}
+
+	const keys = Object.keys(styles) as (keyof CSSStyleDeclaration)[];
+
+	let hasSet = false;
+	let values: Record<string, string | undefined> = {};
+
+	return {
+		set(): void {
+			if (!hasSet) {
+				toggle(true);
+			}
+		},
+		remove(): void {
+			if (hasSet) {
+				toggle(false);
+			}
+		},
+	};
+}
+
 function updateStyleProperty(
 	element: HTMLOrSVGElement,
 	key: string,
@@ -126,3 +188,9 @@ function updateStyleProperty(
 		false,
 	);
 }
+
+//
+
+const ATTRIBUTE_DIRECTION = 'dir';
+
+const EXPRESSION_DIRECTION = /^(ltr|rtl)$/i;

@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/noMagicNumbers: Testing */
 import {expect, test} from 'vitest';
 import {html} from '../src/html';
 
@@ -84,11 +85,15 @@ test('html', () => {
 		false,
 		{},
 		[],
-		() => {},
+		(): void => {},
 		document.createElement('div'),
 	];
 
 	for (let index = 0; index < values.length; index += 1) {
 		expect(html(values[index] as never)).toEqual([]);
 	}
+
+	html.remove(original);
+	html.remove(123 as never);
+	html.clear();
 });

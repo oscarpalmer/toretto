@@ -1,7 +1,8 @@
+/** biome-ignore-all lint/style/noMagicNumbers: Testing */
 import {expect, test} from 'vitest';
 import * as Is from '../src/is';
 
-const values = [
+const values: unknown[] = [
 	null,
 	undefined,
 	123,

@@ -14,7 +14,9 @@ export function getAttributeValue(
 	const attribute = element.attributes[normalized as keyof NamedNodeMap];
 	const value = attribute instanceof Attr ? attribute.value : undefined;
 
-	return dataPrefix.test(normalized) && typeof value === 'string' && parseValue
+	return EXPRESSION_DATA_PREFIX.test(normalized) &&
+		typeof value === 'string' &&
+		parseValue
 		? (parse(value) ?? value)
 		: value;
 }
@@ -31,4 +33,4 @@ export function getStyleValue(
 		: element.style[name as never];
 }
 
-const dataPrefix = /^data-/i;
+export const EXPRESSION_DATA_PREFIX = /^data-/i;

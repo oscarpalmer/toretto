@@ -6,7 +6,7 @@ import type {HTMLOrSVGElement} from './models';
  * @returns `true` if it's a child node, otherwise `false`
  */
 export function isChildNode(value: unknown): value is ChildNode {
-	return value instanceof Node && childNodeTypes.has(value.nodeType);
+	return value instanceof Node && CHILD_NODE_TYPES.has(value.nodeType);
 }
 
 /**
@@ -49,21 +49,25 @@ export function isInDocument(node: Node): boolean;
 export function isInDocument(node: Node, document: Document): boolean;
 
 export function isInDocument(node: Node, document?: Document): boolean {
-	return node instanceof Node
-		? document instanceof Document
-			? node.ownerDocument == null
-				? node === document
-				: node.ownerDocument === document && document.contains(node)
-			: (node.ownerDocument?.contains(node) ?? true)
-		: false;
+	if (!(node instanceof Node)) {
+		return false;
+	}
+
+	if (!(document instanceof Document)) {
+		return node.ownerDocument?.contains(node) ?? true;
+	}
+
+	return node.ownerDocument == null
+		? node === document
+		: node.ownerDocument === document && document.contains(node);
 }
 
 //
 
-const childNodeTypes = new Set<unknown>([
-	1, // Node.ELEMENT_NODE,
-	3, // Node.TEXT_NODE,
-	7, // Node.PROCESSING_INSTRUCTION_NODE,
-	8, // Node.COMMENT_NODE,
-	10, // Node.DOCUMENT_TYPE_NODE,
+const CHILD_NODE_TYPES: Set<number> = new Set([
+	Node.ELEMENT_NODE,
+	Node.TEXT_NODE,
+	Node.PROCESSING_INSTRUCTION_NODE,
+	Node.COMMENT_NODE,
+	Node.DOCUMENT_TYPE_NODE,
 ]);

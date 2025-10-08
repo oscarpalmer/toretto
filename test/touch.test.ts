@@ -24,7 +24,7 @@ test('supportsTouch', () => {
 
 	expect(supportsTouch.get()).toBe(true);
 
-	window.matchMedia = () =>
+	window.matchMedia = (): MediaQueryList =>
 		({
 			matches: true,
 		}) as never;
