@@ -18,7 +18,7 @@ test('sanitize', () => {
 		<a xlink:href="javascript:console.log">Two</a>
 		<img src="javascript:console.log">
 	</p>
-</div>`;
+<script>alert('!')</script></div>`;
 
 	document.body.innerHTML = original;
 
@@ -26,27 +26,31 @@ test('sanitize', () => {
 
 	expect(nodes.length).toBe(1);
 
-	expect(join(nodes)).toBe(`<body><div hidden="">
+	expect(join(nodes)).toBe(
+		`<body><div hidden="">
 	<p>
 		<a>One</a>
 		<a>Two</a>
 		<img>
 	</p>
-</div></body>`);
+</div></body>`,
+	);
 
 	document.body.innerHTML = original;
 
-	nodes = sanitize(document.body, {
+	nodes = sanitize([document.body], {
 		sanitizeBooleanAttributes: false,
 	});
 
 	expect(nodes.length).toBe(1);
 
-	expect(join(nodes)).toBe(`<body><div hidden="hmm">
+	expect(join(nodes)).toBe(
+		`<body><div hidden="hmm">
 	<p>
 		<a>One</a>
 		<a>Two</a>
 		<img>
 	</p>
-</div></body>`);
+</div></body>`,
+	);
 });

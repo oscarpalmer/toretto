@@ -15,20 +15,20 @@ test('html', () => {
 		<a xlink:href="javascript:console.log">Two</a>
 		<img src="javascript:console.log" />
 	</p>
-</div><script>alert('!')</script>`;
+</div><script>alert('!')</script>`.replace(/\s+/g, ' ');
 
-	let sanitized = `<div onclick="alert('!')">
+	let sanitized = `<div>
 	<p>
-		<a href="data:text/html,hmm">One</a>
-		<a xlink:href="javascript:console.log">Two</a>
-		<img src="javascript:console.log">
+		<a>One</a>
+		<a>Two</a>
+		<img>
 	</p>
-</div>`;
+</div>`.replace(/\s+/g, ' ');
 
-	const expectedNodes = html(original, false);
+	let nodes = html(original);
 
-	expect(expectedNodes.length).toBe(1);
-	expect(join(expectedNodes)).toBe(sanitized);
+	expect(nodes.length).toBe(1);
+	expect(join(nodes)).toBe(sanitized);
 
 	//
 
@@ -38,10 +38,10 @@ test('html', () => {
 		<a>Two</a>
 		<img>
 	</p>
-</div>`;
+</div>`.replace(/\s+/g, ' ');
 
 	const sanitizedOne = html(original);
-	const sanitizedTwo = html(original, true);
+	const sanitizedTwo = html(original);
 	const sanitizedThree = html(original, {});
 
 	expect(sanitizedOne.length).toBe(1);
@@ -50,6 +50,20 @@ test('html', () => {
 	expect(join(sanitizedTwo)).toBe(sanitized);
 	expect(sanitizedThree.length).toBe(1);
 	expect(join(sanitizedThree)).toBe(sanitized);
+
+	//
+
+	nodes = html('<p hidden="nah"></p>');
+
+	expect(nodes.length).toBe(1);
+	expect(join(nodes)).toBe('<p hidden=""></p>');
+
+	nodes = html('<p hidden="nah"></p>', {
+		sanitizeBooleanAttributes: false,
+	});
+
+	expect(nodes.length).toBe(1);
+	expect(join(nodes)).toBe('<p hidden="nah"></p>');
 
 	//
 
@@ -93,7 +107,15 @@ test('html', () => {
 		expect(html(values[index] as never)).toEqual([]);
 	}
 
+	html('<p>Hello, world! #1</p>');
+
+	html('<p>Hello, world! #2</p>', {
+		ignoreCache: true,
+	});
+
 	html.remove(original);
+	html.remove('non-existent');
 	html.remove(123 as never);
+
 	html.clear();
 });

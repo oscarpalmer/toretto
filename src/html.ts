@@ -1,4 +1,5 @@
-import {type SanitizeOptions, sanitize} from './sanitize';
+import {isPlainObject} from '@oscarpalmer/atoms/is';
+import {type SanitizeOptions, sanitizeNodes} from './internal/sanitize';
 
 //
 
@@ -6,21 +7,18 @@ type Html = {
 	/**
 	 * Create nodes from an HTML string or a template element
 	 * @param value HTML string or id for a template element
-	 * @param sanitization Sanitization options
+	 * @param options Options for creating nodes
 	 * @returns Created nodes
 	 */
-	(value: string, sanitization?: boolean | SanitizeOptions): Node[];
+	(value: string, options?: HtmlOptions): Node[];
 
 	/**
 	 * Create nodes from a template element
 	 * @param template Template element
-	 * @param sanitization Sanitization options
+	 * @param options Options for creating nodes
 	 * @returns Created nodes
 	 */
-	(
-		template: HTMLTemplateElement,
-		sanitization?: boolean | SanitizeOptions,
-	): Node[];
+	(template: HTMLTemplateElement, options?: HtmlOptions): Node[];
 
 	/**
 	 * Clear cache of template elements
@@ -34,19 +32,77 @@ type Html = {
 	remove(template: string): void;
 };
 
+type HtmlOptions = {
+	/**
+	 * Ignore caching the template element for the HTML string? _(defaults to `false`)_
+	 */
+	ignoreCache?: boolean;
+} & SanitizeOptions;
+
+type Options = Required<HtmlOptions>;
+
 //
 
-function createTemplate(html: string): HTMLTemplateElement {
+function createTemplate(html: string, ignore: boolean): HTMLTemplateElement {
 	const template = document.createElement('template');
 
 	template.innerHTML = html;
 
-	templates[html] = template;
+	if (!ignore) {
+		templates[html] = template;
+	}
 
 	return template;
 }
 
-function getTemplate(value: string): HTMLTemplateElement | undefined {
+function getHtml(
+	value: string | HTMLTemplateElement,
+	options: Options,
+): Node[] {
+	if (typeof value !== 'string' && !(value instanceof HTMLTemplateElement)) {
+		return [];
+	}
+
+	const template =
+		value instanceof HTMLTemplateElement
+			? value
+			: getTemplate(value, options.ignoreCache);
+
+	if (template == null) {
+		return [];
+	}
+
+	const cloned = template.content.cloneNode(true) as DocumentFragment;
+
+	const scripts = cloned.querySelectorAll('script');
+
+	for (const script of scripts) {
+		script.remove();
+	}
+
+	cloned.normalize();
+
+	return sanitizeNodes([...cloned.childNodes], options);
+}
+
+function getOptions(input?: HtmlOptions): Options {
+	const options = isPlainObject(input) ? input : {};
+
+	options.ignoreCache =
+		typeof options.ignoreCache === 'boolean' ? options.ignoreCache : false;
+
+	options.sanitizeBooleanAttributes =
+		typeof options.sanitizeBooleanAttributes === 'boolean'
+			? options.sanitizeBooleanAttributes
+			: true;
+
+	return options as Options;
+}
+
+function getTemplate(
+	value: string,
+	ignore: boolean,
+): HTMLTemplateElement | undefined {
 	if (typeof value !== 'string' || value.trim().length === 0) {
 		return;
 	}
@@ -62,49 +118,18 @@ function getTemplate(value: string): HTMLTemplateElement | undefined {
 		: null;
 
 	template =
-		element instanceof HTMLTemplateElement ? element : createTemplate(value);
-
-	templates[value] = template;
+		element instanceof HTMLTemplateElement
+			? element
+			: createTemplate(value, ignore);
 
 	return template;
 }
 
 const html = ((
 	value: string | HTMLTemplateElement,
-	sanitization?: boolean | SanitizeOptions,
+	options?: Options,
 ): Node[] => {
-	if (typeof value !== 'string' && !(value instanceof HTMLTemplateElement)) {
-		return [];
-	}
-
-	let options: SanitizeOptions | undefined;
-
-	if (sanitization == null || sanitization === true) {
-		options = {};
-	} else {
-		options = sanitization === false ? undefined : sanitization;
-	}
-
-	const template =
-		value instanceof HTMLTemplateElement ? value : getTemplate(value);
-
-	if (template == null) {
-		return [];
-	}
-
-	const cloned = template.content.cloneNode(true) as DocumentFragment;
-	const scripts = cloned.querySelectorAll('script');
-	const {length} = scripts;
-
-	for (let index = 0; index < length; index += 1) {
-		scripts[index].remove();
-	}
-
-	cloned.normalize();
-
-	return options != null
-		? sanitize([...cloned.childNodes], options)
-		: [...cloned.childNodes];
+	return getHtml(value, getOptions(options));
 }) as Html;
 
 html.clear = (): void => {
@@ -112,16 +137,31 @@ html.clear = (): void => {
 };
 
 html.remove = (template: string): void => {
-	if (typeof template === 'string') {
-		templates[template] = undefined;
+	if (typeof template !== 'string' || templates[template] == null) {
+		return;
 	}
+
+	const keys = Object.keys(templates);
+	const {length} = keys;
+
+	const updated: Record<string, HTMLTemplateElement> = {};
+
+	for (let index = 0; index < length; index += 1) {
+		const key = keys[index];
+
+		if (key !== template) {
+			updated[key] = templates[key];
+		}
+	}
+
+	templates = updated;
 };
 
 //
 
 const EXPRESSION_ID = /^[a-z][\w-]*$/i;
 
-let templates: Record<string, HTMLTemplateElement | undefined> = {};
+let templates: Record<string, HTMLTemplateElement> = {};
 
 //
 
