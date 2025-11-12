@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/style/noMagicNumbers: Testing */
 import {afterAll, expect, test} from 'vitest';
-import * as Find from '../src/find';
+import * as Find from '../src/find/index';
 
 document.body.innerHTML = `<div>
 	<div class="target">

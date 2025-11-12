@@ -1,8 +1,8 @@
 /** biome-ignore-all lint/style/noMagicNumbers: Testing */
 import {expect, test} from 'vitest';
-import {html} from '../src/html';
+import {html, sanitize} from '../src/html';
 
-function join(nodes: Node[]): string {
+function joinNodes(nodes: Node[]): string {
 	return nodes
 		.map(node => (node instanceof Element ? node.outerHTML : node.textContent))
 		.join();
@@ -28,7 +28,7 @@ test('html', () => {
 	let nodes = html(original);
 
 	expect(nodes.length).toBe(1);
-	expect(join(nodes)).toBe(sanitized);
+	expect(joinNodes(nodes)).toBe(sanitized);
 
 	//
 
@@ -45,25 +45,25 @@ test('html', () => {
 	const sanitizedThree = html(original, {});
 
 	expect(sanitizedOne.length).toBe(1);
-	expect(join(sanitizedOne)).toBe(sanitized);
+	expect(joinNodes(sanitizedOne)).toBe(sanitized);
 	expect(sanitizedTwo.length).toBe(1);
-	expect(join(sanitizedTwo)).toBe(sanitized);
+	expect(joinNodes(sanitizedTwo)).toBe(sanitized);
 	expect(sanitizedThree.length).toBe(1);
-	expect(join(sanitizedThree)).toBe(sanitized);
+	expect(joinNodes(sanitizedThree)).toBe(sanitized);
 
 	//
 
 	nodes = html('<p hidden="nah"></p>');
 
 	expect(nodes.length).toBe(1);
-	expect(join(nodes)).toBe('<p hidden=""></p>');
+	expect(joinNodes(nodes)).toBe('<p hidden=""></p>');
 
 	nodes = html('<p hidden="nah"></p>', {
 		sanitizeBooleanAttributes: false,
 	});
 
 	expect(nodes.length).toBe(1);
-	expect(join(nodes)).toBe('<p hidden="nah"></p>');
+	expect(joinNodes(nodes)).toBe('<p hidden="nah"></p>');
 
 	//
 
@@ -79,12 +79,12 @@ test('html', () => {
 	template.remove();
 
 	expect(external.length).toBe(1);
-	expect(join(external)).toBe('<p>Hello</p>');
+	expect(joinNodes(external)).toBe('<p>Hello</p>');
 
 	external = html(template);
 
 	expect(external.length).toBe(1);
-	expect(join(external)).toBe('<p>Hello</p>');
+	expect(joinNodes(external)).toBe('<p>Hello</p>');
 
 	//
 
@@ -118,4 +118,48 @@ test('html', () => {
 	html.remove(123 as never);
 
 	html.clear();
+});
+
+test('sanitize', () => {
+	const original = `<div hidden="hmm" onclick="alert('!')">
+	<p>
+		<a href="data:text/html,hmm">One</a>
+		<a xlink:href="javascript:console.log">Two</a>
+		<img src="javascript:console.log">
+	</p>
+<script>alert('!')</script></div>`;
+
+	document.body.innerHTML = original;
+
+	let nodes = sanitize(document.body);
+
+	expect(nodes.length).toBe(1);
+
+	expect(joinNodes(nodes)).toBe(
+		`<body><div hidden="">
+	<p>
+		<a>One</a>
+		<a>Two</a>
+		<img>
+	</p>
+</div></body>`,
+	);
+
+	document.body.innerHTML = original;
+
+	nodes = sanitize([document.body], {
+		sanitizeBooleanAttributes: false,
+	});
+
+	expect(nodes.length).toBe(1);
+
+	expect(joinNodes(nodes)).toBe(
+		`<body><div hidden="hmm">
+	<p>
+		<a>One</a>
+		<a>Two</a>
+		<img>
+	</p>
+</div></body>`,
+	);
 });

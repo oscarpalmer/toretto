@@ -15,7 +15,7 @@
 		"@vitest/coverage-istanbul": "^4",
 		"glob": "^11",
 		"jsdom": "^27.1",
-		"rollup": "^4.52",
+		"rollup": "^4.53",
 		"tslib": "^2.8",
 		"typescript": "^5.9",
 		"vite": "npm:rolldown-vite@latest",
@@ -28,20 +28,20 @@
 			"default": "./dist/index.js"
 		},
 		"./attribute": {
-			"types": "./types/attribute.d.ts",
-			"default": "./dist/attribute.js"
+			"types": "./types/attribute/index.d.ts",
+			"default": "./dist/attribute/index.js"
 		},
 		"./data": {
 			"types": "./types/data.d.ts",
 			"default": "./dist/data.js"
 		},
 		"./event": {
-			"types": "./types/event.d.ts",
-			"default": "./dist/event.js"
+			"types": "./types/event/index.d.ts",
+			"default": "./dist/event/index.js"
 		},
 		"./find": {
-			"types": "./types/find.d.ts",
-			"default": "./dist/find.js"
+			"types": "./types/find/index.d.ts",
+			"default": "./dist/find/index.js"
 		},
 		"./focusable": {
 			"types": "./types/focusable.d.ts",
@@ -57,10 +57,6 @@
 		},
 		"./models": {
 			"types": "./types/models.d.ts"
-		},
-		"./sanitize": {
-			"types": "./types/sanitize.d.ts",
-			"default": "./dist/sanitize.js"
 		},
 		"./style": {
 			"types": "./types/style.d.ts",
@@ -97,5 +93,5 @@
 	},
 	"type": "module",
 	"types": "types/index.d.ts",
-	"version": "0.25.0"
+	"version": "0.26.0"
 }

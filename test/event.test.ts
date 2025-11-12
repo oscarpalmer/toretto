@@ -1,7 +1,8 @@
 /** biome-ignore-all lint/style/noMagicNumbers: Testing */
 import {noop} from '@oscarpalmer/atoms/function';
-import {expect, test} from 'vitest';
-import {dispatch, getPosition, off, on} from '../src/event';
+import {afterAll, expect, test} from 'vitest';
+import {dispatch, getPosition, off, on} from '../src/event/index';
+import type {RemovableEventListener} from '../src/models';
 
 class FakeTouch {
 	clientX: number;
@@ -24,6 +25,10 @@ type FakeTouchInit = {
 	target: EventTarget;
 };
 
+afterAll(() => {
+	document.body.innerHTML = '';
+});
+
 test('dispatch', () => {
 	let value = 0;
 
@@ -32,8 +37,8 @@ test('dispatch', () => {
 
 		expect(event).toBeInstanceOf(value === 3 ? CustomEvent : Event);
 		expect(event.type).toBe(value === 3 ? 'dblclick' : 'hello');
-		expect(event.bubbles).toBe(value === 3);
-		expect(event.cancelable).toBe(value === 3);
+		expect(event.bubbles).toBe(true);
+		expect(event.cancelable).toBe(true);
 		expect(event.composed).toBe(value === 3);
 
 		expect((event as unknown as CustomEvent).detail).toEqual(
@@ -48,8 +53,8 @@ test('dispatch', () => {
 
 		expect(event).toBeInstanceOf(Event);
 		expect(event.type).toBe(value === 1 ? 'click' : 'focus');
-		expect(event.bubbles).toBe(value !== 1);
-		expect(event.cancelable).toBe(value !== 1);
+		expect(event.bubbles).toBe(value === 1);
+		expect(event.cancelable).toBe(value === 1);
 		expect(event.composed).toBe(value !== 1);
 
 		target.textContent = String(value);
@@ -59,7 +64,9 @@ test('dispatch', () => {
 
 	target.textContent = 'Hello, world!';
 
-	on(target, 'click', native);
+	document.body.append(target);
+
+	on(target, 'click', native, {capture: true});
 	on(target, 'focus', native);
 	on(target, 'dblclick', custom);
 	on(target, 'hello', custom);
@@ -73,16 +80,14 @@ test('dispatch', () => {
 	expect(target.textContent).toBe('1');
 
 	dispatch(target, 'focus', {
-		bubbles: true,
-		cancelable: true,
+		bubbles: false,
+		cancelable: false,
 		composed: true,
 	});
 
 	expect(target.textContent).toBe('2');
 
 	dispatch(target, 'dblclick', {
-		bubbles: true,
-		cancelable: true,
 		composed: true,
 		detail: {a: {b: 'c'}},
 	});
@@ -156,7 +161,7 @@ test('getPosition', () => {
 	expect(getPosition([])).toBeUndefined();
 });
 
-test('on & off', () => {
+test('on & off (direct)', () => {
 	const abortController = new AbortController();
 	const values = [0, 0, 0, 0];
 
@@ -171,7 +176,7 @@ test('on & off', () => {
 	const target = document.createElement('div');
 
 	on(target, 'click', onOnce, {once: true});
-	on(target, 'click', onOne);
+	on(target, 'click', onOne, {capture: true});
 
 	on(
 		target,
@@ -184,9 +189,14 @@ test('on & off', () => {
 		{signal: abortController.signal},
 	);
 
-	const remove = on(target, 'click', () => {
-		values[2] += 1;
-	});
+	const remove = on(
+		target,
+		'click',
+		() => {
+			values[2] += 1;
+		},
+		{capture: true},
+	);
 
 	for (let index = 0; index < 10; index += 1) {
 		dispatch(target, 'click');
@@ -196,7 +206,8 @@ test('on & off', () => {
 
 	abortController.abort();
 
-	off(target, 'click', onOne);
+	off(target, 'click', onOne, {capture: true});
+
 	remove();
 
 	for (let index = 0; index < 10; index += 1) {
@@ -212,4 +223,148 @@ test('on & off', () => {
 	off(123 as never, 'click', onOnce);
 	off(target, 123 as never, onOnce);
 	off(target, 'click', 123 as never);
+});
+
+test('on & off (delegated)', () => {
+	const target = document.createElement('div');
+
+	target.id = 'one';
+	target.innerHTML = `<div id="two"><div id="three"><div id="four"></div></div></div>`;
+
+	document.body.append(target);
+
+	function handler(event: Event): void {
+		const div = event.target as HTMLDivElement;
+
+		if (div.id === 'three' && stop) {
+			event.stopPropagation();
+		}
+
+		expect(event.currentTarget).toBe(div);
+		expect(event.target).toBe(div);
+
+		values.push(div.id);
+	}
+
+	const listeners: RemovableEventListener[] = [];
+	const values: string[] = [];
+
+	let stop = false;
+
+	const divs = [...document.querySelectorAll('div[id]')] as HTMLDivElement[];
+
+	const remove = on(document, 'click', () => {
+		values.push('document');
+	});
+
+	for (const div of divs) {
+		listeners.push(
+			on(div, 'click', handler, {
+				passive: div.id !== 'two',
+			}),
+		);
+
+		const handlers = (div as any)[
+			`@click:${div.id === 'two' ? 'active' : 'passive'}`
+		];
+
+		expect(handlers).toBeInstanceOf(Set);
+		expect(handlers.size).toBe(1);
+	}
+
+	let handlers = (document as any)['@click:passive'];
+
+	expect(handlers).toBeInstanceOf(Set);
+	expect(handlers.size).toBe(1);
+
+	expect((document as any)['@click:active:listeners']).toBe(1);
+	expect((document as any)['@click:passive:listeners']).toBe(4);
+
+	const last = divs.at(-1);
+
+	last?.click();
+
+	expect(values).toEqual(['four', 'three', 'one', 'document', 'two']);
+
+	stop = true;
+
+	last?.click();
+
+	expect(values).toEqual([
+		'four',
+		'three',
+		'one',
+		'document',
+		'two',
+		'four',
+		'three',
+		'two',
+	]);
+
+	if (last != null) {
+		off(last, 'click', handler);
+	}
+
+	handlers = (document as any)['@click:passive'];
+
+	expect(handlers).toBeInstanceOf(Set);
+	expect(handlers.size).toBe(1);
+
+	expect((document as any)['@click:active:listeners']).toBe(1);
+	expect((document as any)['@click:passive:listeners']).toBe(3);
+
+	for (const listener of listeners) {
+		listener();
+	}
+
+	for (const div of divs) {
+		const handlers = (div as any)[
+			`@click:${div.id === 'two' ? 'active' : 'passive'}`
+		];
+
+		expect(handlers).toBeUndefined();
+	}
+
+	handlers = (document as any)['@click:passive'];
+
+	expect(handlers).toBeInstanceOf(Set);
+	expect(handlers.size).toBe(1);
+
+	expect((document as any)['@click:active:listeners']).toBeUndefined();
+	expect((document as any)['@click:passive:listeners']).toBe(1);
+
+	last?.click();
+
+	expect(values).toEqual([
+		'four',
+		'three',
+		'one',
+		'document',
+		'two',
+		'four',
+		'three',
+		'two',
+		'document',
+	]);
+
+	remove();
+
+	handlers = (document as any)['@click:passive'];
+
+	expect(handlers).toBeUndefined();
+
+	expect((document as any)['@click:active:listeners']).toBeUndefined();
+	expect((document as any)['@click:passive:listeners']).toBeUndefined();
+
+	expect(values).toEqual([
+		'four',
+		'three',
+		'one',
+		'document',
+		'two',
+		'four',
+		'three',
+		'two',
+		'document',
+	]);
 });

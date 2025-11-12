@@ -3,7 +3,7 @@ import {
 	isBadAttribute,
 	isEmptyNonBooleanAttribute,
 	isInvalidBooleanAttribute,
-} from '../attribute';
+} from './attribute';
 
 //
 

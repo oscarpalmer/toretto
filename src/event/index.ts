@@ -1,17 +1,34 @@
 import {noop} from '@oscarpalmer/atoms/function';
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import {getBoolean} from './internal/get-value';
-import {isEventTarget} from './is';
+import {getBoolean} from '../internal/get-value';
+import {isEventTarget} from '../internal/is';
 import type {
 	CustomEventListener,
 	EventPosition,
 	RemovableEventListener,
-} from './models';
+} from '../models';
+import {
+	addDelegatedListener,
+	type EventTargetWithListeners,
+	getDelegatedName,
+	removeDelegatedListener,
+} from './delegation';
+
+//
+
+type EventOptions = {
+	capture: boolean;
+	once: boolean;
+	passive: boolean;
+	signal?: AbortSignal;
+};
+
+//
 
 function createDispatchOptions(options: EventInit): EventInit {
 	return {
-		bubbles: getBoolean(options?.bubbles),
-		cancelable: getBoolean(options?.cancelable),
+		bubbles: getBoolean(options?.bubbles, true),
+		cancelable: getBoolean(options?.cancelable, true),
 		composed: getBoolean(options?.composed),
 	};
 }
@@ -29,14 +46,12 @@ function createEvent(type: string, options?: CustomEventInit): Event {
 	return new Event(type, createDispatchOptions(hasOptions ? options : {}));
 }
 
-function createEventOptions(
-	options?: AddEventListenerOptions,
-): AddEventListenerOptions {
+function createEventOptions(options?: AddEventListenerOptions): EventOptions {
 	return {
 		capture: getBoolean(options?.capture),
 		once: getBoolean(options?.once),
 		passive: getBoolean(options?.passive, true),
-		signal: options?.signal,
+		signal: options?.signal instanceof AbortSignal ? options.signal : undefined,
 	};
 }
 
@@ -44,7 +59,7 @@ function createEventOptions(
  * Dispatch an event for a target
  * @param target Event target
  * @param type Type of event
- * @param options Options for event
+ * @param options Options for event _(bubbles and is cancelable by default)_
  */
 export function dispatch<Type extends keyof HTMLElementEventMap>(
 	target: EventTarget,
@@ -56,7 +71,7 @@ export function dispatch<Type extends keyof HTMLElementEventMap>(
  * Dispatch an event for a target
  * @param target Event target
  * @param type Type of event
- * @param options Options for event
+ * @param options Options for event _(bubbles and is cancelable by default)_
  */
 export function dispatch(
 	target: EventTarget,
@@ -110,15 +125,27 @@ export function off(
 	options?: EventListenerOptions,
 ): void {
 	if (
-		isEventTarget(target) &&
-		typeof type === 'string' &&
-		typeof listener === 'function'
+		!isEventTarget(target) ||
+		typeof type !== 'string' ||
+		typeof listener !== 'function'
 	) {
-		target.removeEventListener(
+		return;
+	}
+
+	const extended = createEventOptions(options);
+	const delegated = getDelegatedName(target, type, extended);
+
+	if (
+		delegated == null ||
+		!removeDelegatedListener(
+			target as EventTargetWithListeners,
 			type,
-			listener as EventListener,
-			createEventOptions(options),
-		);
+			delegated,
+			listener,
+			extended.passive,
+		)
+	) {
+		target.removeEventListener(type, listener as EventListener, extended);
 	}
 }
 
@@ -127,7 +154,7 @@ export function off(
  * @param target Event target
  * @param type Type of event
  * @param listener Event listener
- * @param options Options for event
+ * @param options Options for event _(passive by default)_
  */
 export function on<Type extends keyof HTMLElementEventMap>(
 	target: EventTarget,
@@ -141,7 +168,7 @@ export function on<Type extends keyof HTMLElementEventMap>(
  * @param target Event target
  * @param type Type of event
  * @param listener Event listener
- * @param options Options for event
+ * @param options Options for event _(passive by default)_
  */
 export function on(
 	target: EventTarget,
@@ -165,8 +192,23 @@ export function on(
 	}
 
 	const extended = createEventOptions(options);
+	const delegated = getDelegatedName(target, type, extended);
+
+	if (delegated != null) {
+		return addDelegatedListener(
+			target as EventTargetWithListeners,
+			type,
+			delegated,
+			listener,
+			extended.passive,
+		);
+	}
 
 	target.addEventListener(type, listener as EventListener, extended);
+
+	if (extended.once) {
+		return noop;
+	}
 
 	return () => {
 		target.removeEventListener(type, listener as EventListener, extended);

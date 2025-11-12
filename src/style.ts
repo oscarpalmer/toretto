@@ -1,6 +1,6 @@
 import {setElementValues, updateElementValue} from './internal/element-value';
 import {getStyleValue} from './internal/get-value';
-import {isHTMLOrSVGElement} from './is';
+import {isHTMLOrSVGElement} from './internal/is';
 import type {HTMLOrSVGElement, TextDirection} from './models';
 
 export type StyleToggler = {

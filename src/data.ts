@@ -2,7 +2,7 @@ import type {PlainObject} from '@oscarpalmer/atoms';
 import {kebabCase, parse} from '@oscarpalmer/atoms/string';
 import {setElementValues, updateElementValue} from './internal/element-value';
 import {EXPRESSION_DATA_PREFIX} from './internal/get-value';
-import {isHTMLOrSVGElement} from './is';
+import {isHTMLOrSVGElement} from './internal/is';
 import type {HTMLOrSVGElement} from './models';
 
 /**
