@@ -55,30 +55,26 @@ export function addDelegatedListener(
 function delegatedEventHandler(this: boolean, event: Event): void {
 	const key = `${EVENT_PREFIX}${event.type}${this ? EVENT_SUFFIX_PASSIVE : EVENT_SUFFIX_ACTIVE}`;
 
-	let target: EventTarget | Node | null = event.target;
-
 	const items = event.composedPath();
 	const {length} = items;
 
+	Object.defineProperty(event, 'target', {
+		configurable: true,
+		value: items[0],
+	});
+
 	for (let index = 0; index < length; index += 1) {
-		target = items[index];
+		const item = items[index] as EventTargetWithListeners;
+		const listeners = item[key];
 
-		const listeners = (target as EventTargetWithListeners)[key];
-
-		if (!(target as HTMLButtonElement).disabled && listeners != null) {
-			Object.defineProperties(event, {
-				currentTarget: {
-					configurable: true,
-					value: target,
-				},
-				target: {
-					configurable: true,
-					value: target,
-				},
+		if (!(item as unknown as HTMLButtonElement).disabled && listeners != null) {
+			Object.defineProperty(event, 'currentTarget', {
+				configurable: true,
+				value: item,
 			});
 
 			for (const listener of listeners) {
-				(listener as EventListener).call(target, event);
+				(listener as EventListener).call(item, event);
 
 				if (event.cancelBubble) {
 					return;

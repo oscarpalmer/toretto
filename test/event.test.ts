@@ -234,16 +234,17 @@ test('on & off (delegated)', () => {
 	document.body.append(target);
 
 	function handler(event: Event): void {
-		const div = event.target as HTMLDivElement;
+		const div = event.currentTarget as HTMLDivElement;
+		const {id} = div;
 
-		if (div.id === 'three' && stop) {
+		if (id === 'three' && stop) {
 			event.stopPropagation();
 		}
 
-		expect(event.currentTarget).toBe(div);
-		expect(event.target).toBe(div);
+		expect((event.currentTarget as Element).id).toBe(id);
+		expect((event.target as Element).id).toBe('four');
 
-		values.push(div.id);
+		values.push(id);
 	}
 
 	const listeners: RemovableEventListener[] = [];
