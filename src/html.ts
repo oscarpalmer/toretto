@@ -1,7 +1,7 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
 import {
-	type SanitizeOptions,
 	getSanitizeOptions,
+	type SanitizeOptions,
 	sanitizeNodes,
 } from './internal/sanitize';
 

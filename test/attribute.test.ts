@@ -376,24 +376,29 @@ test('setProperty', () => {
 	Attribute.setProperty(element, 'hidden', true);
 
 	expect(element.hidden).toBe(true);
+	expect(element.getAttribute('hidden')).toBe('');
 
 	Attribute.setProperty(element, 'hidden', false);
 
 	expect(element.hidden).toBe(false);
+	expect(element.getAttribute('hidden')).toBe(null);
 
 	Attribute.setProperty(element, 'hidden', 'abc123');
 
 	expect(element.hidden).toBe(false);
+	expect(element.getAttribute('hidden')).toBe(null);
 
 	Attribute.setProperties(element, {
 		selected: true,
 	});
 
 	expect(element.selected).toBe(true);
+	expect(element.getAttribute('selected')).toBe('');
 
 	Attribute.setProperties(element, {
 		selected: false,
 	});
 
 	expect(element.selected).toBe(false);
+	expect(element.getAttribute('selected')).toBe(null);
 });

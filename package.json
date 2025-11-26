@@ -13,7 +13,6 @@
 		"@rollup/plugin-typescript": "^12.3",
 		"@types/node": "^24.10",
 		"@vitest/coverage-istanbul": "^4",
-		"glob": "^11",
 		"jsdom": "^27.2",
 		"rollup": "^4.53",
 		"tslib": "^2.8",
@@ -93,5 +92,5 @@
 	},
 	"type": "module",
 	"types": "types/index.d.ts",
-	"version": "0.26.1"
+	"version": "0.27.0"
 }

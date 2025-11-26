@@ -120,6 +120,34 @@ export function getPosition(
  */
 export function off(
 	target: EventTarget,
+	type: keyof HTMLElementEventMap,
+	listener: EventListener | CustomEventListener,
+	options?: EventListenerOptions,
+): void;
+
+/**
+ * Remove an event listener
+ * @param target Event target
+ * @param type Type of event
+ * @param listener Event listener
+ * @param options Options for event
+ */
+export function off(
+	target: EventTarget,
+	type: string,
+	listener: EventListener | CustomEventListener,
+	options?: EventListenerOptions,
+): void;
+
+/**
+ * Remove an event listener
+ * @param target Event target
+ * @param type Type of event
+ * @param listener Event listener
+ * @param options Options for event
+ */
+export function off(
+	target: EventTarget,
 	type: string,
 	listener: EventListener | CustomEventListener,
 	options?: EventListenerOptions,

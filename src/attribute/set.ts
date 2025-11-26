@@ -1,22 +1,5 @@
+import {updateValue, updateValues} from '../internal/attribute';
 import type {Attribute, HTMLOrSVGElement, Property} from '../models';
-import {
-	updateAttribute,
-	updateProperty,
-	updateValue,
-	updateValues,
-} from './update';
-
-/**
- * Set an attribute on an element
- *
- * _(Or remove it, if value is `null` or `undefined`)_
- * @param element Element for attribute
- * @param attribute Attribute to set
- */
-export function setAttribute(
-	element: HTMLOrSVGElement,
-	attribute: Attr | Attribute,
-): void;
 
 /**
  * Set an attribute on an element
@@ -32,12 +15,24 @@ export function setAttribute(
 	value?: unknown,
 ): void;
 
+/**
+ * Set an attribute on an element
+ *
+ * _(Or remove it, if value is `null` or `undefined`)_
+ * @param element Element for attribute
+ * @param attribute Attribute to set
+ */
+export function setAttribute(
+	element: HTMLOrSVGElement,
+	attribute: Attr | Attribute,
+): void;
+
 export function setAttribute(
 	element: HTMLOrSVGElement,
 	first: unknown,
 	second?: unknown,
 ): void {
-	updateValue(element, first, second, updateAttribute);
+	updateValue(element, first, second);
 }
 
 /**
@@ -76,18 +71,6 @@ export function setAttributes(
  *
  * _(Or remove it, if value is not an empty string or does not match the name)_
  * @param element Element for property
- * @param property Property to set
- */
-export function setProperty(
-	element: HTMLOrSVGElement,
-	property: Property,
-): void;
-
-/**
- * Set a property on an element
- *
- * _(Or remove it, if value is not an empty string or does not match the name)_
- * @param element Element for property
  * @param name Property name
  * @param value Property value
  */
@@ -97,12 +80,24 @@ export function setProperty(
 	value: boolean | string,
 ): void;
 
+/**
+ * Set a property on an element
+ *
+ * _(Or remove it, if value is not an empty string or does not match the name)_
+ * @param element Element for property
+ * @param property Property to set
+ */
+export function setProperty(
+	element: HTMLOrSVGElement,
+	property: Property,
+): void;
+
 export function setProperty(
 	element: HTMLOrSVGElement,
 	first: unknown,
 	second?: unknown,
 ): void {
-	updateValue(element, first, second, updateProperty);
+	updateValue(element, first, second);
 }
 
 /**
@@ -133,5 +128,5 @@ export function setProperties(
 	element: HTMLOrSVGElement,
 	properties: Property[] | Record<string, unknown>,
 ): void {
-	updateValues(element, properties, updateProperty);
+	updateValues(element, properties);
 }

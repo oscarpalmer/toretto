@@ -1,6 +1,8 @@
 import type {PlainObject} from '@oscarpalmer/atoms';
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import type {Attribute} from '../models';
+import {getString} from '@oscarpalmer/atoms/string';
+import type {Attribute, HTMLOrSVGElement, Property} from '../models';
+import {isHTMLOrSVGElement} from './is';
 
 function isAttribute(value: unknown): value is Attr | Attribute {
 	return (
@@ -141,6 +143,12 @@ export function isInvalidBooleanAttribute(
 	);
 }
 
+export function isProperty(value: unknown): value is Property {
+	return (
+		isPlainObject(value) && typeof (value as PlainObject).name === 'string'
+	);
+}
+
 function isValidAttribute(
 	callback: (attribute: Attr | Attribute | undefined) => boolean,
 	first: string | Attr | Attribute,
@@ -155,6 +163,84 @@ function isValidAttribute(
 	}
 
 	return callback(attribute);
+}
+
+function updateAttribute(
+	element: HTMLOrSVGElement,
+	name: string,
+	value: unknown,
+): void {
+	const isBoolean = booleanAttributes.includes(name.toLowerCase());
+
+	if (isBoolean) {
+		updateProperty(element, name, value);
+	}
+
+	if (isBoolean ? value !== true : value == null) {
+		element.removeAttribute(name);
+	} else {
+		element.setAttribute(name, isBoolean ? '' : getString(value));
+	}
+}
+
+function updateProperty(
+	element: HTMLOrSVGElement,
+	name: string,
+	value: unknown,
+): void {
+	const actual = name.toLowerCase();
+
+	(element as unknown as PlainObject)[actual] =
+		value === '' ||
+		(typeof value === 'string' && value.toLowerCase() === actual) ||
+		value === true;
+}
+
+export function updateValue(
+	element: HTMLOrSVGElement,
+	first: unknown,
+	second: unknown,
+): void {
+	if (!isHTMLOrSVGElement(element)) {
+		return;
+	}
+
+	if (isProperty(first)) {
+		updateAttribute(
+			element,
+			(first as Attribute).name,
+			(first as Attribute).value,
+		);
+	} else if (typeof first === 'string') {
+		updateAttribute(element, first as string, second);
+	}
+}
+
+export function updateValues(
+	element: HTMLOrSVGElement,
+	values: Attribute<unknown>[] | Record<string, unknown>,
+): void {
+	if (!isHTMLOrSVGElement(element)) {
+		return;
+	}
+
+	const isArray = Array.isArray(values);
+	const entries = Object.entries(values);
+	const {length} = entries;
+
+	for (let index = 0; index < length; index += 1) {
+		const entry = entries[index];
+
+		if (isArray) {
+			updateAttribute(
+				element,
+				(entry[1] as Attribute).name,
+				(entry[1] as Attribute).value,
+			);
+		} else {
+			updateAttribute(element, entry[0], entry[1]);
+		}
+	}
 }
 
 //
