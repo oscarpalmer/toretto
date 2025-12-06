@@ -55,12 +55,10 @@ test('html', () => {
 	expect(nodes.length).toBe(1);
 	expect(joinNodes(nodes)).toBe('<p hidden=""></p>');
 
-	nodes = html('<p hidden="nah"></p>', {
-		sanitizeBooleanAttributes: false,
-	});
+	nodes = html('<p hidden="nah"></p>');
 
 	expect(nodes.length).toBe(1);
-	expect(joinNodes(nodes)).toBe('<p hidden="nah"></p>');
+	expect(joinNodes(nodes)).toBe('<p hidden=""></p>');
 
 	//
 
@@ -122,41 +120,29 @@ test('sanitize', () => {
 	<p>
 		<a href="data:text/html,hmm">One</a>
 		<a xlink:href="javascript:console.log">Two</a>
+		<button disabled>Three</button>
 		<img src="javascript:console.log">
 	</p>
 <script>alert('!')</script></div>`;
 
 	document.body.innerHTML = original;
 
+	const expected = `<body><div hidden="">
+	<p>
+		<a>One</a>
+		<a>Two</a>
+		<button disabled="">Three</button>
+		<img>
+	</p>
+</div></body>`;
+
 	let nodes = sanitize(document.body);
 
 	expect(nodes.length).toBe(1);
+	expect(joinNodes(nodes)).toBe(expected);
 
-	expect(joinNodes(nodes)).toBe(
-		`<body><div hidden="">
-	<p>
-		<a>One</a>
-		<a>Two</a>
-		<img>
-	</p>
-</div></body>`,
-	);
-
-	document.body.innerHTML = original;
-
-	nodes = sanitize([document.body], {
-		sanitizeBooleanAttributes: false,
-	});
+	nodes = sanitize([document.body]);
 
 	expect(nodes.length).toBe(1);
-
-	expect(joinNodes(nodes)).toBe(
-		`<body><div hidden="hmm">
-	<p>
-		<a>One</a>
-		<a>Two</a>
-		<img>
-	</p>
-</div></body>`,
-	);
+	expect(joinNodes(nodes)).toBe(expected);
 });

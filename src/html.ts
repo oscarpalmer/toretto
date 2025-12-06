@@ -1,5 +1,5 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import {getSanitizeOptions, type SanitizeOptions, sanitizeNodes} from './internal/sanitize';
+import {sanitizeNodes} from './internal/sanitize';
 
 //
 
@@ -37,47 +37,48 @@ type HtmlOptions = {
 	 * Ignore caching the template element for the HTML string? _(defaults to `false`)_
 	 */
 	ignoreCache?: boolean;
-} & SanitizeOptions;
+};
 
 type Options = Required<HtmlOptions>;
 
 //
 
-function createTemplate(html: string, ignore: boolean): HTMLTemplateElement {
-	const template = document.createElement('template');
+function createHtml(value: string | HTMLTemplateElement): string {
+	const html = getParser().parseFromString(
+		typeof value === 'string' ? value : value.innerHTML,
+		HTML_PARSE_TYPE,
+	);
 
-	template.innerHTML = html;
+	html.body.normalize();
 
-	if (!ignore) {
-		templates[html] = template;
+	sanitizeNodes([html.body]);
+
+	return html.body.innerHTML;
+}
+
+function createTemplate(
+	value: string | HTMLTemplateElement,
+	options: Options,
+): HTMLTemplateElement {
+	const template = document.createElement(TEMPLATE_TAG);
+
+	template.innerHTML = createHtml(value);
+
+	if (typeof value === 'string' && !options.ignoreCache) {
+		templates[value] = template;
 	}
 
 	return template;
 }
 
-function getHtml(value: string | HTMLTemplateElement, options: Options): Node[] {
+function getNodes(value: string | HTMLTemplateElement, options: Options): Node[] {
 	if (typeof value !== 'string' && !(value instanceof HTMLTemplateElement)) {
 		return [];
 	}
 
-	const template =
-		value instanceof HTMLTemplateElement ? value : getTemplate(value, options.ignoreCache);
+	const template = getTemplate(value, options);
 
-	if (template == null) {
-		return [];
-	}
-
-	const cloned = template.content.cloneNode(true) as DocumentFragment;
-
-	const scripts = cloned.querySelectorAll('script');
-
-	for (const script of scripts) {
-		script.remove();
-	}
-
-	cloned.normalize();
-
-	return sanitizeNodes([...cloned.childNodes], options);
+	return template == null ? [] : [...template.content.cloneNode(true).childNodes];
 }
 
 function getOptions(input?: HtmlOptions): Options {
@@ -85,15 +86,23 @@ function getOptions(input?: HtmlOptions): Options {
 
 	options.ignoreCache = typeof options.ignoreCache === 'boolean' ? options.ignoreCache : false;
 
-	options.sanitizeBooleanAttributes =
-		typeof options.sanitizeBooleanAttributes === 'boolean'
-			? options.sanitizeBooleanAttributes
-			: true;
-
 	return options as Options;
 }
 
-function getTemplate(value: string, ignore: boolean): HTMLTemplateElement | undefined {
+function getParser(): DOMParser {
+	parser ??= new DOMParser();
+
+	return parser;
+}
+
+function getTemplate(
+	value: string | HTMLTemplateElement,
+	options: Options,
+): HTMLTemplateElement | undefined {
+	if (value instanceof HTMLTemplateElement) {
+		return createTemplate(value, options);
+	}
+
 	if (typeof value !== 'string' || value.trim().length === 0) {
 		return;
 	}
@@ -106,13 +115,13 @@ function getTemplate(value: string, ignore: boolean): HTMLTemplateElement | unde
 
 	const element = EXPRESSION_ID.test(value) ? document.querySelector(`#${value}`) : null;
 
-	template = element instanceof HTMLTemplateElement ? element : createTemplate(value, ignore);
+	template = element instanceof HTMLTemplateElement ? element : createTemplate(value, options);
 
 	return template;
 }
 
 const html = ((value: string | HTMLTemplateElement, options?: Options): Node[] => {
-	return getHtml(value, getOptions(options));
+	return getNodes(value, getOptions(options));
 }) as Html;
 
 html.clear = (): void => {
@@ -146,13 +155,19 @@ html.remove = (template: string): void => {
  * @param options Sanitization options
  * @returns Sanitized nodes
  */
-export function sanitize(value: Node | Node[], options?: SanitizeOptions): Node[] {
-	return sanitizeNodes(Array.isArray(value) ? value : [value], getSanitizeOptions(options));
+export function sanitize(value: Node | Node[]): Node[] {
+	return sanitizeNodes(Array.isArray(value) ? value : [value]);
 }
 
 //
 
 const EXPRESSION_ID = /^[a-z][\w-]*$/i;
+
+const HTML_PARSE_TYPE = 'text/html';
+
+const TEMPLATE_TAG = 'template';
+
+let parser: DOMParser;
 
 let templates: Record<string, HTMLTemplateElement> = {};
 
