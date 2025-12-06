@@ -2,10 +2,7 @@
  * - Get the distance between two elements _(i.e., the amount of nodes of between them)_
  * - If the distance cannot be calculated, `-1` is returned
  */
-function getDistanceBetweenElements(
-	origin: Element,
-	target: Element,
-): number | undefined {
+function getDistanceBetweenElements(origin: Element, target: Element): number | undefined {
 	if (origin === target || origin.parentElement === target) {
 		return 0;
 	}
@@ -20,12 +17,7 @@ function getDistanceBetweenElements(
 	const beforeOrInside = !!(comparison & 2 || comparison & 8);
 
 	if (beforeOrInside || !!(comparison & 4 || comparison & 16)) {
-		return (
-			traverse(
-				beforeOrInside ? origin : target,
-				beforeOrInside ? target : origin,
-			) ?? -1
-		);
+		return traverse(beforeOrInside ? origin : target, beforeOrInside ? target : origin) ?? -1;
 	}
 }
 
@@ -137,9 +129,7 @@ export function findRelatives(
 
 	return minimum == null
 		? []
-		: distances
-				.filter(found => found.distance === minimum)
-				.map(found => found.element);
+		: distances.filter(found => found.distance === minimum).map(found => found.element);
 }
 
 function traverse(from: Element, to: Element): number | undefined {
@@ -161,9 +151,7 @@ function traverse(from: Element, to: Element): number | undefined {
 		const children = [...(parent.children ?? [])];
 
 		if (children.includes(to)) {
-			return (
-				distance + Math.abs(children.indexOf(current) - children.indexOf(to))
-			);
+			return distance + Math.abs(children.indexOf(current) - children.indexOf(to));
 		}
 
 		index = children.findIndex(child => child.contains(to));

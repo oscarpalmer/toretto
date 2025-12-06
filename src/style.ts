@@ -57,11 +57,7 @@ export function getStyles<Property extends keyof CSSStyleDeclaration>(
 		const property = properties[index];
 
 		if (typeof property === 'string') {
-			styles[property] = getStyleValue(
-				element,
-				property,
-				computed === true,
-			) as never;
+			styles[property] = getStyleValue(element, property, computed === true) as never;
 		}
 	}
 
@@ -74,10 +70,7 @@ export function getStyles<Property extends keyof CSSStyleDeclaration>(
  * @param computed Get the computed text direction? _(defaults to `false`)_
  * @returns Text direction
  */
-export function getTextDirection(
-	element: HTMLOrSVGElement,
-	computed?: boolean,
-): TextDirection {
+export function getTextDirection(element: HTMLOrSVGElement, computed?: boolean): TextDirection {
 	if (!(element instanceof Element)) {
 		return undefined as never;
 	}
@@ -112,10 +105,7 @@ export function setStyle(
  * @param element Element to set the styles on
  * @param styles Styles to set
  */
-export function setStyles(
-	element: HTMLOrSVGElement,
-	styles: Partial<CSSStyleDeclaration>,
-): void {
+export function setStyles(element: HTMLOrSVGElement, styles: Partial<CSSStyleDeclaration>): void {
 	setElementValues(element, styles as never, null, updateStyleProperty);
 }
 
@@ -170,11 +160,7 @@ export function toggleStyles(
 	};
 }
 
-function updateStyleProperty(
-	element: HTMLOrSVGElement,
-	key: string,
-	value: unknown,
-): void {
+function updateStyleProperty(element: HTMLOrSVGElement, key: string, value: unknown): void {
 	updateElementValue(
 		element,
 		key,

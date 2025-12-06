@@ -1,8 +1,8 @@
-/** biome-ignore-all lint/style/noMagicNumbers: Testing */
 import {noop} from '@oscarpalmer/atoms/function';
-import {afterAll, expect, test} from 'vitest';
+import {expect, test} from 'vitest';
 import {dispatch, getPosition, off, on} from '../src/event/index';
 import type {RemovableEventListener} from '../src/models';
+import {afterEach} from 'node:test';
 
 class FakeTouch {
 	clientX: number;
@@ -25,7 +25,7 @@ type FakeTouchInit = {
 	target: EventTarget;
 };
 
-afterAll(() => {
+afterEach(() => {
 	document.body.innerHTML = '';
 });
 
@@ -265,9 +265,7 @@ test('on & off (delegated)', () => {
 			}),
 		);
 
-		const handlers = (div as any)[
-			`@click:${div.id === 'two' ? 'active' : 'passive'}`
-		];
+		const handlers = (div as any)[`@click:${div.id === 'two' ? 'active' : 'passive'}`];
 
 		expect(handlers).toBeInstanceOf(Set);
 		expect(handlers.size).toBe(1);
@@ -278,8 +276,8 @@ test('on & off (delegated)', () => {
 	expect(handlers).toBeInstanceOf(Set);
 	expect(handlers.size).toBe(1);
 
-	expect((document as any)['@click:active:listeners']).toBe(1);
-	expect((document as any)['@click:passive:listeners']).toBe(4);
+	expect((document as any)['@click:active.count']).toBe(1);
+	expect((document as any)['@click:passive.count']).toBe(4);
 
 	const last = divs.at(-1);
 
@@ -291,16 +289,7 @@ test('on & off (delegated)', () => {
 
 	last?.click();
 
-	expect(values).toEqual([
-		'four',
-		'three',
-		'one',
-		'document',
-		'two',
-		'four',
-		'three',
-		'two',
-	]);
+	expect(values).toEqual(['four', 'three', 'one', 'document', 'two', 'four', 'three', 'two']);
 
 	if (last != null) {
 		off(last, 'click', handler);
@@ -311,17 +300,15 @@ test('on & off (delegated)', () => {
 	expect(handlers).toBeInstanceOf(Set);
 	expect(handlers.size).toBe(1);
 
-	expect((document as any)['@click:active:listeners']).toBe(1);
-	expect((document as any)['@click:passive:listeners']).toBe(3);
+	expect((document as any)['@click:active.count']).toBe(1);
+	expect((document as any)['@click:passive.count']).toBe(3);
 
 	for (const listener of listeners) {
 		listener();
 	}
 
 	for (const div of divs) {
-		const handlers = (div as any)[
-			`@click:${div.id === 'two' ? 'active' : 'passive'}`
-		];
+		const handlers = (div as any)[`@click:${div.id === 'two' ? 'active' : 'passive'}`];
 
 		expect(handlers).toBeUndefined();
 	}
@@ -331,8 +318,8 @@ test('on & off (delegated)', () => {
 	expect(handlers).toBeInstanceOf(Set);
 	expect(handlers.size).toBe(1);
 
-	expect((document as any)['@click:active:listeners']).toBeUndefined();
-	expect((document as any)['@click:passive:listeners']).toBe(1);
+	expect((document as any)['@click:active.count']).toBeUndefined();
+	expect((document as any)['@click:passive.count']).toBe(1);
 
 	last?.click();
 
@@ -354,8 +341,8 @@ test('on & off (delegated)', () => {
 
 	expect(handlers).toBeUndefined();
 
-	expect((document as any)['@click:active:listeners']).toBeUndefined();
-	expect((document as any)['@click:passive:listeners']).toBeUndefined();
+	expect((document as any)['@click:active.count']).toBeUndefined();
+	expect((document as any)['@click:passive.count']).toBeUndefined();
 
 	expect(values).toEqual([
 		'four',
@@ -368,4 +355,60 @@ test('on & off (delegated)', () => {
 		'two',
 		'document',
 	]);
+});
+
+test('on & off (delegated, multiple on single element)', () => {
+	const div = document.createElement('div');
+
+	document.body.append(div);
+
+	const listeners = {
+		first: on(div, 'click', () => {
+			values.first += 1;
+		}),
+		second: on(div, 'click', () => {
+			values.second += 1;
+		}),
+	};
+
+	const values = {
+		first: 0,
+		second: 0,
+	};
+
+	expect((div as any)['@click:passive']).toBeInstanceOf(Set);
+	expect((div as any)['@click:passive'].size).toBe(2);
+	expect((document as any)['@click:passive.count']).toBe(2);
+
+	div.click();
+
+	expect(values).toEqual({
+		first: 1,
+		second: 1,
+	});
+
+	listeners.first();
+
+	expect((div as any)['@click:passive']).toBeInstanceOf(Set);
+	expect((div as any)['@click:passive'].size).toBe(1);
+	expect((document as any)['@click:passive.count']).toBe(1);
+
+	div.click();
+
+	expect(values).toEqual({
+		first: 1,
+		second: 2,
+	});
+
+	listeners.second();
+
+	expect((div as any)['@click:passive']).toBeUndefined();
+	expect((document as any)['@click:passive.count']).toBeUndefined();
+
+	div.click();
+
+	expect(values).toEqual({
+		first: 1,
+		second: 2,
+	});
 });

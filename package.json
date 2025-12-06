@@ -4,20 +4,21 @@
 		"url": "https://oscarpalmer.se"
 	},
 	"dependencies": {
-		"@oscarpalmer/atoms": "^0.114"
+		"@oscarpalmer/atoms": "^0.115"
 	},
 	"description": "A collection of badass DOM utilities.",
 	"devDependencies": {
-		"@biomejs/biome": "^2.3",
 		"@rollup/plugin-node-resolve": "^16",
 		"@rollup/plugin-typescript": "^12.3",
 		"@types/node": "^24.10",
 		"@vitest/coverage-istanbul": "^4",
 		"jsdom": "^27.2",
+		"oxfmt": "^0.16",
+		"oxlint": "^1.31",
 		"rollup": "^4.53",
 		"tslib": "^2.8",
 		"typescript": "^5.9",
-		"vite": "npm:rolldown-vite@latest",
+		"vite": "8.0.0-beta.0",
 		"vitest": "^4"
 	},
 	"exports": {
@@ -92,5 +93,5 @@
 	},
 	"type": "module",
 	"types": "types/index.d.ts",
-	"version": "0.27.0"
+	"version": "0.28.0"
 }

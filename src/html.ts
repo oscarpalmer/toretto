@@ -1,9 +1,5 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import {
-	getSanitizeOptions,
-	type SanitizeOptions,
-	sanitizeNodes,
-} from './internal/sanitize';
+import {getSanitizeOptions, type SanitizeOptions, sanitizeNodes} from './internal/sanitize';
 
 //
 
@@ -59,18 +55,13 @@ function createTemplate(html: string, ignore: boolean): HTMLTemplateElement {
 	return template;
 }
 
-function getHtml(
-	value: string | HTMLTemplateElement,
-	options: Options,
-): Node[] {
+function getHtml(value: string | HTMLTemplateElement, options: Options): Node[] {
 	if (typeof value !== 'string' && !(value instanceof HTMLTemplateElement)) {
 		return [];
 	}
 
 	const template =
-		value instanceof HTMLTemplateElement
-			? value
-			: getTemplate(value, options.ignoreCache);
+		value instanceof HTMLTemplateElement ? value : getTemplate(value, options.ignoreCache);
 
 	if (template == null) {
 		return [];
@@ -92,8 +83,7 @@ function getHtml(
 function getOptions(input?: HtmlOptions): Options {
 	const options = isPlainObject(input) ? input : {};
 
-	options.ignoreCache =
-		typeof options.ignoreCache === 'boolean' ? options.ignoreCache : false;
+	options.ignoreCache = typeof options.ignoreCache === 'boolean' ? options.ignoreCache : false;
 
 	options.sanitizeBooleanAttributes =
 		typeof options.sanitizeBooleanAttributes === 'boolean'
@@ -103,10 +93,7 @@ function getOptions(input?: HtmlOptions): Options {
 	return options as Options;
 }
 
-function getTemplate(
-	value: string,
-	ignore: boolean,
-): HTMLTemplateElement | undefined {
+function getTemplate(value: string, ignore: boolean): HTMLTemplateElement | undefined {
 	if (typeof value !== 'string' || value.trim().length === 0) {
 		return;
 	}
@@ -117,22 +104,14 @@ function getTemplate(
 		return template;
 	}
 
-	const element = EXPRESSION_ID.test(value)
-		? document.querySelector(`#${value}`)
-		: null;
+	const element = EXPRESSION_ID.test(value) ? document.querySelector(`#${value}`) : null;
 
-	template =
-		element instanceof HTMLTemplateElement
-			? element
-			: createTemplate(value, ignore);
+	template = element instanceof HTMLTemplateElement ? element : createTemplate(value, ignore);
 
 	return template;
 }
 
-const html = ((
-	value: string | HTMLTemplateElement,
-	options?: Options,
-): Node[] => {
+const html = ((value: string | HTMLTemplateElement, options?: Options): Node[] => {
 	return getHtml(value, getOptions(options));
 }) as Html;
 
@@ -167,14 +146,8 @@ html.remove = (template: string): void => {
  * @param options Sanitization options
  * @returns Sanitized nodes
  */
-export function sanitize(
-	value: Node | Node[],
-	options?: SanitizeOptions,
-): Node[] {
-	return sanitizeNodes(
-		Array.isArray(value) ? value : [value],
-		getSanitizeOptions(options),
-	);
+export function sanitize(value: Node | Node[], options?: SanitizeOptions): Node[] {
+	return sanitizeNodes(Array.isArray(value) ? value : [value], getSanitizeOptions(options));
 }
 
 //

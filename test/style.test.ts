@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/style/noMagicNumbers: Testing */
 import {expect, test} from 'vitest';
 import * as Style from '../src/style';
 
@@ -38,14 +37,7 @@ test('getStyle(s) & setStyle(s)', () =>
 			expect(
 				Style.getStyles(
 					div,
-					[
-						'color',
-						'display',
-						'backgroundColor',
-						'position',
-						123 as never,
-						(() => {}) as never,
-					],
+					['color', 'display', 'backgroundColor', 'position', 123 as never, (() => {}) as never],
 					true,
 				),
 			).toEqual({

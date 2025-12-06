@@ -28,10 +28,7 @@ export function isBadAttribute(attribute: Attr | Attribute): boolean;
  */
 export function isBadAttribute(name: string, value: string): boolean;
 
-export function isBadAttribute(
-	first: string | Attr | Attribute,
-	second?: string,
-): boolean {
+export function isBadAttribute(first: string | Attr | Attribute, second?: string): boolean {
 	return isValidAttribute(
 		attribute =>
 			attribute == null ||
@@ -59,9 +56,7 @@ export function isBooleanAttribute(name: string): boolean;
 
 export function isBooleanAttribute(value: string | Attr | Attribute): boolean {
 	return isValidAttribute(
-		attribute =>
-			attribute != null &&
-			booleanAttributes.includes(attribute.name.toLowerCase()),
+		attribute => attribute != null && booleanAttributes.includes(attribute.name.toLowerCase()),
 		value,
 		'',
 	);
@@ -72,9 +67,7 @@ export function isBooleanAttribute(value: string | Attr | Attribute): boolean {
  * @param attribute Attribute to check
  * @returns `true` if attribute is empty and not a boolean attribute
  */
-export function isEmptyNonBooleanAttribute(
-	attribute: Attr | Attribute,
-): boolean;
+export function isEmptyNonBooleanAttribute(attribute: Attr | Attribute): boolean;
 
 /**
  * Is the attribute empty and not a boolean attribute?
@@ -82,10 +75,7 @@ export function isEmptyNonBooleanAttribute(
  * @param value Attribute value
  * @returns `true` if attribute is empty and not a boolean attribute
  */
-export function isEmptyNonBooleanAttribute(
-	name: string,
-	value: string,
-): boolean;
+export function isEmptyNonBooleanAttribute(name: string, value: string): boolean;
 
 export function isEmptyNonBooleanAttribute(
 	first: string | Attr | Attribute,
@@ -144,9 +134,7 @@ export function isInvalidBooleanAttribute(
 }
 
 export function isProperty(value: unknown): value is Property {
-	return (
-		isPlainObject(value) && typeof (value as PlainObject).name === 'string'
-	);
+	return isPlainObject(value) && typeof (value as PlainObject).name === 'string';
 }
 
 function isValidAttribute(
@@ -165,11 +153,7 @@ function isValidAttribute(
 	return callback(attribute);
 }
 
-function updateAttribute(
-	element: HTMLOrSVGElement,
-	name: string,
-	value: unknown,
-): void {
+function updateAttribute(element: HTMLOrSVGElement, name: string, value: unknown): void {
 	const isBoolean = booleanAttributes.includes(name.toLowerCase());
 
 	if (isBoolean) {
@@ -183,34 +167,20 @@ function updateAttribute(
 	}
 }
 
-function updateProperty(
-	element: HTMLOrSVGElement,
-	name: string,
-	value: unknown,
-): void {
+function updateProperty(element: HTMLOrSVGElement, name: string, value: unknown): void {
 	const actual = name.toLowerCase();
 
 	(element as unknown as PlainObject)[actual] =
-		value === '' ||
-		(typeof value === 'string' && value.toLowerCase() === actual) ||
-		value === true;
+		value === '' || (typeof value === 'string' && value.toLowerCase() === actual) || value === true;
 }
 
-export function updateValue(
-	element: HTMLOrSVGElement,
-	first: unknown,
-	second: unknown,
-): void {
+export function updateValue(element: HTMLOrSVGElement, first: unknown, second: unknown): void {
 	if (!isHTMLOrSVGElement(element)) {
 		return;
 	}
 
 	if (isProperty(first)) {
-		updateAttribute(
-			element,
-			(first as Attribute).name,
-			(first as Attribute).value,
-		);
+		updateAttribute(element, (first as Attribute).name, (first as Attribute).value);
 	} else if (typeof first === 'string') {
 		updateAttribute(element, first as string, second);
 	}
@@ -232,11 +202,7 @@ export function updateValues(
 		const entry = entries[index];
 
 		if (isArray) {
-			updateAttribute(
-				element,
-				(entry[1] as Attribute).name,
-				(entry[1] as Attribute).value,
-			);
+			updateAttribute(element, (entry[1] as Attribute).name, (entry[1] as Attribute).value);
 		} else {
 			updateAttribute(element, entry[0], entry[1]);
 		}

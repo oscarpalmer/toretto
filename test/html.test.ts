@@ -1,11 +1,8 @@
-/** biome-ignore-all lint/style/noMagicNumbers: Testing */
 import {expect, test} from 'vitest';
 import {html, sanitize} from '../src/html';
 
 function joinNodes(nodes: Node[]): string {
-	return nodes
-		.map(node => (node instanceof Element ? node.outerHTML : node.textContent))
-		.join();
+	return nodes.map(node => (node instanceof Element ? node.outerHTML : node.textContent)).join();
 }
 
 test('html', () => {

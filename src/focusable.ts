@@ -41,8 +41,7 @@ function getTabIndex(element: Element): number {
 
 	if (
 		tabIndex < TABINDEX_BASE &&
-		(EXPRESSION_SPECIAL_TABINDEX.test(element.tagName) ||
-			isEditable(element)) &&
+		(EXPRESSION_SPECIAL_TABINDEX.test(element.tagName) || isEditable(element)) &&
 		!hasTabIndex(element)
 	) {
 		return TABINDEX_BASE;
@@ -51,11 +50,7 @@ function getTabIndex(element: Element): number {
 	return tabIndex;
 }
 
-function getValidElements(
-	parent: Element,
-	filters: Filter[],
-	tabbable: boolean,
-): Element[] {
+function getValidElements(parent: Element, filters: Filter[], tabbable: boolean): Element[] {
 	if (!(parent instanceof Element)) {
 		return [];
 	}
@@ -88,10 +83,7 @@ function getValidElements(
 		if (item.tabIndex === TABINDEX_BASE) {
 			zeroed.push(item.element);
 		} else {
-			indiced[item.tabIndex] = [
-				...(indiced[item.tabIndex] ?? []),
-				item.element,
-			];
+			indiced[item.tabIndex] = [...(indiced[item.tabIndex] ?? []), item.element];
 		}
 	}
 
@@ -99,16 +91,11 @@ function getValidElements(
 }
 
 function hasTabIndex(element: Element): boolean {
-	return !Number.isNaN(
-		Number.parseInt(element.getAttribute(ATTRIBUTE_TABINDEX) as string, 10),
-	);
+	return !Number.isNaN(Number.parseInt(element.getAttribute(ATTRIBUTE_TABINDEX) as string, 10));
 }
 
 function isDisabled(item: ElementWithTabIndex): boolean {
-	if (
-		EXPRESSION_DISABLEABLE.test(item.element.tagName) &&
-		isDisabledFromFieldset(item.element)
-	) {
+	if (EXPRESSION_DISABLEABLE.test(item.element.tagName) && isDisabledFromFieldset(item.element)) {
 		return true;
 	}
 
@@ -127,10 +114,7 @@ function isDisabledFromFieldset(element: Element): boolean {
 				const child = children[index];
 
 				if (child instanceof HTMLLegendElement) {
-					return (
-						parent.matches(SELECTOR_FIELDSET_DISABLED) ||
-						!child.contains(element)
-					);
+					return parent.matches(SELECTOR_FIELDSET_DISABLED) || !child.contains(element);
 				}
 			}
 
@@ -144,9 +128,7 @@ function isDisabledFromFieldset(element: Element): boolean {
 }
 
 function isEditable(element: Element): boolean {
-	return EXPRESSION_TRUEISH.test(
-		element.getAttribute(ATTRIBUTE_CONTENTEDITABLE) as string,
-	);
+	return EXPRESSION_TRUEISH.test(element.getAttribute(ATTRIBUTE_CONTENTEDITABLE) as string);
 }
 
 /**
@@ -155,25 +137,20 @@ function isEditable(element: Element): boolean {
  * @returns `true` if focusable, otherwise `false`
  */
 export function isFocusable(element: Element): boolean {
-	return element instanceof Element
-		? isValidElement(element, FILTERS_FOCUSABLE, false)
-		: false;
+	return element instanceof Element ? isValidElement(element, FILTERS_FOCUSABLE, false) : false;
 }
 
 function isHidden(item: ElementWithTabIndex): boolean {
 	if (
 		((item.element as HTMLElement).hidden ?? false) ||
-		(item.element instanceof HTMLInputElement &&
-			item.element.type === STYLE_HIDDEN)
+		(item.element instanceof HTMLInputElement && item.element.type === STYLE_HIDDEN)
 	) {
 		return true;
 	}
 
 	const isDirectSummary = item.element.matches(SELECTOR_SUMMARY_FIRST);
 
-	const nodeUnderDetails = isDirectSummary
-		? item.element.parentElement
-		: item.element;
+	const nodeUnderDetails = isDirectSummary ? item.element.parentElement : item.element;
 
 	if (nodeUnderDetails?.matches(SELECTOR_DETAILS_CLOSED_CHILDREN) ?? false) {
 		return true;
@@ -193,9 +170,7 @@ function isHidden(item: ElementWithTabIndex): boolean {
 function isInert(item: ElementWithTabIndex): boolean {
 	return (
 		((item.element as InertElement).inert ?? false) ||
-		EXPRESSION_TRUEISH.test(
-			item.element.getAttribute(ATTRIBUTE_INERT) as string,
-		) ||
+		EXPRESSION_TRUEISH.test(item.element.getAttribute(ATTRIBUTE_INERT) as string) ||
 		(item.element.parentElement != null &&
 			isInert({
 				element: item.element.parentElement,
@@ -218,10 +193,7 @@ function isNotTabbableRadio(item: ElementWithTabIndex): boolean {
 		return false;
 	}
 
-	const parent =
-		item.element.form ??
-		item.element.getRootNode?.() ??
-		item.element.ownerDocument;
+	const parent = item.element.form ?? item.element.getRootNode?.() ?? item.element.ownerDocument;
 
 	const realName = CSS?.escape?.(item.element.name) ?? item.element.name;
 
@@ -239,9 +211,7 @@ function isNotTabbableRadio(item: ElementWithTabIndex): boolean {
 function isSummarised(item: ElementWithTabIndex): boolean {
 	return (
 		item.element instanceof HTMLDetailsElement &&
-		[...item.element.children].some(child =>
-			EXPRESSION_SUMMARY.test(child.tagName),
-		)
+		[...item.element.children].some(child => EXPRESSION_SUMMARY.test(child.tagName))
 	);
 }
 
@@ -251,16 +221,10 @@ function isSummarised(item: ElementWithTabIndex): boolean {
  * @returns `true` if tabbable, otherwise `false`
  */
 export function isTabbable(element: Element): boolean {
-	return element instanceof Element
-		? isValidElement(element, FILTERS_TABBABLE, true)
-		: false;
+	return element instanceof Element ? isValidElement(element, FILTERS_TABBABLE, true) : false;
 }
 
-function isValidElement(
-	element: Element,
-	filters: Filter[],
-	tabbable: boolean,
-): boolean {
+function isValidElement(element: Element, filters: Filter[], tabbable: boolean): boolean {
 	const item = getItem(element, tabbable);
 
 	return !filters.some(filter => filter(item));

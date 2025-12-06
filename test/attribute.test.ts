@@ -1,5 +1,3 @@
-/** biome-ignore-all lint/style/noMagicNumbers: Testing */
-/** biome-ignore-all lint/suspicious/noExplicitAny: Testing */
 import {expect, test} from 'vitest';
 import * as Attribute from '../src/attribute/index';
 
@@ -129,17 +127,19 @@ test('getAttribute + setAttribute', () => {
 	expect(Attribute.getAttribute(element, 'data-a')).toBe(123);
 	expect(Attribute.getAttribute(element, 'data-a', false)).toBe('123');
 	expect(Attribute.getAttribute(element, 'data-b')).toBe('hello, world!');
-	expect(Attribute.getAttribute(element, 'data-b', false)).toBe(
-		'hello, world!',
-	);
+	expect(Attribute.getAttribute(element, 'data-b', false)).toBe('hello, world!');
 
 	let first = Attribute.getAttributes(element, [
 		'data-a',
 		'data-b',
 		'id',
 		'keyed',
+		123 as never,
+		[] as never,
+		(() => {}) as never,
 	]);
 
+	expect(Object.keys(first).length).toBe(4);
 	expect(first['data-a']).toBe(123);
 	expect(first['data-b']).toBe('hello, world!');
 	expect(first.id).toBe('test');
@@ -151,11 +151,7 @@ test('getAttribute + setAttribute', () => {
 	expect(Attribute.getAttribute(element, 'id')).toBe(undefined);
 	expect(Attribute.getAttribute(element, 'keyed')).toBe(undefined);
 
-	first = Attribute.getAttributes(
-		element,
-		['data-a', 'data-b', 'id', 'keyed'],
-		false,
-	);
+	first = Attribute.getAttributes(element, ['data-a', 'data-b', 'id', 'keyed'], false);
 
 	expect(first['data-a']).toBe('123');
 	expect(first['data-b']).toBe('hello, world!');
@@ -246,9 +242,7 @@ test('getAttribute + setAttribute', () => {
 	expect(Attribute.getAttributes('blah' as never, [])).toEqual({});
 	expect(Attribute.getAttributes(element, 'blah' as never)).toEqual({});
 
-	expect(Attribute.setAttribute(123 as never, {name: 'x', value: 'y'})).toBe(
-		undefined,
-	);
+	expect(Attribute.setAttribute(123 as never, {name: 'x', value: 'y'})).toBe(undefined);
 
 	expect(Attribute.setAttribute(element, 123 as never, 'blah')).toBe(undefined);
 
@@ -314,24 +308,16 @@ test('isEmptyNonBooleanAttribute', () => {
 
 		expect(Attribute.isEmptyNonBooleanAttribute({name, value: ''})).toBe(true);
 
-		expect(Attribute.isEmptyNonBooleanAttribute({name, value: '  '})).toBe(
-			true,
-		);
+		expect(Attribute.isEmptyNonBooleanAttribute({name, value: '  '})).toBe(true);
 
-		expect(Attribute.isEmptyNonBooleanAttribute({name, value: name})).toBe(
-			false,
-		);
+		expect(Attribute.isEmptyNonBooleanAttribute({name, value: name})).toBe(false);
 	}
 
 	expect(Attribute.isEmptyNonBooleanAttribute(123 as never)).toBe(false);
 
-	expect(
-		Attribute.isEmptyNonBooleanAttribute({name: 123 as never, value: ''}),
-	).toBe(false);
+	expect(Attribute.isEmptyNonBooleanAttribute({name: 123 as never, value: ''})).toBe(false);
 
-	expect(
-		Attribute.isEmptyNonBooleanAttribute({name: '', value: 123 as never}),
-	).toBe(false);
+	expect(Attribute.isEmptyNonBooleanAttribute({name: '', value: 123 as never})).toBe(false);
 });
 
 test('isInvalidBooleanAttribute', () => {
@@ -342,9 +328,7 @@ test('isInvalidBooleanAttribute', () => {
 
 		expect(Attribute.isInvalidBooleanAttribute({name, value: ''})).toBe(false);
 
-		expect(Attribute.isInvalidBooleanAttribute({name, value: name})).toBe(
-			false,
-		);
+		expect(Attribute.isInvalidBooleanAttribute({name, value: name})).toBe(false);
 
 		expect(Attribute.isInvalidBooleanAttribute({name, value: '!'})).toBe(true);
 	}
@@ -354,20 +338,14 @@ test('isInvalidBooleanAttribute', () => {
 	for (let index = 0; index < length; index += 1) {
 		const name = nonBooleanAttributes[index];
 
-		expect(Attribute.isInvalidBooleanAttribute({name, value: name})).toBe(
-			false,
-		);
+		expect(Attribute.isInvalidBooleanAttribute({name, value: name})).toBe(false);
 	}
 
 	expect(Attribute.isInvalidBooleanAttribute(123 as never)).toBe(true);
 
-	expect(
-		Attribute.isInvalidBooleanAttribute({name: 123 as never, value: ''}),
-	).toBe(true);
+	expect(Attribute.isInvalidBooleanAttribute({name: 123 as never, value: ''})).toBe(true);
 
-	expect(
-		Attribute.isInvalidBooleanAttribute({name: '', value: 123 as never}),
-	).toBe(true);
+	expect(Attribute.isInvalidBooleanAttribute({name: '', value: 123 as never})).toBe(true);
 });
 
 test('setProperty', () => {

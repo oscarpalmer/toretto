@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/style/noMagicNumbers: Testing */
 import {expect, test} from 'vitest';
 import * as Is from '../src/is';
 

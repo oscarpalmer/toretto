@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/style/noMagicNumbers: Testing */
 import {afterAll, expect, test} from 'vitest';
 import * as Find from '../src/find/index';
 
@@ -33,19 +32,13 @@ test('findAncestor', () => {
 	expect(Find.findAncestor(origin, '#origin')).toBe(origin);
 	expect(Find.findAncestor(origin, '.target')).toBe(target);
 
-	expect(Find.findAncestor(origin, element => element.id === 'origin')).toBe(
-		origin,
-	);
+	expect(Find.findAncestor(origin, element => element.id === 'origin')).toBe(origin);
 
-	expect(
-		Find.findAncestor(origin, element => (element as HTMLElement).hidden),
-	).toBe(hidden);
+	expect(Find.findAncestor(origin, element => (element as HTMLElement).hidden)).toBe(hidden);
 
 	expect(Find.findAncestor(origin, 'noop')).toBe(null);
 
-	expect(Find.findAncestor(origin, element => element.tagName === 'noop')).toBe(
-		null,
-	);
+	expect(Find.findAncestor(origin, element => element.tagName === 'noop')).toBe(null);
 
 	expect(Find.findAncestor(123 as never, 'span')).toBe(null);
 	expect(Find.findAncestor(origin, 123 as never)).toBe(null);
@@ -95,10 +88,7 @@ test('findElements', () => {
 	expect(children[0].textContent).toBe('hello');
 
 	expect(
-		Find.findElements(
-			[123, 'a', document.body, ...origin, ...children] as never,
-			document,
-		).length,
+		Find.findElements([123, 'a', document.body, ...origin, ...children] as never, document).length,
 	).toBe(3);
 });
 
@@ -163,23 +153,15 @@ test('findRelatives', () => {
 	const buttonTargets = Find.findRelatives(buttonOrigin, 'li.target', element);
 
 	expect(divTargets.length).toBe(2);
-	expect(divTargets.map(target => target.textContent?.trim())).toEqual([
-		'good',
-		'good',
-	]);
+	expect(divTargets.map(target => target.textContent?.trim())).toEqual(['good', 'good']);
 
 	expect(liTargets.length).toBe(2);
-	expect(liTargets.map(target => target.textContent?.trim())).toEqual([
-		'3',
-		'5',
-	]);
+	expect(liTargets.map(target => target.textContent?.trim())).toEqual(['3', '5']);
 
 	expect(buttonTargets.length).toBe(1);
 	expect(buttonTargets[0].textContent?.trim()).toBe('good');
 
-	expect(Find.findRelatives(buttonOrigin, 'button.origin', element)[0]).toBe(
-		buttonOrigin,
-	);
+	expect(Find.findRelatives(buttonOrigin, 'button.origin', element)[0]).toBe(buttonOrigin);
 
 	expect(Find.findRelatives(liOrigin, '.not-found').length).toBe(0);
 

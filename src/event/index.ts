@@ -2,11 +2,7 @@ import {noop} from '@oscarpalmer/atoms/function';
 import {isPlainObject} from '@oscarpalmer/atoms/is';
 import {getBoolean} from '../internal/get-value';
 import {isEventTarget} from '../internal/is';
-import type {
-	CustomEventListener,
-	EventPosition,
-	RemovableEventListener,
-} from '../models';
+import type {CustomEventListener, EventPosition, RemovableEventListener} from '../models';
 import {
 	addDelegatedListener,
 	type EventTargetWithListeners,
@@ -73,11 +69,7 @@ export function dispatch<Type extends keyof HTMLElementEventMap>(
  * @param type Type of event
  * @param options Options for event _(bubbles and is cancelable by default)_
  */
-export function dispatch(
-	target: EventTarget,
-	type: string,
-	options?: CustomEventInit,
-): void;
+export function dispatch(target: EventTarget, type: string, options?: CustomEventInit): void;
 
 export function dispatch<Type extends keyof HTMLElementEventMap>(
 	target: EventTarget,
@@ -94,9 +86,7 @@ export function dispatch<Type extends keyof HTMLElementEventMap>(
  * @param event Pointer event
  * @returns X- and Y-coordinates
  */
-export function getPosition(
-	event: MouseEvent | TouchEvent,
-): EventPosition | undefined {
+export function getPosition(event: MouseEvent | TouchEvent): EventPosition | undefined {
 	let x: number | undefined;
 	let y: number | undefined;
 
@@ -152,11 +142,7 @@ export function off(
 	listener: EventListener | CustomEventListener,
 	options?: EventListenerOptions,
 ): void {
-	if (
-		!isEventTarget(target) ||
-		typeof type !== 'string' ||
-		typeof listener !== 'function'
-	) {
+	if (!isEventTarget(target) || typeof type !== 'string' || typeof listener !== 'function') {
 		return;
 	}
 
@@ -211,11 +197,7 @@ export function on(
 	listener: EventListener | CustomEventListener,
 	options?: AddEventListenerOptions,
 ): RemovableEventListener {
-	if (
-		!isEventTarget(target) ||
-		typeof type !== 'string' ||
-		typeof listener !== 'function'
-	) {
+	if (!isEventTarget(target) || typeof type !== 'string' || typeof listener !== 'function') {
 		return noop;
 	}
 

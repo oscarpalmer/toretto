@@ -12,11 +12,7 @@ import type {HTMLOrSVGElement} from './models';
  * @param parse Parse values? _(defaults to `true`)_
  * @returns Data value
  */
-export function getData(
-	element: HTMLOrSVGElement,
-	key: string,
-	parse?: boolean,
-): unknown;
+export function getData(element: HTMLOrSVGElement, key: string, parse?: boolean): unknown;
 
 /**
  * Get keyed data values from an element
@@ -87,11 +83,7 @@ export function setData(element: HTMLOrSVGElement, data: PlainObject): void;
  * @param key Data key
  * @param value Data value
  */
-export function setData(
-	element: HTMLOrSVGElement,
-	key: string,
-	value: unknown,
-): void;
+export function setData(element: HTMLOrSVGElement, key: string, value: unknown): void;
 
 export function setData(
 	element: HTMLOrSVGElement,
@@ -101,11 +93,7 @@ export function setData(
 	setElementValues(element, first, second, updateDataAttribute);
 }
 
-function updateDataAttribute(
-	element: HTMLOrSVGElement,
-	key: string,
-	value: unknown,
-): void {
+function updateDataAttribute(element: HTMLOrSVGElement, key: string, value: unknown): void {
 	updateElementValue(
 		element,
 		getName(key),

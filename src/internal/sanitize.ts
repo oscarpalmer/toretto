@@ -1,9 +1,5 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import {
-	isBadAttribute,
-	isEmptyNonBooleanAttribute,
-	isInvalidBooleanAttribute,
-} from './attribute';
+import {isBadAttribute, isEmptyNonBooleanAttribute, isInvalidBooleanAttribute} from './attribute';
 
 //
 
@@ -31,11 +27,7 @@ export function getSanitizeOptions(input?: SanitizeOptions): Options {
 	return options as Options;
 }
 
-export function sanitizeAttributes(
-	element: Element,
-	attributes: Attr[],
-	options: Options,
-): void {
+export function sanitizeAttributes(element: Element, attributes: Attr[], options: Options): void {
 	const {length} = attributes;
 
 	for (let index = 0; index < length; index += 1) {
@@ -43,10 +35,7 @@ export function sanitizeAttributes(
 
 		if (isBadAttribute(attribute) || isEmptyNonBooleanAttribute(attribute)) {
 			element.removeAttribute(attribute.name);
-		} else if (
-			options.sanitizeBooleanAttributes &&
-			isInvalidBooleanAttribute(attribute)
-		) {
+		} else if (options.sanitizeBooleanAttributes && isInvalidBooleanAttribute(attribute)) {
 			element.setAttribute(attribute.name, '');
 		}
 	}

@@ -14,9 +14,7 @@ export function getAttributeValue(
 	const attribute = element.attributes[normalized as keyof NamedNodeMap];
 	const value = attribute instanceof Attr ? attribute.value : undefined;
 
-	return EXPRESSION_DATA_PREFIX.test(normalized) &&
-		typeof value === 'string' &&
-		parseValue
+	return EXPRESSION_DATA_PREFIX.test(normalized) && typeof value === 'string' && parseValue
 		? (parse(value) ?? value)
 		: value;
 }
@@ -28,9 +26,7 @@ export function getStyleValue(
 ): string | undefined {
 	const name = camelCase(property);
 
-	return computed
-		? getComputedStyle(element)[name as never]
-		: element.style[name as never];
+	return computed ? getComputedStyle(element)[name as never] : element.style[name as never];
 }
 
 export const EXPRESSION_DATA_PREFIX = /^data-/i;

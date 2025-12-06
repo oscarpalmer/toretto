@@ -36,16 +36,12 @@ function getSupport(): boolean {
 		return true;
 	}
 
-	if (
-		typeof navigator.maxTouchPoints === 'number' &&
-		navigator.maxTouchPoints > 0
-	) {
+	if (typeof navigator.maxTouchPoints === 'number' && navigator.maxTouchPoints > 0) {
 		return true;
 	}
 
 	if (
-		typeof (navigator as NavigatorWithMsMaxTouchPoints).msMaxTouchPoints ===
-			'number' &&
+		typeof (navigator as NavigatorWithMsMaxTouchPoints).msMaxTouchPoints === 'number' &&
 		(navigator as NavigatorWithMsMaxTouchPoints).msMaxTouchPoints > 0
 	) {
 		return true;

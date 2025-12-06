@@ -7,10 +7,7 @@ import type {Selector} from '../models';
  * @param context Context to search within _(defaults to `document`)_
  * @returns Found element or `null`
  */
-export function findElement(
-	selector: string,
-	context?: Selector | null,
-): Element | null {
+export function findElement(selector: string, context?: Selector | null): Element | null {
 	return findElementOrElements(selector, context, true) as never;
 }
 
@@ -24,17 +21,10 @@ function findElementOrElements(
 	const contexts =
 		context == null
 			? [document]
-			: (findElementOrElements(context, undefined, false) as Element[]).filter(
-					isContext,
-				);
+			: (findElementOrElements(context, undefined, false) as Element[]).filter(isContext);
 
 	if (typeof selector === 'string') {
-		return findElementOrElementsForSelector(
-			selector,
-			contexts,
-			callback,
-			single,
-		);
+		return findElementOrElementsForSelector(selector, contexts, callback, single);
 	}
 
 	let array: unknown[];
@@ -59,9 +49,10 @@ function findElementOrElementsForSelector(
 	const result: Element[] = [];
 
 	for (let index = 0; index < length; index += 1) {
-		const value = (
-			contexts[index][callback] as (selector: string) => Node | null
-		)(selector) as Element | Element[] | null;
+		const value = (contexts[index][callback] as (selector: string) => Node | null)(selector) as
+			| Element
+			| Element[]
+			| null;
 
 		if (single) {
 			if (value == null) {
@@ -74,9 +65,7 @@ function findElementOrElementsForSelector(
 		result.push(...Array.from(value as Element[]));
 	}
 
-	return single
-		? null
-		: result.filter((value, index, array) => array.indexOf(value) === index);
+	return single ? null : result.filter((value, index, array) => array.indexOf(value) === index);
 }
 
 function findElementOrElementsFromNodes(
@@ -104,9 +93,7 @@ function findElementOrElementsFromNodes(
 			element != null &&
 			(context == null ||
 				contexts.length === 0 ||
-				contexts.some(
-					context => context === element || context.contains(element),
-				)) &&
+				contexts.some(context => context === element || context.contains(element))) &&
 			!result.includes(element)
 		) {
 			result.push(element);
@@ -122,10 +109,7 @@ function findElementOrElementsFromNodes(
  * @param context Context to search within _(defaults to `document`)_
  * @returns Found elements
  */
-export function findElements(
-	selector: Selector,
-	context?: Selector | null,
-): Element[] {
+export function findElements(selector: Selector, context?: Selector | null): Element[] {
 	return findElementOrElements(selector, context, false) as never;
 }
 

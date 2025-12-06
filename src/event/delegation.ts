@@ -3,7 +3,7 @@ import type {CustomEventListener, RemovableEventListener} from '../models';
 
 //
 
-type DocumentWithListeners = Document &
+type DocumentWithListenerCounts = Document &
 	Partial<{
 		[key: string]: number;
 	}>;
@@ -14,20 +14,20 @@ export type EventTargetWithListeners = EventTarget &
 	}>;
 
 function addDelegatedHandler(
-	document: DocumentWithListeners,
+	document: DocumentWithListenerCounts,
 	type: string,
 	name: string,
 	passive: boolean,
 ): void {
-	const listeners = `${name}${LISTENERS_SUFFIX}`;
+	const count = `${name}${COUNT_SUFFIX}`;
 
-	if (document[listeners] != null) {
-		(document[listeners] as number) += 1;
+	if (document[count] != null) {
+		(document[count] as number) += 1;
 
 		return;
 	}
 
-	document[listeners] = 1;
+	document[count] = 1;
 
 	document.addEventListener(type, passive ? HANDLER_PASSIVE : HANDLER_ACTIVE, {
 		passive,
@@ -45,7 +45,7 @@ export function addDelegatedListener(
 
 	target[name]?.add(listener);
 
-	addDelegatedHandler(document as DocumentWithListeners, type, name, passive);
+	addDelegatedHandler(document as DocumentWithListenerCounts, type, name, passive);
 
 	return () => {
 		removeDelegatedListener(target, type, name, listener, passive);
@@ -67,18 +67,20 @@ function delegatedEventHandler(this: boolean, event: Event): void {
 		const item = items[index] as EventTargetWithListeners;
 		const listeners = item[key];
 
-		if (!(item as unknown as HTMLButtonElement).disabled && listeners != null) {
-			Object.defineProperty(event, 'currentTarget', {
-				configurable: true,
-				value: item,
-			});
+		if ((item as unknown as HTMLButtonElement).disabled || listeners == null) {
+			continue;
+		}
 
-			for (const listener of listeners) {
-				(listener as EventListener).call(item, event);
+		Object.defineProperty(event, 'currentTarget', {
+			configurable: true,
+			value: item,
+		});
 
-				if (event.cancelBubble) {
-					return;
-				}
+		for (const listener of listeners) {
+			(listener as EventListener).call(item, event);
+
+			if (event.cancelBubble) {
+				return;
 			}
 		}
 	}
@@ -101,22 +103,19 @@ export function getDelegatedName(
 }
 
 function removeDelegatedHandler(
-	document: DocumentWithListeners,
+	document: DocumentWithListenerCounts,
 	type: string,
 	name: string,
 	passive: boolean,
 ): void {
-	const listeners = `${name}${LISTENERS_SUFFIX}`;
+	const count = `${name}${COUNT_SUFFIX}`;
 
-	(document[listeners] as number) -= 1;
+	(document[count] as number) -= 1;
 
-	if ((document[listeners] as number) < 1) {
-		document[listeners] = undefined;
+	if ((document[count] as number) < 1) {
+		document[count] = undefined;
 
-		document.removeEventListener(
-			type,
-			passive ? HANDLER_PASSIVE : HANDLER_ACTIVE,
-		);
+		document.removeEventListener(type, passive ? HANDLER_PASSIVE : HANDLER_ACTIVE);
 	}
 }
 
@@ -135,21 +134,18 @@ export function removeDelegatedListener(
 
 	handlers.delete(listener);
 
-	if (handlers?.size === 0) {
+	if (handlers.size === 0) {
 		target[name] = undefined;
 	}
 
-	removeDelegatedHandler(
-		document as DocumentWithListeners,
-		type,
-		name,
-		passive,
-	);
+	removeDelegatedHandler(document as DocumentWithListenerCounts, type, name, passive);
 
 	return true;
 }
 
 //
+
+const COUNT_SUFFIX = '.count';
 
 const EVENT_PREFIX = '@';
 
@@ -185,5 +181,3 @@ const EVENT_TYPES: Set<string> = new Set([
 const HANDLER_ACTIVE: EventListener = delegatedEventHandler.bind(false);
 
 const HANDLER_PASSIVE: EventListener = delegatedEventHandler.bind(true);
-
-const LISTENERS_SUFFIX = ':listeners';
