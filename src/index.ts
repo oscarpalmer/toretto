@@ -1,11 +1,16 @@
 import supportsTouch from './touch';
 
-export * from './attribute';
+export {
+	isBadAttribute,
+	isBooleanAttribute,
+	isEmptyNonBooleanAttribute,
+	isInvalidBooleanAttribute,
+} from './attribute';
 export * from './data';
 export * from './event/index';
 export * from './find/index';
 export * from './focusable';
-export * from './html';
+export * from './html/index';
 export * from './is';
 export * from './models';
 export * from './style';

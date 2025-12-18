@@ -1,5 +1,5 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import {sanitizeNodes} from './internal/sanitize';
+import {sanitizeNodes} from './sanitize';
 
 //
 
@@ -34,9 +34,9 @@ type Html = {
 
 type HtmlOptions = {
 	/**
-	 * Ignore caching the template element for the HTML string? _(defaults to `false`)_
+	 * Cache template element for the HTML string? _(defaults to `true`)_
 	 */
-	ignoreCache?: boolean;
+	cache?: boolean;
 };
 
 type Options = Required<HtmlOptions>;
@@ -51,7 +51,7 @@ function createHtml(value: string | HTMLTemplateElement): string {
 
 	html.body.normalize();
 
-	sanitizeNodes([html.body]);
+	sanitizeNodes([html.body], 0);
 
 	return html.body.innerHTML;
 }
@@ -64,7 +64,7 @@ function createTemplate(
 
 	template.innerHTML = createHtml(value);
 
-	if (typeof value === 'string' && !options.ignoreCache) {
+	if (typeof value === 'string' && options.cache) {
 		templates[value] = template;
 	}
 
@@ -84,7 +84,7 @@ function getNodes(value: string | HTMLTemplateElement, options: Options): Node[]
 function getOptions(input?: HtmlOptions): Options {
 	const options = isPlainObject(input) ? input : {};
 
-	options.ignoreCache = typeof options.ignoreCache === 'boolean' ? options.ignoreCache : false;
+	options.cache = typeof options.cache === 'boolean' ? options.cache : true;
 
 	return options as Options;
 }
@@ -156,7 +156,7 @@ html.remove = (template: string): void => {
  * @returns Sanitized nodes
  */
 export function sanitize(value: Node | Node[]): Node[] {
-	return sanitizeNodes(Array.isArray(value) ? value : [value]);
+	return sanitizeNodes(Array.isArray(value) ? value : [value], 0);
 }
 
 //

@@ -4,6 +4,75 @@ import {getString} from '@oscarpalmer/atoms/string';
 import type {Attribute, HTMLOrSVGElement, Property} from '../models';
 import {isHTMLOrSVGElement} from './is';
 
+function badAttributeHandler(name?: string, value?: string): boolean {
+	if (name == null || value == null) {
+		return true;
+	}
+
+	if (
+		(EXPRESSION_CLOBBERED_NAME.test(name) && (value in document || value in formElement)) ||
+		EXPRESSION_EVENT_NAME.test(name)
+	) {
+		return true;
+	}
+
+	if (
+		EXPRESSION_SKIP_NAME.test(name) ||
+		EXPRESSION_URI_VALUE.test(value) ||
+		isValidSourceAttribute(name, value)
+	) {
+		return false;
+	}
+
+	return EXPRESSION_DATA_OR_SCRIPT.test(value);
+}
+
+function booleanAttributeHandler(name?: string, value?: string): boolean {
+	if (name == null || value == null) {
+		return true;
+	}
+
+	if (!booleanAttributesSet.has(name)) {
+		return false;
+	}
+
+	const normalized = value.toLowerCase().trim();
+
+	return !(normalized.length === 0 || normalized === name);
+}
+
+function decodeAttribute(value: string): string {
+	textArea ??= document.createElement('textarea');
+
+	textArea.innerHTML = value;
+
+	return decodeURIComponent(textArea.value);
+}
+
+function handleAttribute(
+	callback: (name?: string, value?: string) => boolean,
+	decode: boolean,
+	first: unknown,
+	second?: unknown,
+): boolean {
+	let name: string | undefined;
+	let value: string | undefined;
+
+	if (isAttribute(first)) {
+		name = first.name;
+		value = String(first.value);
+	} else if (typeof first === 'string' && typeof second === 'string') {
+		name = first;
+		value = second;
+	}
+
+	if (decode && value != null) {
+		value = decodeAttribute(value);
+	}
+
+	return callback(name, value?.replace(EXPRESSION_WHITESPACE, ''));
+}
+
 function isAttribute(value: unknown): value is Attr | Attribute {
 	return (
 		value instanceof Attr ||
@@ -13,148 +82,51 @@ function isAttribute(value: unknown): value is Attr | Attribute {
 	);
 }
 
-/**
- * Is the attribute considered bad and potentially harmful?
- * @param attribute Attribute to check
- * @returns `true` if attribute is considered bad
- */
-export function isBadAttribute(attribute: Attr | Attribute): boolean;
-
-/**
- * Is the attribute considered bad and potentially harmful?
- * @param name Attribute name
- * @param value Attribute value
- * @returns `true` if attribute is considered bad
- */
-export function isBadAttribute(name: string, value: string): boolean;
-
-export function isBadAttribute(first: string | Attr | Attribute, second?: string): boolean {
-	return isValidAttribute(
-		attribute =>
-			attribute == null ||
-			EXPRESSION_ON_PREFIX.test(attribute.name) ||
-			(EXPRESSION_SOURCE_PREFIX.test(attribute.name) &&
-				EXPRESSION_VALUE_PREFIX.test(String(attribute.value))),
-		first,
-		second,
-	);
+export function isBadAttribute(first: unknown, second: unknown, decode: boolean): boolean {
+	return handleAttribute(badAttributeHandler, decode, first, second);
 }
 
-/**
- * Is the attribute a boolean attribute?
- * @param name Attribute to check
- * @returns `true` if attribute is a boolean attribute
- */
-export function isBooleanAttribute(attribute: Attr | Attribute): boolean;
-
-/**
- * Is the attribute a boolean attribute?
- * @param name Attribute name
- * @returns `true` if attribute is a boolean attribute
- */
-export function isBooleanAttribute(name: string): boolean;
-
-export function isBooleanAttribute(value: string | Attr | Attribute): boolean {
-	return isValidAttribute(
-		attribute => attribute != null && booleanAttributes.includes(attribute.name.toLowerCase()),
-		value,
+export function isBooleanAttribute(first: unknown, decode: boolean): boolean {
+	return handleAttribute(
+		name => booleanAttributesSet.has(name?.toLowerCase() as string),
+		decode,
+		first,
 		'',
 	);
 }
 
-/**
- * Is the attribute empty and not a boolean attribute?
- * @param attribute Attribute to check
- * @returns `true` if attribute is empty and not a boolean attribute
- */
-export function isEmptyNonBooleanAttribute(attribute: Attr | Attribute): boolean;
-
-/**
- * Is the attribute empty and not a boolean attribute?
- * @param name Attribute name
- * @param value Attribute value
- * @returns `true` if attribute is empty and not a boolean attribute
- */
-export function isEmptyNonBooleanAttribute(name: string, value: string): boolean;
-
 export function isEmptyNonBooleanAttribute(
-	first: string | Attr | Attribute,
-	second?: string,
+	first: unknown,
+	second: unknown,
+	decode: boolean,
 ): boolean {
-	return isValidAttribute(
-		attribute =>
-			attribute != null &&
-			!booleanAttributes.includes(attribute.name) &&
-			String(attribute.value).trim().length === 0,
+	return handleAttribute(
+		(name, value) =>
+			name != null && value != null && !booleanAttributesSet.has(name) && value.trim().length === 0,
+		decode,
 		first,
 		second,
 	);
 }
 
-/**
- * Is the attribute an invalid boolean attribute?
- *
- * _(I.e., its value is not empty or the same as its name)_
- * @param attribute Attribute to check
- * @returns `true` if attribute is an invalid boolean attribute
- */
-export function isInvalidBooleanAttribute(attribute: Attr | Attribute): boolean;
-
-/**
- * Is the attribute an invalid boolean attribute?
- *
- * _(I.e., its value is not empty or the same as its name)_
- * @param name Attribute name
- * @param value Attribute value
- * @returns `true` if attribute is an invalid boolean attribute
- */
-export function isInvalidBooleanAttribute(name: string, value: string): boolean;
-
 export function isInvalidBooleanAttribute(
-	first: string | Attr | Attribute,
-	second?: string,
+	first: unknown,
+	second: unknown,
+	decode: boolean,
 ): boolean {
-	return isValidAttribute(
-		attribute => {
-			if (attribute == null) {
-				return true;
-			}
-
-			if (!booleanAttributes.includes(attribute.name)) {
-				return false;
-			}
-
-			const normalized = String(attribute.value).toLowerCase().trim();
-
-			return !(normalized.length === 0 || normalized === attribute.name);
-		},
-		first,
-		second,
-	);
+	return handleAttribute(booleanAttributeHandler, decode, first, second);
 }
 
 export function isProperty(value: unknown): value is Property {
 	return isPlainObject(value) && typeof (value as PlainObject).name === 'string';
 }
 
-function isValidAttribute(
-	callback: (attribute: Attr | Attribute | undefined) => boolean,
-	first: string | Attr | Attribute,
-	second?: string,
-): boolean {
-	let attribute: Attribute | undefined;
-
-	if (isAttribute(first)) {
-		attribute = first;
-	} else if (typeof first === 'string' && typeof second === 'string') {
-		attribute = {name: first, value: second};
-	}
-
-	return callback(attribute);
+function isValidSourceAttribute(name: string, value: string): boolean {
+	return EXPRESSION_SOURCE_NAME.test(name) && EXPRESSION_SOURCE_VALUE.test(value);
 }
 
 function updateAttribute(element: HTMLOrSVGElement, name: string, value: unknown): void {
-	const isBoolean = booleanAttributes.includes(name.toLowerCase());
+	const isBoolean = booleanAttributesSet.has(name.toLowerCase());
 
 	if (isBoolean) {
 		updateProperty(element, name, value);
@@ -211,11 +183,23 @@ export function updateValues(
 
 //
 
-const EXPRESSION_ON_PREFIX = /^on/i;
+const EXPRESSION_CLOBBERED_NAME = /^(id|name)$/i;
 
-const EXPRESSION_SOURCE_PREFIX = /^(href|src|xlink:href)$/i;
+const EXPRESSION_DATA_OR_SCRIPT = /^(?:data|\w+script):/i;
 
-const EXPRESSION_VALUE_PREFIX = /(data:text\/html|javascript:)/i;
+const EXPRESSION_EVENT_NAME = /^on/i;
+
+const EXPRESSION_SKIP_NAME = /^(aria-[-\w]+|data-[-\w.\u00B7-\uFFFF]+)$/i;
+
+const EXPRESSION_SOURCE_NAME = /^src$/i;
+
+const EXPRESSION_SOURCE_VALUE = /^data:/i;
+
+const EXPRESSION_URI_VALUE =
+	/^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|matrix):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i;
+
+// oxlint-disable-next-line no-control-regex
+const EXPRESSION_WHITESPACE = /[\u0000-\u0020\u00A0\u1680\u180E\u2000-\u2029\u205F\u3000]/g;
 
 /**
  * List of boolean attributes
@@ -246,3 +230,9 @@ export const booleanAttributes: readonly string[] = Object.freeze([
 	'reversed',
 	'selected',
 ]);
+
+const booleanAttributesSet = new Set(booleanAttributes);
+
+const formElement = document.createElement('form');
+
+let textArea: HTMLTextAreaElement;

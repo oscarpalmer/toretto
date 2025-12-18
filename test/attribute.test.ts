@@ -108,6 +108,74 @@ const nonBooleanAttributes: string[] = [
 	'wrap',
 ];
 
+const testableAttributes = [
+	// Standard attributes
+	{name: 'class', value: 'button primary', valid: true},
+	{name: 'id', value: 'submit-btn', valid: true},
+	{name: 'title', value: 'Click to submit', valid: true},
+	{name: 'alt', value: 'Profile picture', valid: true},
+	{name: 'src', value: 'https://example.com/image.jpg', valid: true},
+	{name: 'href', value: 'https://example.com', valid: true},
+	{name: 'href', value: '/relative/path', valid: true},
+	{name: 'type', value: 'text', valid: true},
+	{name: 'name', value: 'username', valid: true},
+	{name: 'value', value: 'Default text', valid: true},
+	{name: 'placeholder', value: 'Enter your name', valid: true},
+	{name: 'disabled', value: '', valid: true},
+
+	// ARIA attributes
+	{name: 'aria-label', value: 'Close dialog', valid: true},
+	{name: 'aria-labelledby', value: 'heading-1', valid: true},
+	{name: 'aria-describedby', value: 'description-1', valid: true},
+	{name: 'aria-hidden', value: 'true', valid: true},
+
+	// Data attributes
+	{name: 'data-id', value: '12345', valid: true},
+	{name: 'data-user-role', value: 'admin', valid: true},
+	{name: 'data-index', value: '0', valid: true},
+	{name: 'data-config', value: '{"theme":"dark"}', valid: true},
+	{name: 'data-tooltip', value: 'Click here', valid: true},
+
+	// Event handlers
+	{name: 'onclick', value: "alert('XSS')", valid: false},
+	{name: 'onload', value: 'malicious()', valid: false},
+	{name: 'onerror', value: 'steal()', valid: false},
+	{name: 'onmouseover', value: 'exploit()', valid: false},
+	{name: 'onmouseout', value: 'track()', valid: false},
+
+	// JavaScript URLs
+	{name: 'href', value: "javascript:alert('XSS')", valid: false},
+	{name: 'href', value: 'javascript:void(0)', valid: false},
+	{name: 'href', value: '  javascript:exploit()', valid: false},
+	{name: 'href', value: 'JAVASCRIPT:malicious()', valid: false},
+	{name: 'src', value: 'javascript:alert(1)', valid: false},
+	{name: 'action', value: 'javascript:submit()', valid: false},
+	{name: 'formaction', value: 'javascript:hack()', valid: false},
+	{name: 'xlink:href', value: 'javascript:alert(1)', valid: false},
+
+	// Data URLs
+	{name: 'src', value: 'data:image/png;base64,iVBORw0KG...', valid: true},
+	{name: 'href', value: 'data:text/html,<script>alert(1)</script>', valid: false},
+	// {name: 'src', value: "data:text/javascript,alert('XSS')", valid: false},
+	{name: 'href', value: 'data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==', valid: false},
+
+	// Edge cases and encoding
+	{name: 'href', value: '&#106;avascript:alert(1)', valid: false},
+	{name: 'href', value: 'jav&#x09;ascript:alert(1)', valid: false},
+	{name: 'src', value: '\u006Aavascript:alert(1)', valid: false},
+
+	// XML namespaced attributes
+	{name: 'xmlns', value: 'http://www.w3.org/2000/svg', valid: true},
+	{name: 'xml:lang', value: 'en', valid: true},
+	{name: 'xml:space', value: 'preserve', valid: true},
+
+	// Custom element attributes
+	{name: 'is', value: 'custom-button', valid: true},
+	{name: 'part', value: 'button', valid: true},
+	{name: 'exportparts', value: 'button: custom-button', valid: true},
+	{name: 'slot', value: 'header', valid: true},
+];
+
 test('getAttribute + setAttribute', () => {
 	const element = document.createElement('div');
 
@@ -250,22 +318,12 @@ test('getAttribute + setAttribute', () => {
 });
 
 test('isBadAttribute', () => {
-	const attributes = [
-		['onclick', 'alert()'],
-		['href', 'data:text/html,'],
-		['src', 'javascript:'],
-		['xlink:href', 'javascript:'],
-		['href', 'https://example.com'],
-		['src', 'https://example.com'],
-		['xlink:href', 'https://example.com'],
-	];
-
-	const {length} = attributes;
+	const {length} = testableAttributes;
 
 	for (let index = 0; index < length; index += 1) {
-		const [name, value] = attributes[index];
+		const {name, valid, value} = testableAttributes[index];
 
-		expect(Attribute.isBadAttribute({name, value})).toBe(index < 4);
+		expect(Attribute.isBadAttribute({name, value})).toBe(!valid);
 	}
 
 	expect(Attribute.isBadAttribute(123 as never)).toBe(true);

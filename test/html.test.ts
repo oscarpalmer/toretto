@@ -105,7 +105,7 @@ test('html', () => {
 	html('<p>Hello, world! #1</p>');
 
 	html('<p>Hello, world! #2</p>', {
-		ignoreCache: true,
+		cache: false,
 	});
 
 	html.remove(original);
@@ -121,7 +121,7 @@ test('sanitize', () => {
 		<a href="data:text/html,hmm">One</a>
 		<a xlink:href="javascript:console.log">Two</a>
 		<button disabled>Three</button>
-		<img src="javascript:console.log">
+		<img src="jav&#x09;ascript:alert(1)">
 	</p>
 <script>alert('!')</script></div>`;
 
