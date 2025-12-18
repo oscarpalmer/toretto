@@ -46,8 +46,8 @@
 			"default": "./dist/focusable.js"
 		},
 		"./html": {
-			"types": "./types/html.d.ts",
-			"default": "./dist/html.js"
+			"types": "./types/html/index.d.ts",
+			"default": "./dist/html/index.js"
 		},
 		"./is": {
 			"types": "./types/is.d.ts",
@@ -93,5 +93,5 @@
 	},
 	"type": "module",
 	"types": "types/index.d.ts",
-	"version": "0.30.0"
+	"version": "0.30.1"
 }
