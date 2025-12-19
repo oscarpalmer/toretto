@@ -1,148 +1,199 @@
 import {expect, test} from 'vitest';
 import {html, sanitize} from '../src/html';
 
-function joinNodes(nodes: Node[]): string {
-	return nodes.map(node => (node instanceof Element ? node.outerHTML : node.textContent)).join();
+const cases = [
+	// Basic sanitization
+
+	{
+		original: '<p>Hello, world!</p>',
+		sanitized: '<p>Hello, world!</p>',
+	},
+	{
+		original: '<button disabled="blah">Click me</button>',
+		sanitized: '<button disabled="">Click me</button>',
+	},
+	{
+		original: '<script>alert(1);</script><p>Text</p>',
+		sanitized: '<p>Text</p>',
+	},
+	{
+		original: '<div><script>alert(1);</script></div>',
+		sanitized: '<div></div>',
+	},
+	{
+		original: '<!-- A regular comment -->',
+		sanitized: '<!-- A regular comment -->',
+	},
+	{
+		original: '<textarea>@shafigullin</textarea><!--</textarea><img src=x onerror=alert(1)>-->',
+		sanitized: '<textarea>@shafigullin</textarea>',
+	},
+
+	// DOM clobbering (Thanks, DOMPurify)
+
+	{
+		original: '<form onmouseover=\'alert(1)\'><input name="attributes"><input name="attributes">',
+		sanitized: '<form><input><input></form>',
+	},
+	{
+		original: '<img src=x name=getElementById>',
+		sanitized: '<img src="x">',
+	},
+	{
+		original: '<a href="#some-code-here" id="location">invisible',
+		sanitized: '<a href="#some-code-here">invisible</a>',
+	},
+	{
+		original:
+			'<div onclick=alert(0)><form onsubmit=alert(1)><input onfocus=alert(2) name=parentNode>123</form></div>',
+		sanitized: '<div><form><input>123</form></div>',
+	},
+	{
+		original: '<form onsubmit=alert(1)><input onfocus=alert(2) name=nodeName>123</form>',
+		sanitized: '<form><input>123</form>',
+	},
+	{
+		original: '<form onsubmit=alert(1)><input onfocus=alert(2) name=nodeType>123</form>',
+		sanitized: '<form><input>123</form>',
+	},
+	{
+		original: '<form onsubmit=alert(1)><input onfocus=alert(2) name=children>123</form>',
+		sanitized: '<form><input>123</form>',
+	},
+	{
+		original: '<form onsubmit=alert(1)><input onfocus=alert(2) name=attributes>123</form>',
+		sanitized: '<form><input>123</form>',
+	},
+	{
+		original: '<form onsubmit=alert(1)><input onfocus=alert(2) name=removeChild>123</form>',
+		sanitized: '<form><input>123</form>',
+	},
+	{
+		original: '<form onsubmit=alert(1)><input onfocus=alert(2) name=removeAttributeNode>123</form>',
+		sanitized: '<form><input>123</form>',
+	},
+	{
+		original: '<form onsubmit=alert(1)><input onfocus=alert(2) name=setAttribute>123</form>',
+		sanitized: '<form><input>123</form>',
+	},
+	{
+		original:
+			'<image name=body><image name=adoptNode>@mmrupp<image name=firstElementChild><svg onload=alert(1)>',
+		sanitized: '<img><img>@mmrupp<img><svg></svg>',
+	},
+	{
+		original: '<image name=activeElement><svg onload=alert(1)>',
+		sanitized: '<img><svg></svg>',
+	},
+	// Toretto doesn't disallow tags, so result is different from DOMPurify
+	{
+		original:
+			'<image name=body><img src=x><svg onload=alert(1); autofocus>, <keygen onfocus=alert(1); autofocus>',
+		sanitized: '<img><img src="x"><svg autofocus="">, <keygen autofocus=""></keygen></svg>',
+	},
+	{
+		original: '<input name=submit>123',
+		sanitized: '<input>123',
+	},
+	{
+		original: '<input name=acceptCharset>123',
+		sanitized: '<input>123',
+	},
+	{
+		original: '<form><input name=hasChildNodes>',
+		sanitized: '<form><input></form>',
+	},
+
+	// JS attributes (Thanks, DOMPurify)
+
+	{
+		original: '<a href="javascript:123" onclick="alert(1)">CLICK ME</a>',
+		sanitized: '<a>CLICK ME</a>',
+	},
+	{
+		original: '<form action="javasc\nript:alert(1)"><button>XXX</button></form>',
+		sanitized: '<form><button>XXX</button></form>',
+	},
+];
+
+function join(nodes: Node[]): string {
+	return nodes
+		.map(node =>
+			node instanceof Comment
+				? `<!--${node.data}-->`
+				: node instanceof Element
+					? node.outerHTML
+					: (node.nodeValue ?? ''),
+		)
+		.join('');
 }
 
-test('html', () => {
-	const original = `<div onclick="alert('!')">
-	<p>
-		<a href="data:text/html,hmm">One</a>
-		<a xlink:href="javascript:console.log">Two</a>
-		<img src="javascript:console.log" />
-	</p>
-</div><script>alert('!')</script>`.replace(/\s+/g, ' ');
+test('html: cases', () => {
+	const {length} = cases;
 
-	let sanitized = `<div>
-	<p>
-		<a>One</a>
-		<a>Two</a>
-		<img>
-	</p>
-</div>`.replace(/\s+/g, ' ');
+	for (let index = 0; index < length; index += 1) {
+		const {original, sanitized} = cases[index];
 
-	let nodes = html(original);
+		const first = join(html(original));
+		const second = join(html(original));
 
-	expect(nodes.length).toBe(1);
-	expect(joinNodes(nodes)).toBe(sanitized);
+		// console.log(index, result === sanitized ? '✓' : '✗', result);
 
-	//
-
-	sanitized = `<div>
-	<p>
-		<a>One</a>
-		<a>Two</a>
-		<img>
-	</p>
-</div>`.replace(/\s+/g, ' ');
-
-	const sanitizedOne = html(original);
-	const sanitizedTwo = html(original);
-	const sanitizedThree = html(original, {});
-
-	expect(sanitizedOne.length).toBe(1);
-	expect(joinNodes(sanitizedOne)).toBe(sanitized);
-	expect(sanitizedTwo.length).toBe(1);
-	expect(joinNodes(sanitizedTwo)).toBe(sanitized);
-	expect(sanitizedThree.length).toBe(1);
-	expect(joinNodes(sanitizedThree)).toBe(sanitized);
-
-	//
-
-	nodes = html('<p hidden="nah"></p>');
-
-	expect(nodes.length).toBe(1);
-	expect(joinNodes(nodes)).toBe('<p hidden=""></p>');
-
-	nodes = html('<p hidden="nah"></p>');
-
-	expect(nodes.length).toBe(1);
-	expect(joinNodes(nodes)).toBe('<p hidden=""></p>');
-
-	//
-
-	const template = document.createElement('template');
-
-	template.id = 'tpl';
-	template.innerHTML = '<p>Hello</p>';
-
-	document.body.append(template);
-
-	let external = html('tpl');
-
-	template.remove();
-
-	expect(external.length).toBe(1);
-	expect(joinNodes(external)).toBe('<p>Hello</p>');
-
-	external = html(template);
-
-	expect(external.length).toBe(1);
-	expect(joinNodes(external)).toBe('<p>Hello</p>');
-
-	//
-
-	expect(html('')).toEqual([]);
-
-	const values = [
-		null,
-		undefined,
-		0,
-		1,
-		true,
-		false,
-		{},
-		[],
-		(): void => {},
-		document.createElement('div'),
-	];
-
-	for (let index = 0; index < values.length; index += 1) {
-		expect(html(values[index] as never)).toEqual([]);
+		expect(first).toBe(sanitized);
+		expect(second).toBe(sanitized);
+		expect(first).toBe(second);
 	}
 
-	html('<p>Hello, world! #1</p>');
-
-	html('<p>Hello, world! #2</p>', {
-		cache: false,
-	});
-
-	html.remove(original);
-	html.remove('non-existent');
-	html.remove(123 as never);
+	for (let index = 0; index < length; index += 1) {
+		html.remove(cases[index].original);
+	}
 
 	html.clear();
 });
 
+test('html: templates', () => {
+	const first = document.createElement('template');
+	const second = document.createElement('template');
+
+	first.innerHTML = '<p>Test</p><script>alert(1);</script>';
+
+	second.id = 'test-template';
+	second.innerHTML = '<p>Test</p><script>alert(1);</script>';
+
+	document.body.append(second);
+
+	expect(join(html(first, {cache: false}))).toBe('<p>Test</p>');
+	expect(join(html('test-template'))).toBe('<p>Test</p>');
+});
+
+test('html: error handling', () => {
+	expect(html('   ', {cache: 123 as never})).toEqual([]);
+	expect(html(123 as never, 456 as never)).toEqual([]);
+
+	html.remove('non-existent-template');
+	html.remove(123 as never);
+});
+
 test('sanitize', () => {
-	const original = `<div hidden="hmm" onclick="alert('!')">
-	<p>
-		<a href="data:text/html,hmm">One</a>
-		<a xlink:href="javascript:console.log">Two</a>
-		<button disabled>Three</button>
-		<img src="jav&#x09;ascript:alert(1)">
-	</p>
-<script>alert('!')</script></div>`;
+	function getElement() {
+		const element = document.createElement('div');
 
-	document.body.innerHTML = original;
+		element.setAttribute('onclick', 'alert(1)');
+		element.innerHTML = '<p>Hello, world!<script>alert(2);</script></p>';
 
-	const expected = `<body><div hidden="">
-	<p>
-		<a>One</a>
-		<a>Two</a>
-		<button disabled="">Three</button>
-		<img>
-	</p>
-</div></body>`;
+		return element;
+	}
 
-	let nodes = sanitize(document.body);
+	const firstElement = getElement();
+	const secondElement = getElement();
 
-	expect(nodes.length).toBe(1);
-	expect(joinNodes(nodes)).toBe(expected);
+	const firstSanitized = sanitize([firstElement]);
+	const secondSanitized = sanitize(secondElement);
 
-	nodes = sanitize([document.body]);
+	const firstHtml = join(firstSanitized);
+	const secondHtml = join(secondSanitized);
 
-	expect(nodes.length).toBe(1);
-	expect(joinNodes(nodes)).toBe(expected);
+	expect(firstHtml).toBe('<div><p>Hello, world!</p></div>');
+	expect(secondHtml).toBe('<div><p>Hello, world!</p></div>');
+	expect(firstHtml).toBe(secondHtml);
 });

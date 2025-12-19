@@ -1,8 +1,8 @@
 import {
-	isBadAttribute as internalIsBadAttribute,
-	isBooleanAttribute as _isBooleanAttribute,
-	isEmptyNonBooleanAttribute as _isEmptyNonBooleanAttribute,
-	isInvalidBooleanAttribute as _isInvalidBooleanAttribute,
+	_isBadAttribute,
+	_isBooleanAttribute,
+	_isEmptyNonBooleanAttribute,
+	_isInvalidBooleanAttribute,
 } from '../internal/attribute';
 import type {Attribute} from '../models';
 
@@ -22,7 +22,7 @@ export function isBadAttribute(attribute: Attr | Attribute): boolean;
 export function isBadAttribute(name: string, value: string): boolean;
 
 export function isBadAttribute(first: unknown, second?: unknown): boolean {
-	return internalIsBadAttribute(first, second, true);
+	return _isBadAttribute(first, second, true);
 }
 
 /**

@@ -3,20 +3,24 @@
  * - If the distance cannot be calculated, `-1` is returned
  */
 function getDistanceBetweenElements(origin: Element, target: Element): number | undefined {
-	if (origin === target || origin.parentElement === target) {
+	if (origin === target) {
 		return 0;
 	}
 
-	const comparison = origin.compareDocumentPosition(target);
+	if (origin.parentElement === target) {
+		return 1;
+	}
+
 	const children = [...(origin.parentElement?.children ?? [])];
 
 	if (children.includes(target)) {
 		return Math.abs(children.indexOf(origin) - children.indexOf(target));
 	}
 
-	const beforeOrInside = !!(comparison & 2 || comparison & 8);
+	const comparison = origin.compareDocumentPosition(target);
+	const beforeOrInside = Boolean(comparison & 2 || comparison & 8);
 
-	if (beforeOrInside || !!(comparison & 4 || comparison & 16)) {
+	if (beforeOrInside || Boolean(comparison & 4 || comparison & 16)) {
 		return traverse(beforeOrInside ? origin : target, beforeOrInside ? target : origin) ?? -1;
 	}
 }
@@ -86,10 +90,6 @@ export function findRelatives(
 		return [];
 	}
 
-	if (origin.matches(selector)) {
-		return [origin];
-	}
-
 	const elements = [
 		...(context instanceof Document || context instanceof Element
 			? context
@@ -99,12 +99,8 @@ export function findRelatives(
 
 	const {length} = elements;
 
-	if (length === 0) {
-		return [];
-	}
-
-	if (length === 1) {
-		return [elements[0]];
+	if (length < 2) {
+		return elements.filter(element => element !== origin);
 	}
 
 	const distances = [];
@@ -113,9 +109,9 @@ export function findRelatives(
 
 	for (let index = 0; index < length; index += 1) {
 		const element = elements[index];
-		const distance = getDistanceBetweenElements(origin, element) ?? -1;
+		const distance = getDistanceBetweenElements(origin, element);
 
-		if (distance > -1) {
+		if (distance != null && distance > 0) {
 			if (minimum == null || distance < minimum) {
 				minimum = distance;
 			}
@@ -127,16 +123,16 @@ export function findRelatives(
 		}
 	}
 
-	return minimum == null
-		? []
-		: distances.filter(found => found.distance === minimum).map(found => found.element);
+	return distances
+		.filter(found => found.distance === minimum && found.element !== origin)
+		.map(found => found.element);
 }
 
 function traverse(from: Element, to: Element): number | undefined {
 	let index = [...to.children].indexOf(from);
 
 	if (index > -1) {
-		return index + 1;
+		return 1;
 	}
 
 	let current = from;
@@ -148,7 +144,7 @@ function traverse(from: Element, to: Element): number | undefined {
 			return distance + 1;
 		}
 
-		const children = [...(parent.children ?? [])];
+		const children = [...parent.children];
 
 		if (children.includes(to)) {
 			return distance + Math.abs(children.indexOf(current) - children.indexOf(to));
@@ -157,9 +153,9 @@ function traverse(from: Element, to: Element): number | undefined {
 		index = children.findIndex(child => child.contains(to));
 
 		if (index > -1) {
-			const traversed = traverse(current, children[index]) ?? -1;
+			const traversed = traverse(current, children[index]);
 
-			return traversed === -1
+			return traversed == null || traversed === -1
 				? -1
 				: distance + Math.abs(index - children.indexOf(current)) + traversed;
 		}

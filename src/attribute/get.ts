@@ -8,11 +8,7 @@ import {isHTMLOrSVGElement} from '../internal/is';
  * @param parse Parse value? _(defaults to `true`)_
  * @returns Attribute value _(or `undefined`)_
  */
-export function getAttribute(
-	element: HTMLOrSVGElement,
-	name: `data-${string}`,
-	parse?: boolean,
-): unknown;
+export function getAttribute(element: Element, name: `data-${string}`, parse?: boolean): unknown;
 
 /**
  * Get the value of a specific attribute from an element
@@ -20,13 +16,9 @@ export function getAttribute(
  * @param name Attribute name
  * @returns Attribute value _(or `undefined`)_
  */
-export function getAttribute(element: HTMLOrSVGElement, name: string): unknown;
+export function getAttribute(element: Element, name: string): unknown;
 
-export function getAttribute(
-	element: HTMLOrSVGElement,
-	name: string,
-	parseValues?: boolean,
-): unknown {
+export function getAttribute(element: Element, name: string, parseValues?: boolean): unknown {
 	if (isHTMLOrSVGElement(element) && typeof name === 'string') {
 		return getAttributeValue(element, name, parseValues !== false);
 	}
@@ -40,7 +32,7 @@ export function getAttribute(
  * @returns Object of named attributes
  */
 export function getAttributes<Key extends string>(
-	element: HTMLOrSVGElement,
+	element: Element,
 	names: Key[],
 	parseData?: boolean,
 ): Record<Key, unknown> {

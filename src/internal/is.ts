@@ -1,5 +1,3 @@
-import type {HTMLOrSVGElement} from '../models';
-
 /**
  * Is the value an event target?
  * @param value Value to check
@@ -20,6 +18,6 @@ export function isEventTarget(value: unknown): value is EventTarget {
  * @param value Value to check
  * @returns `true` if it's an HTML or SVG element, otherwise `false`
  */
-export function isHTMLOrSVGElement(value: unknown): value is HTMLOrSVGElement {
+export function isHTMLOrSVGElement(value: unknown): value is HTMLElement | SVGElement {
 	return value instanceof HTMLElement || value instanceof SVGElement;
 }

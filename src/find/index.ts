@@ -93,7 +93,7 @@ function findElementOrElementsFromNodes(
 			element != null &&
 			(context == null ||
 				contexts.length === 0 ||
-				contexts.some(context => context === element || context.contains(element))) &&
+				contexts.some(ctx => ctx === element || ctx.contains(element))) &&
 			!result.includes(element)
 		) {
 			result.push(element);

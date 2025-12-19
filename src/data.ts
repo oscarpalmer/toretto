@@ -3,7 +3,6 @@ import {kebabCase, parse} from '@oscarpalmer/atoms/string';
 import {setElementValues, updateElementValue} from './internal/element-value';
 import {EXPRESSION_DATA_PREFIX} from './internal/get-value';
 import {isHTMLOrSVGElement} from './internal/is';
-import type {HTMLOrSVGElement} from './models';
 
 /**
  * Get a keyed data value from an element
@@ -12,7 +11,7 @@ import type {HTMLOrSVGElement} from './models';
  * @param parse Parse values? _(defaults to `true`)_
  * @returns Data value
  */
-export function getData(element: HTMLOrSVGElement, key: string, parse?: boolean): unknown;
+export function getData(element: Element, key: string, parse?: boolean): unknown;
 
 /**
  * Get keyed data values from an element
@@ -22,16 +21,12 @@ export function getData(element: HTMLOrSVGElement, key: string, parse?: boolean)
  * @returns Keyed data values
  */
 export function getData<Key extends string>(
-	element: HTMLOrSVGElement,
+	element: Element,
 	keys: Key[],
 	parse?: boolean,
 ): Record<Key, unknown>;
 
-export function getData(
-	element: HTMLOrSVGElement,
-	keys: string | string[],
-	parseValues?: boolean,
-): unknown {
+export function getData(element: Element, keys: string | string[], parseValues?: boolean): unknown {
 	if (!isHTMLOrSVGElement(element)) {
 		return;
 	}
@@ -75,7 +70,7 @@ function getName(original: string): string {
  * @param element Element to set data on
  * @param data Data to set
  */
-export function setData(element: HTMLOrSVGElement, data: PlainObject): void;
+export function setData(element: Element, data: PlainObject): void;
 
 /**
  * Set a data value on an element
@@ -83,17 +78,13 @@ export function setData(element: HTMLOrSVGElement, data: PlainObject): void;
  * @param key Data key
  * @param value Data value
  */
-export function setData(element: HTMLOrSVGElement, key: string, value: unknown): void;
+export function setData(element: Element, key: string, value: unknown): void;
 
-export function setData(
-	element: HTMLOrSVGElement,
-	first: PlainObject | string,
-	second?: unknown,
-): void {
+export function setData(element: Element, first: PlainObject | string, second?: unknown): void {
 	setElementValues(element, first, second, updateDataAttribute);
 }
 
-function updateDataAttribute(element: HTMLOrSVGElement, key: string, value: unknown): void {
+function updateDataAttribute(element: Element, key: string, value: unknown): void {
 	updateElementValue(
 		element,
 		getName(key),

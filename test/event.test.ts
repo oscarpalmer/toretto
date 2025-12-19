@@ -1,8 +1,7 @@
 import {noop} from '@oscarpalmer/atoms/function';
-import {expect, test} from 'vitest';
-import {dispatch, getPosition, off, on} from '../src/event/index';
+import {afterEach, expect, test} from 'vitest';
+import * as Evt from '../src/event/index';
 import type {RemovableEventListener} from '../src/models';
-import {afterEach} from 'node:test';
 
 class FakeTouch {
 	clientX: number;
@@ -66,20 +65,20 @@ test('dispatch', () => {
 
 	document.body.append(target);
 
-	on(target, 'click', native, {capture: true});
-	on(target, 'focus', native);
-	on(target, 'dblclick', custom);
-	on(target, 'hello', custom);
+	Evt.on(target, 'click', native, {capture: true});
+	Evt.on(target, 'focus', native);
+	Evt.on(target, 'dblclick', custom);
+	Evt.on(target, 'hello', custom);
 
 	expect(target.textContent).toBe('Hello, world!');
 
-	dispatch(target, 'click');
-	dispatch(123 as never, 'click');
-	dispatch(target, 123 as never);
+	Evt.dispatch(target, 'click');
+	Evt.dispatch(123 as never, 'click');
+	Evt.dispatch(target, 123 as never);
 
 	expect(target.textContent).toBe('1');
 
-	dispatch(target, 'focus', {
+	Evt.dispatch(target, 'focus', {
 		bubbles: false,
 		cancelable: false,
 		composed: true,
@@ -87,14 +86,14 @@ test('dispatch', () => {
 
 	expect(target.textContent).toBe('2');
 
-	dispatch(target, 'dblclick', {
+	Evt.dispatch(target, 'dblclick', {
 		composed: true,
 		detail: {a: {b: 'c'}},
 	});
 
 	expect(target.textContent).toBe('3');
 
-	dispatch(target, 'hello');
+	Evt.dispatch(target, 'hello');
 
 	expect(target.textContent).toBe('4');
 });
@@ -104,19 +103,19 @@ test('dispatch:global', () =>
 		let fromDocument: string | undefined;
 		let fromWindow: string | undefined;
 
-		on(document, 'fromDocument', () => {
+		Evt.on(document, 'fromDocument', () => {
 			fromDocument = 'fromDocument';
 		});
 
-		on(window, 'fromWindow', (event: CustomEvent) => {
+		Evt.on(window, 'fromWindow', (event: CustomEvent) => {
 			fromWindow = event.detail;
 		});
 
-		dispatch(document, 'fromDocument', {
+		Evt.dispatch(document, 'fromDocument', {
 			detail: 'fromDocument',
 		});
 
-		dispatch(window, 'fromWindow', {
+		Evt.dispatch(window, 'fromWindow', {
 			detail: 'fromWindow',
 		});
 
@@ -145,8 +144,8 @@ test('getPosition', () => {
 		],
 	});
 
-	const position = getPosition(event);
-	const touchPosition = getPosition(touchEvent);
+	const position = Evt.getPosition(event);
+	const touchPosition = Evt.getPosition(touchEvent);
 
 	expect(position?.x).toBe(10);
 	expect(position?.y).toBe(20);
@@ -155,10 +154,10 @@ test('getPosition', () => {
 	expect(touchPosition?.y).toBe(10);
 
 	// @ts-expect-error Testing invalid input
-	expect(getPosition(123)).toBeUndefined();
+	expect(Evt.getPosition(123)).toBeUndefined();
 
 	// @ts-expect-error Testing invalid input
-	expect(getPosition([])).toBeUndefined();
+	expect(Evt.getPosition([])).toBeUndefined();
 });
 
 test('on & off (direct)', () => {
@@ -175,10 +174,10 @@ test('on & off (direct)', () => {
 
 	const target = document.createElement('div');
 
-	on(target, 'click', onOnce, {once: true});
-	on(target, 'click', onOne, {capture: true});
+	Evt.on(target, 'click', onOnce, {once: true});
+	Evt.on(target, 'click', onOne, {capture: true});
 
-	on(
+	Evt.on(
 		target,
 		'click',
 		() => {
@@ -189,7 +188,7 @@ test('on & off (direct)', () => {
 		{signal: abortController.signal},
 	);
 
-	const remove = on(
+	const remove = Evt.on(
 		target,
 		'click',
 		() => {
@@ -199,30 +198,30 @@ test('on & off (direct)', () => {
 	);
 
 	for (let index = 0; index < 10; index += 1) {
-		dispatch(target, 'click');
+		Evt.dispatch(target, 'click');
 	}
 
 	expect(values).toEqual([1, 10, 10, 10]);
 
 	abortController.abort();
 
-	off(target, 'click', onOne, {capture: true});
+	Evt.off(target, 'click', onOne, {capture: true});
 
 	remove();
 
 	for (let index = 0; index < 10; index += 1) {
-		dispatch(target, 'click');
+		Evt.dispatch(target, 'click');
 	}
 
 	expect(values).toEqual([1, 10, 10, 10]);
 
-	const fail = on(123 as never, 'click', () => {});
+	const fail = Evt.on(123 as never, 'click', () => {});
 
 	expect(fail).toBe(noop);
 
-	off(123 as never, 'click', onOnce);
-	off(target, 123 as never, onOnce);
-	off(target, 'click', 123 as never);
+	Evt.off(123 as never, 'click', onOnce);
+	Evt.off(target, 123 as never, onOnce);
+	Evt.off(target, 'click', 123 as never);
 });
 
 test('on & off (delegated)', () => {
@@ -254,13 +253,13 @@ test('on & off (delegated)', () => {
 
 	const divs = [...document.querySelectorAll('div[id]')] as HTMLDivElement[];
 
-	const remove = on(document, 'click', () => {
+	const remove = Evt.on(document, 'click', () => {
 		values.push('document');
 	});
 
 	for (const div of divs) {
 		listeners.push(
-			on(div, 'click', handler, {
+			Evt.on(div, 'click', handler, {
 				passive: div.id !== 'two',
 			}),
 		);
@@ -292,7 +291,7 @@ test('on & off (delegated)', () => {
 	expect(values).toEqual(['four', 'three', 'one', 'document', 'two', 'four', 'three', 'two']);
 
 	if (last != null) {
-		off(last, 'click', handler);
+		Evt.off(last, 'click', handler);
 	}
 
 	handlers = (document as any)['@click:passive'];
@@ -363,10 +362,10 @@ test('on & off (delegated, multiple on single element)', () => {
 	document.body.append(div);
 
 	const listeners = {
-		first: on(div, 'click', () => {
+		first: Evt.on(div, 'click', () => {
 			values.first += 1;
 		}),
-		second: on(div, 'click', () => {
+		second: Evt.on(div, 'click', () => {
 			values.second += 1;
 		}),
 	};

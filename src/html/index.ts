@@ -44,16 +44,13 @@ type Options = Required<HtmlOptions>;
 //
 
 function createHtml(value: string | HTMLTemplateElement): string {
-	const html = getParser().parseFromString(
-		typeof value === 'string' ? value : value.innerHTML,
-		HTML_PARSE_TYPE,
-	);
+	const parsed = getParser().parseFromString(getHtml(value), PARSE_TYPE_HTML);
 
-	html.body.normalize();
+	parsed.body.normalize();
 
-	sanitizeNodes([html.body], 0);
+	sanitizeNodes([parsed.body], 0);
 
-	return html.body.innerHTML;
+	return parsed.body.innerHTML;
 }
 
 function createTemplate(
@@ -69,6 +66,10 @@ function createTemplate(
 	}
 
 	return template;
+}
+
+function getHtml(value: string | HTMLTemplateElement): string {
+	return `${TEMPORARY_ELEMENT}${typeof value === 'string' ? value : value.innerHTML}${TEMPORARY_ELEMENT}`;
 }
 
 function getNodes(value: string | HTMLTemplateElement, options: Options): Node[] {
@@ -103,7 +104,7 @@ function getTemplate(
 		return createTemplate(value, options);
 	}
 
-	if (typeof value !== 'string' || value.trim().length === 0) {
+	if (value.trim().length === 0) {
 		return;
 	}
 
@@ -115,9 +116,7 @@ function getTemplate(
 
 	const element = EXPRESSION_ID.test(value) ? document.querySelector(`#${value}`) : null;
 
-	template = element instanceof HTMLTemplateElement ? element : createTemplate(value, options);
-
-	return template;
+	return createTemplate(element instanceof HTMLTemplateElement ? element : value, options);
 }
 
 const html = ((value: string | HTMLTemplateElement, options?: Options): Node[] => {
@@ -163,9 +162,11 @@ export function sanitize(value: Node | Node[]): Node[] {
 
 const EXPRESSION_ID = /^[a-z][\w-]*$/i;
 
-const HTML_PARSE_TYPE = 'text/html';
+const PARSE_TYPE_HTML = 'text/html';
 
 const TEMPLATE_TAG = 'template';
+
+const TEMPORARY_ELEMENT = '<toretto-temporary></toretto-temporary>';
 
 let parser: DOMParser;
 

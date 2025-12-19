@@ -20,11 +20,6 @@ export type EventPosition = {
 };
 
 /**
- * Combined type to work with HTML and SVG elements
- */
-export type HTMLOrSVGElement = HTMLElement | SVGElement;
-
-/**
  * Property for an element
  */
 export type Property = Attribute<unknown>;

@@ -1,15 +1,10 @@
 import {camelCase, kebabCase, parse} from '@oscarpalmer/atoms/string';
-import type {HTMLOrSVGElement} from '../models';
 
 export function getBoolean(value: unknown, defaultValue?: boolean): boolean {
 	return typeof value === 'boolean' ? value : (defaultValue ?? false);
 }
 
-export function getAttributeValue(
-	element: HTMLOrSVGElement,
-	name: string,
-	parseValue: boolean,
-): unknown {
+export function getAttributeValue(element: Element, name: string, parseValue: boolean): unknown {
 	const normalized = kebabCase(name);
 	const attribute = element.attributes[normalized as keyof NamedNodeMap];
 	const value = attribute instanceof Attr ? attribute.value : undefined;
@@ -20,13 +15,15 @@ export function getAttributeValue(
 }
 
 export function getStyleValue(
-	element: HTMLOrSVGElement,
+	element: Element,
 	property: string,
 	computed: boolean,
 ): string | undefined {
 	const name = camelCase(property);
 
-	return computed ? getComputedStyle(element)[name as never] : element.style[name as never];
+	return computed
+		? getComputedStyle(element)[name as never]
+		: (element as HTMLElement).style[name as never];
 }
 
 export const EXPRESSION_DATA_PREFIX = /^data-/i;

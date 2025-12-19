@@ -93,23 +93,22 @@ test('findElements', () => {
 });
 
 test('findRelatives', () => {
-	const template = `
-<div>
+	const template = `<div>
 	<div>
 		<div>
-			<div class="target">bad</div>
+			<div class="target">D1</div>
 		</div>
 	</div>
 	<div>
-		<div class="target">good</div>
+		<div class="target">D2</div>
 	</div>
 	<div>
 		<div class="origin">
-			<p>origin</p>
+			<p>P1</p>
 			<div>
 				<div>
 					<div class="target">
-						<p>good</p>
+						<p>P2</p>
 					</div>
 				</div>
 			</div>
@@ -117,24 +116,23 @@ test('findRelatives', () => {
 	</div>
 </div>
 
-<ul>
-	<li class="target">1</li>
-	<li class="target">2</li>
-	<li class="target">3</li>
-	<li class="origin">4</li>
-	<li class="target">5</li>
-	<li class="target">6</li>
-	<li class="target">7</li>
+<ul class="targets">
+	<li class="target">L1</li>
+	<li class="target">L2</li>
+	<li class="target">L3</li>
+	<li class="origin" id="four">L4</li>
+	<li class="target">L5</li>
+	<li class="target">L6</li>
+	<li class="target">L7</li>
 </ul>
 
 <ul>
-<li class="target"><button></button></li>
-<li class="target"><button></button></li>
-<li class="target"><button class="origin">good</button></li>
-<li class="target"><button></button></li>
-<li class="target"><button></button></li>
-</ul>
-`;
+	<li class="target"><button>B1</button></li>
+	<li class="target"><button>B2</button></li>
+	<li class="target"><button class="origin">B3</button></li>
+	<li class="target"><button>B4</button></li>
+	<li class="target"><button>B5</button></li>
+</ul>`;
 
 	const element = document.createElement('div');
 
@@ -143,27 +141,37 @@ test('findRelatives', () => {
 	const divOrigin = Find.$('div.origin', element);
 	const liOrigin = Find.$('li.origin', element);
 	const buttonOrigin = Find.$('button.origin', element);
+	const targetsOrigin = Find.$('.targets', element);
 
-	if (divOrigin == null || liOrigin == null || buttonOrigin == null) {
+	const floatingOrigin = document.createElement('div');
+
+	if (divOrigin == null || liOrigin == null || buttonOrigin == null || targetsOrigin == null) {
 		return;
 	}
 
 	const divTargets = Find.findRelatives(divOrigin, 'div.target', element);
-	const liTargets = Find.findRelatives(liOrigin, 'li.target', element);
-	const buttonTargets = Find.findRelatives(buttonOrigin, 'li.target', element);
 
 	expect(divTargets.length).toBe(2);
-	expect(divTargets.map(target => target.textContent?.trim())).toEqual(['good', 'good']);
+	expect(divTargets.map(target => target.textContent?.trim())).toEqual(['D2', 'P2']);
+
+	let liTargets = Find.findRelatives(liOrigin, 'li', element);
 
 	expect(liTargets.length).toBe(2);
-	expect(liTargets.map(target => target.textContent?.trim())).toEqual(['3', '5']);
+	expect(liTargets.map(target => target.textContent?.trim())).toEqual(['L3', 'L5']);
+
+	const buttonTargets = Find.findRelatives(buttonOrigin, 'li.target', element);
 
 	expect(buttonTargets.length).toBe(1);
-	expect(buttonTargets[0].textContent?.trim()).toBe('good');
+	expect(buttonTargets[0].textContent?.trim()).toBe('B3');
 
-	expect(Find.findRelatives(buttonOrigin, 'button.origin', element)[0]).toBe(buttonOrigin);
+	liTargets = Find.findRelatives(targetsOrigin, '.target', element);
 
-	expect(Find.findRelatives(liOrigin, '.not-found').length).toBe(0);
+	expect(liTargets.length).toBe(6);
+	expect(liTargets.map(t => t.textContent?.trim())).toEqual(['L1', 'L2', 'L3', 'L5', 'L6', 'L7']);
+
+	expect(Find.findRelatives(buttonOrigin, 'button.origin', element)).toEqual([]);
+	expect(Find.findRelatives(liOrigin, '.not-found')).toEqual([]);
+	expect(Find.findRelatives(floatingOrigin, 'div', element)).toEqual([]);
 
 	expect(Find.findRelatives(123 as never, 'blah')).toEqual([]);
 	expect(Find.findRelatives(divOrigin, 123 as never)).toEqual([]);

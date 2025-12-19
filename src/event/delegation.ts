@@ -14,22 +14,22 @@ export type EventTargetWithListeners = EventTarget &
 	}>;
 
 function addDelegatedHandler(
-	document: DocumentWithListenerCounts,
+	doc: DocumentWithListenerCounts,
 	type: string,
 	name: string,
 	passive: boolean,
 ): void {
 	const count = `${name}${COUNT_SUFFIX}`;
 
-	if (document[count] != null) {
-		(document[count] as number) += 1;
+	if (doc[count] != null) {
+		(doc[count] as number) += 1;
 
 		return;
 	}
 
-	document[count] = 1;
+	doc[count] = 1;
 
-	document.addEventListener(type, passive ? HANDLER_PASSIVE : HANDLER_ACTIVE, {
+	doc.addEventListener(type, passive ? HANDLER_PASSIVE : HANDLER_ACTIVE, {
 		passive,
 	});
 }
@@ -103,19 +103,19 @@ export function getDelegatedName(
 }
 
 function removeDelegatedHandler(
-	document: DocumentWithListenerCounts,
+	doc: DocumentWithListenerCounts,
 	type: string,
 	name: string,
 	passive: boolean,
 ): void {
 	const count = `${name}${COUNT_SUFFIX}`;
 
-	(document[count] as number) -= 1;
+	(doc[count] as number) -= 1;
 
-	if ((document[count] as number) < 1) {
-		document[count] = undefined;
+	if ((doc[count] as number) < 1) {
+		doc[count] = undefined;
 
-		document.removeEventListener(type, passive ? HANDLER_PASSIVE : HANDLER_ACTIVE);
+		doc.removeEventListener(type, passive ? HANDLER_PASSIVE : HANDLER_ACTIVE);
 	}
 }
 

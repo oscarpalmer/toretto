@@ -1,13 +1,12 @@
 import type {PlainObject} from '@oscarpalmer/atoms';
 import {isNullableOrWhitespace, isPlainObject} from '@oscarpalmer/atoms/is';
 import {isHTMLOrSVGElement} from '../is';
-import type {HTMLOrSVGElement} from '../models';
 
 export function setElementValues(
-	element: HTMLOrSVGElement,
+	element: Element,
 	first: PlainObject | string,
 	second: unknown,
-	callback: (element: HTMLOrSVGElement, key: string, value: unknown) => void,
+	callback: (element: Element, key: string, value: unknown) => void,
 ): void {
 	if (!isHTMLOrSVGElement(element)) {
 		return;
@@ -28,7 +27,7 @@ export function setElementValues(
 }
 
 export function updateElementValue(
-	element: HTMLOrSVGElement,
+	element: Element,
 	key: string,
 	value: unknown,
 	set: (key: string, value: string) => void,

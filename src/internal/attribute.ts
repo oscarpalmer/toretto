@@ -1,7 +1,7 @@
 import type {PlainObject} from '@oscarpalmer/atoms';
 import {isPlainObject} from '@oscarpalmer/atoms/is';
 import {getString} from '@oscarpalmer/atoms/string';
-import type {Attribute, HTMLOrSVGElement, Property} from '../models';
+import type {Attribute, Property} from '../models';
 import {isHTMLOrSVGElement} from './is';
 
 function badAttributeHandler(name?: string, value?: string): boolean {
@@ -82,11 +82,11 @@ function isAttribute(value: unknown): value is Attr | Attribute {
 	);
 }
 
-export function isBadAttribute(first: unknown, second: unknown, decode: boolean): boolean {
+export function _isBadAttribute(first: unknown, second: unknown, decode: boolean): boolean {
 	return handleAttribute(badAttributeHandler, decode, first, second);
 }
 
-export function isBooleanAttribute(first: unknown, decode: boolean): boolean {
+export function _isBooleanAttribute(first: unknown, decode: boolean): boolean {
 	return handleAttribute(
 		name => booleanAttributesSet.has(name?.toLowerCase() as string),
 		decode,
@@ -95,7 +95,7 @@ export function isBooleanAttribute(first: unknown, decode: boolean): boolean {
 	);
 }
 
-export function isEmptyNonBooleanAttribute(
+export function _isEmptyNonBooleanAttribute(
 	first: unknown,
 	second: unknown,
 	decode: boolean,
@@ -109,7 +109,7 @@ export function isEmptyNonBooleanAttribute(
 	);
 }
 
-export function isInvalidBooleanAttribute(
+export function _isInvalidBooleanAttribute(
 	first: unknown,
 	second: unknown,
 	decode: boolean,
@@ -125,7 +125,7 @@ function isValidSourceAttribute(name: string, value: string): boolean {
 	return EXPRESSION_SOURCE_NAME.test(name) && EXPRESSION_SOURCE_VALUE.test(value);
 }
 
-function updateAttribute(element: HTMLOrSVGElement, name: string, value: unknown): void {
+function updateAttribute(element: Element, name: string, value: unknown): void {
 	const isBoolean = booleanAttributesSet.has(name.toLowerCase());
 
 	if (isBoolean) {
@@ -139,14 +139,14 @@ function updateAttribute(element: HTMLOrSVGElement, name: string, value: unknown
 	}
 }
 
-function updateProperty(element: HTMLOrSVGElement, name: string, value: unknown): void {
+function updateProperty(element: Element, name: string, value: unknown): void {
 	const actual = name.toLowerCase();
 
 	(element as unknown as PlainObject)[actual] =
 		value === '' || (typeof value === 'string' && value.toLowerCase() === actual) || value === true;
 }
 
-export function updateValue(element: HTMLOrSVGElement, first: unknown, second: unknown): void {
+export function updateValue(element: Element, first: unknown, second: unknown): void {
 	if (!isHTMLOrSVGElement(element)) {
 		return;
 	}
@@ -159,7 +159,7 @@ export function updateValue(element: HTMLOrSVGElement, first: unknown, second: u
 }
 
 export function updateValues(
-	element: HTMLOrSVGElement,
+	element: Element,
 	values: Attribute<unknown>[] | Record<string, unknown>,
 ): void {
 	if (!isHTMLOrSVGElement(element)) {

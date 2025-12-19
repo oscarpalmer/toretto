@@ -1,7 +1,7 @@
 import {setElementValues, updateElementValue} from './internal/element-value';
 import {getStyleValue} from './internal/get-value';
 import {isHTMLOrSVGElement} from './internal/is';
-import type {HTMLOrSVGElement, TextDirection} from './models';
+import type {TextDirection} from './models';
 
 export type StyleToggler = {
 	/**
@@ -22,7 +22,7 @@ export type StyleToggler = {
  * @returns Style value
  */
 export function getStyle(
-	element: HTMLOrSVGElement,
+	element: Element,
 	property: keyof CSSStyleDeclaration,
 	computed?: boolean,
 ): string | undefined {
@@ -41,7 +41,7 @@ export function getStyle(
  * @returns Style values
  */
 export function getStyles<Property extends keyof CSSStyleDeclaration>(
-	element: HTMLOrSVGElement,
+	element: Element,
 	properties: Property[],
 	computed?: boolean,
 ): Record<Property, string | undefined> {
@@ -70,7 +70,7 @@ export function getStyles<Property extends keyof CSSStyleDeclaration>(
  * @param computed Get the computed text direction? _(defaults to `false`)_
  * @returns Text direction
  */
-export function getTextDirection(element: HTMLOrSVGElement, computed?: boolean): TextDirection {
+export function getTextDirection(element: Element, computed?: boolean): TextDirection {
 	if (!(element instanceof Element)) {
 		return undefined as never;
 	}
@@ -93,7 +93,7 @@ export function getTextDirection(element: HTMLOrSVGElement, computed?: boolean):
  * @param value Style value
  */
 export function setStyle(
-	element: HTMLOrSVGElement,
+	element: Element,
 	property: keyof CSSStyleDeclaration,
 	value?: string,
 ): void {
@@ -105,7 +105,7 @@ export function setStyle(
  * @param element Element to set the styles on
  * @param styles Styles to set
  */
-export function setStyles(element: HTMLOrSVGElement, styles: Partial<CSSStyleDeclaration>): void {
+export function setStyles(element: Element, styles: Partial<CSSStyleDeclaration>): void {
 	setElementValues(element, styles as never, null, updateStyleProperty);
 }
 
@@ -115,10 +115,7 @@ export function setStyles(element: HTMLOrSVGElement, styles: Partial<CSSStyleDec
  * @param styles Styles to be set or removed
  * @returns Style toggler
  */
-export function toggleStyles(
-	element: HTMLOrSVGElement,
-	styles: Partial<CSSStyleDeclaration>,
-): StyleToggler {
+export function toggleStyles(element: Element, styles: Partial<CSSStyleDeclaration>): StyleToggler {
 	function toggle(set: boolean): void {
 		hasSet = set;
 
@@ -160,16 +157,16 @@ export function toggleStyles(
 	};
 }
 
-function updateStyleProperty(element: HTMLOrSVGElement, key: string, value: unknown): void {
+function updateStyleProperty(element: Element, key: string, value: unknown): void {
 	updateElementValue(
 		element,
 		key,
 		value,
-		function (this: HTMLOrSVGElement, property: string, value: string) {
-			this.style[property as never] = value;
+		function (this: Element, property: string, style: string) {
+			(this as HTMLElement).style[property as never] = style;
 		},
-		function (this: HTMLOrSVGElement, property: string) {
-			this.style[property as never] = '';
+		function (this: Element, property: string) {
+			(this as HTMLElement).style[property as never] = '';
 		},
 		false,
 	);

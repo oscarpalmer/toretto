@@ -7,5 +7,6 @@ export default defineConfig({
 	input: './src/index.ts',
 	output: {
 		file: './dist/toretto.full.js',
-	},
+		minify: 'dce-only',
+	}
 });

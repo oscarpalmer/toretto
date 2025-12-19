@@ -22,18 +22,18 @@ export function isInDocument(node: Node): boolean;
  */
 export function isInDocument(node: Node, document: Document): boolean;
 
-export function isInDocument(node: Node, document?: Document): boolean {
+export function isInDocument(node: Node, doc?: Document): boolean {
 	if (!(node instanceof Node)) {
 		return false;
 	}
 
-	if (!(document instanceof Document)) {
+	if (!(doc instanceof Document)) {
 		return node.ownerDocument?.contains(node) ?? true;
 	}
 
 	return node.ownerDocument == null
-		? node === document
-		: node.ownerDocument === document && document.contains(node);
+		? node === doc
+		: node.ownerDocument === doc && doc.contains(node);
 }
 
 //
