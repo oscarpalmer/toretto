@@ -1,31 +1,4 @@
 /**
- * - Get the distance between two elements _(i.e., the amount of nodes of between them)_
- * - If the distance cannot be calculated, `-1` is returned
- */
-function getDistanceBetweenElements(origin: Element, target: Element): number | undefined {
-	if (origin === target) {
-		return 0;
-	}
-
-	if (origin.parentElement === target) {
-		return 1;
-	}
-
-	const children = [...(origin.parentElement?.children ?? [])];
-
-	if (children.includes(target)) {
-		return Math.abs(children.indexOf(origin) - children.indexOf(target));
-	}
-
-	const comparison = origin.compareDocumentPosition(target);
-	const beforeOrInside = Boolean(comparison & 2 || comparison & 8);
-
-	if (beforeOrInside || Boolean(comparison & 4 || comparison & 16)) {
-		return traverse(beforeOrInside ? origin : target, beforeOrInside ? target : origin) ?? -1;
-	}
-}
-
-/**
  * Find the closest ancestor element that matches the selector _(string or callback)_
  *
  * - If no match is found, `null` is returned
@@ -74,8 +47,7 @@ export function findAncestor(
 /**
  * Finds the closest elements to the origin element that matches the selector
  *
- * - Traverses up, down, and sideways in the _DOM_-tree
- * - _(If you only want to traverse up, use {@link findAncestor})_
+ * Traverses up, down, and sideways in the _DOM_-tree. _(If you only want to traverse up, use {@link findAncestor})_
  * @param origin Element to start from
  * @param selector Selector to match
  * @param context Context to search within
@@ -109,9 +81,9 @@ export function findRelatives(
 
 	for (let index = 0; index < length; index += 1) {
 		const element = elements[index];
-		const distance = getDistanceBetweenElements(origin, element);
+		const distance = getDistance(origin, element);
 
-		if (distance != null && distance > 0) {
+		if (distance > 0) {
 			if (minimum == null || distance < minimum) {
 				minimum = distance;
 			}
@@ -124,17 +96,43 @@ export function findRelatives(
 	}
 
 	return distances
-		.filter(found => found.distance === minimum && found.element !== origin)
+		.filter(found => found.distance === minimum)
 		.map(found => found.element);
 }
 
-function traverse(from: Element, to: Element): number | undefined {
-	let index = [...to.children].indexOf(from);
+/**
+ * Get the distance between two elements _(i.e., the amount of nodes of between them)_
+ * @param origin Origin element
+ * @param target Target element
+ * @returns Distance between elements, or `-1` if distance cannot be calculated
+ */
+export function getDistance(origin: Element, target: Element): number {
+	if (origin === target) {
+		return 0;
+	}
 
-	if (index > -1) {
+	if (origin.parentElement === target || target.parentElement === origin) {
 		return 1;
 	}
 
+	if (origin.parentElement != null && origin.parentElement === target.parentElement) {
+		const children = [...origin.parentElement.children];
+
+		return Math.abs(children.indexOf(origin) - children.indexOf(target));
+	}
+
+	const comparison = origin.compareDocumentPosition(target);
+
+	if (comparison & Node.DOCUMENT_POSITION_DISCONNECTED) {
+		return -1;
+	}
+
+	const preceding = comparison & Node.DOCUMENT_POSITION_PRECEDING;
+
+	return traverse(preceding ? origin : target, preceding ? target : origin) ?? -1;
+}
+
+function traverse(from: Element, to: Element): number | undefined {
 	let current = from;
 	let distance = 0;
 	let parent: Element | null = from.parentElement;
@@ -146,11 +144,11 @@ function traverse(from: Element, to: Element): number | undefined {
 
 		const children = [...parent.children];
 
-		if (children.includes(to)) {
+		if (to.parentElement === parent) {
 			return distance + Math.abs(children.indexOf(current) - children.indexOf(to));
 		}
 
-		index = children.findIndex(child => child.contains(to));
+		const index = children.findIndex(child => child.contains(to));
 
 		if (index > -1) {
 			const traversed = traverse(current, children[index]);

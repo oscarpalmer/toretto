@@ -132,20 +132,34 @@ test('findRelatives', () => {
 	<li class="target"><button class="origin">B3</button></li>
 	<li class="target"><button>B4</button></li>
 	<li class="target"><button>B5</button></li>
-</ul>`;
+</ul>
+
+<div>
+	<span class="origin"></span>
+	<div>
+		<div>
+			<span class="target"></span>
+		</div>
+	</div>
+</div>`;
 
 	const element = document.createElement('div');
 
 	element.innerHTML = template;
 
+	const buttonOrigin = Find.$('button.origin', element);
 	const divOrigin = Find.$('div.origin', element);
 	const liOrigin = Find.$('li.origin', element);
-	const buttonOrigin = Find.$('button.origin', element);
+	const spanOrigin = Find.$('span.origin', element);
 	const targetsOrigin = Find.$('.targets', element);
 
-	const floatingOrigin = document.createElement('div');
-
-	if (divOrigin == null || liOrigin == null || buttonOrigin == null || targetsOrigin == null) {
+	if (
+		buttonOrigin == null ||
+		divOrigin == null ||
+		liOrigin == null ||
+		spanOrigin == null ||
+		targetsOrigin == null
+	) {
 		return;
 	}
 
@@ -169,9 +183,20 @@ test('findRelatives', () => {
 	expect(liTargets.length).toBe(6);
 	expect(liTargets.map(t => t.textContent?.trim())).toEqual(['L1', 'L2', 'L3', 'L5', 'L6', 'L7']);
 
+	liTargets = Find.findRelatives(targetsOrigin, '.origin', element);
+
+	expect(liTargets.length).toBe(1);
+	expect(liTargets.map(t => t.textContent?.trim())).toEqual(['L4']);
+
 	expect(Find.findRelatives(buttonOrigin, 'button.origin', element)).toEqual([]);
 	expect(Find.findRelatives(liOrigin, '.not-found')).toEqual([]);
-	expect(Find.findRelatives(floatingOrigin, 'div', element)).toEqual([]);
+
+	const floatingOne = document.createElement('div');
+	const floatingTwo = document.createElement('div');
+
+	expect(Find.findRelatives(floatingOne, 'div', element)).toEqual([]);
+	expect(Find.findRelatives(divOrigin, 'div', floatingTwo)).toEqual([]);
+	expect(Find.findRelatives(floatingOne, 'div', floatingTwo)).toEqual([]);
 
 	expect(Find.findRelatives(123 as never, 'blah')).toEqual([]);
 	expect(Find.findRelatives(divOrigin, 123 as never)).toEqual([]);

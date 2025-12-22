@@ -3,31 +3,17 @@ import type {CustomEventListener, RemovableEventListener} from '../models';
 
 //
 
-type DocumentWithListenerCounts = Document &
-	Partial<{
-		[key: string]: number;
-	}>;
-
 export type EventTargetWithListeners = EventTarget &
 	Partial<{
 		[key: string]: Set<EventListener | CustomEventListener>;
 	}>;
 
-function addDelegatedHandler(
-	doc: DocumentWithListenerCounts,
-	type: string,
-	name: string,
-	passive: boolean,
-): void {
-	const count = `${name}${COUNT_SUFFIX}`;
-
-	if (doc[count] != null) {
-		(doc[count] as number) += 1;
-
+function addDelegatedHandler(doc: Document, type: string, name: string, passive: boolean): void {
+	if (DELEGATED.has(name)) {
 		return;
 	}
 
-	doc[count] = 1;
+	DELEGATED.add(name);
 
 	doc.addEventListener(type, passive ? HANDLER_PASSIVE : HANDLER_ACTIVE, {
 		passive,
@@ -43,12 +29,12 @@ export function addDelegatedListener(
 ): RemovableEventListener {
 	target[name] ??= new Set();
 
-	target[name]?.add(listener);
+	target[name].add(listener);
 
-	addDelegatedHandler(document as DocumentWithListenerCounts, type, name, passive);
+	addDelegatedHandler(document, type, name, passive);
 
 	return () => {
-		removeDelegatedListener(target, type, name, listener, passive);
+		removeDelegatedListener(target, name, listener);
 	};
 }
 
@@ -58,9 +44,19 @@ function delegatedEventHandler(this: boolean, event: Event): void {
 	const items = event.composedPath();
 	const {length} = items;
 
-	Object.defineProperty(event, 'target', {
-		configurable: true,
-		value: items[0],
+	let target = items[0];
+
+	Object.defineProperties(event, {
+		currentTarget: {
+			configurable: true,
+			get() {
+				return target;
+			},
+		},
+		target: {
+			configurable: true,
+			value: target,
+		},
 	});
 
 	for (let index = 0; index < length; index += 1) {
@@ -71,10 +67,7 @@ function delegatedEventHandler(this: boolean, event: Event): void {
 			continue;
 		}
 
-		Object.defineProperty(event, 'currentTarget', {
-			configurable: true,
-			value: item,
-		});
+		target = item;
 
 		for (const listener of listeners) {
 			(listener as EventListener).call(item, event);
@@ -102,29 +95,10 @@ export function getDelegatedName(
 	}
 }
 
-function removeDelegatedHandler(
-	doc: DocumentWithListenerCounts,
-	type: string,
-	name: string,
-	passive: boolean,
-): void {
-	const count = `${name}${COUNT_SUFFIX}`;
-
-	(doc[count] as number) -= 1;
-
-	if ((doc[count] as number) < 1) {
-		doc[count] = undefined;
-
-		doc.removeEventListener(type, passive ? HANDLER_PASSIVE : HANDLER_ACTIVE);
-	}
-}
-
 export function removeDelegatedListener(
 	target: EventTargetWithListeners,
-	type: string,
 	name: string,
 	listener: EventListener | CustomEventListener,
-	passive: boolean,
 ): boolean {
 	const handlers = target[name];
 
@@ -138,14 +112,12 @@ export function removeDelegatedListener(
 		target[name] = undefined;
 	}
 
-	removeDelegatedHandler(document as DocumentWithListenerCounts, type, name, passive);
-
 	return true;
 }
 
 //
 
-const COUNT_SUFFIX = '.count';
+const DELEGATED = new Set<string>();
 
 const EVENT_PREFIX = '@';
 
@@ -178,6 +150,6 @@ const EVENT_TYPES: Set<string> = new Set([
 	'touchstart',
 ]);
 
-const HANDLER_ACTIVE: EventListener = delegatedEventHandler.bind(false);
+const HANDLER_ACTIVE = delegatedEventHandler.bind(false);
 
-const HANDLER_PASSIVE: EventListener = delegatedEventHandler.bind(true);
+const HANDLER_PASSIVE = delegatedEventHandler.bind(true);

@@ -171,4 +171,4 @@ const TAG_HEAD = 'HEAD';
 //
 
 export {findElement as $, findElements as $$};
-export {findAncestor, findRelatives} from './relative';
+export {findAncestor, findRelatives, getDistance} from './relative';

@@ -275,9 +275,6 @@ test('on & off (delegated)', () => {
 	expect(handlers).toBeInstanceOf(Set);
 	expect(handlers.size).toBe(1);
 
-	expect((document as any)['@click:active.count']).toBe(1);
-	expect((document as any)['@click:passive.count']).toBe(4);
-
 	const last = divs.at(-1);
 
 	last?.click();
@@ -299,9 +296,6 @@ test('on & off (delegated)', () => {
 	expect(handlers).toBeInstanceOf(Set);
 	expect(handlers.size).toBe(1);
 
-	expect((document as any)['@click:active.count']).toBe(1);
-	expect((document as any)['@click:passive.count']).toBe(3);
-
 	for (const listener of listeners) {
 		listener();
 	}
@@ -316,9 +310,6 @@ test('on & off (delegated)', () => {
 
 	expect(handlers).toBeInstanceOf(Set);
 	expect(handlers.size).toBe(1);
-
-	expect((document as any)['@click:active.count']).toBeUndefined();
-	expect((document as any)['@click:passive.count']).toBe(1);
 
 	last?.click();
 
@@ -339,9 +330,6 @@ test('on & off (delegated)', () => {
 	handlers = (document as any)['@click:passive'];
 
 	expect(handlers).toBeUndefined();
-
-	expect((document as any)['@click:active.count']).toBeUndefined();
-	expect((document as any)['@click:passive.count']).toBeUndefined();
 
 	expect(values).toEqual([
 		'four',
@@ -377,7 +365,6 @@ test('on & off (delegated, multiple on single element)', () => {
 
 	expect((div as any)['@click:passive']).toBeInstanceOf(Set);
 	expect((div as any)['@click:passive'].size).toBe(2);
-	expect((document as any)['@click:passive.count']).toBe(2);
 
 	div.click();
 
@@ -390,7 +377,6 @@ test('on & off (delegated, multiple on single element)', () => {
 
 	expect((div as any)['@click:passive']).toBeInstanceOf(Set);
 	expect((div as any)['@click:passive'].size).toBe(1);
-	expect((document as any)['@click:passive.count']).toBe(1);
 
 	div.click();
 
@@ -402,7 +388,6 @@ test('on & off (delegated, multiple on single element)', () => {
 	listeners.second();
 
 	expect((div as any)['@click:passive']).toBeUndefined();
-	expect((document as any)['@click:passive.count']).toBeUndefined();
 
 	div.click();
 

@@ -151,13 +151,7 @@ export function off(
 
 	if (
 		delegated == null ||
-		!removeDelegatedListener(
-			target as EventTargetWithListeners,
-			type,
-			delegated,
-			listener,
-			extended.passive,
-		)
+		!removeDelegatedListener(target as EventTargetWithListeners, delegated, listener)
 	) {
 		target.removeEventListener(type, listener as EventListener, extended);
 	}
