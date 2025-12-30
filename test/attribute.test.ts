@@ -177,7 +177,7 @@ const testableAttributes = [
 ];
 
 test('getAttribute + setAttribute', () => {
-	const element = document.createElement('div');
+	const element = document.createElement('select');
 
 	Attribute.setAttribute(element, 'id', 'test');
 
@@ -287,23 +287,30 @@ test('getAttribute + setAttribute', () => {
 		{name: 'notreal', value: true},
 		{name: 'readonly', value: 'readonly'},
 		{name: 'selected', value: false},
+		{name: 123} as never,
 	];
 
 	const {length} = properties;
 
 	for (let index = 0; index < length; index += 1) {
-		if (index % 2 === 0) {
-			Attribute.setAttribute(element, properties[index]);
-		} else {
-			Attribute.setProperty(element, properties[index]);
-		}
+		Attribute.setAttribute(element, properties[index]);
 	}
 
 	expect(element.hidden).toBe(true);
 	expect((element as any).multiple).toBe(true);
-	expect((element as any).notreal == null).toBe(true);
-	expect((element as any).readonly).toBe(true);
-	expect((element as any).selected).toBe(false);
+	expect((element as any).notreal).toBeUndefined();
+	expect((element as any).readOnly).toBeUndefined();
+	expect((element as any).selected).toBeUndefined();
+
+	const input = document.createElement('input');
+
+	Attribute.setAttributes(input, properties);
+
+	expect(input.hidden).toBe(true);
+	expect(input.multiple).toBe(true);
+	expect((input as any).notreal).toBeUndefined();
+	expect((input as any).readOnly).toBe(true);
+	expect((input as any).selected).toBeUndefined();
 
 	expect(Attribute.getAttribute('blah' as never, '')).toBe(undefined);
 	expect(Attribute.getAttribute(element, [] as never)).toBe(undefined);
@@ -404,37 +411,4 @@ test('isInvalidBooleanAttribute', () => {
 	expect(Attribute.isInvalidBooleanAttribute({name: 123 as never, value: ''})).toBe(true);
 
 	expect(Attribute.isInvalidBooleanAttribute({name: '', value: 123 as never})).toBe(true);
-});
-
-test('setProperty', () => {
-	const element = document.createElement('option');
-
-	Attribute.setProperty(element, 'hidden', true);
-
-	expect(element.hidden).toBe(true);
-	expect(element.getAttribute('hidden')).toBe('');
-
-	Attribute.setProperty(element, 'hidden', false);
-
-	expect(element.hidden).toBe(false);
-	expect(element.getAttribute('hidden')).toBe(null);
-
-	Attribute.setProperty(element, 'hidden', 'abc123');
-
-	expect(element.hidden).toBe(false);
-	expect(element.getAttribute('hidden')).toBe(null);
-
-	Attribute.setProperties(element, {
-		selected: true,
-	});
-
-	expect(element.selected).toBe(true);
-	expect(element.getAttribute('selected')).toBe('');
-
-	Attribute.setProperties(element, {
-		selected: false,
-	});
-
-	expect(element.selected).toBe(false);
-	expect(element.getAttribute('selected')).toBe(null);
 });

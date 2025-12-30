@@ -81,7 +81,7 @@ export function setData(element: Element, data: PlainObject): void;
 export function setData(element: Element, key: string, value: unknown): void;
 
 export function setData(element: Element, first: PlainObject | string, second?: unknown): void {
-	setElementValues(element, first, second, updateDataAttribute);
+	setElementValues(element, first, second, null, updateDataAttribute);
 }
 
 function updateDataAttribute(element: Element, key: string, value: unknown): void {
@@ -91,6 +91,7 @@ function updateDataAttribute(element: Element, key: string, value: unknown): voi
 		value,
 		element.setAttribute,
 		element.removeAttribute,
+		false,
 		true,
 	);
 }

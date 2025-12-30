@@ -97,7 +97,7 @@ export function setStyle(
 	property: keyof CSSStyleDeclaration,
 	value?: string,
 ): void {
-	setElementValues(element, property as string, value, updateStyleProperty);
+	setElementValues(element, property as string, value, null, updateStyleProperty);
 }
 
 /**
@@ -106,7 +106,7 @@ export function setStyle(
  * @param styles Styles to set
  */
 export function setStyles(element: Element, styles: Partial<CSSStyleDeclaration>): void {
-	setElementValues(element, styles as never, null, updateStyleProperty);
+	setElementValues(element, styles as never, null, null, updateStyleProperty);
 }
 
 /**
@@ -168,6 +168,7 @@ function updateStyleProperty(element: Element, key: string, value: unknown): voi
 		function (this: Element, property: string) {
 			(this as HTMLElement).style[property as never] = '';
 		},
+		false,
 		false,
 	);
 }

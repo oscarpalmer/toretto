@@ -1,9 +1,9 @@
 /**
  * Attribute for an element
  */
-export type Attribute<Value = unknown> = {
+export type Attribute = {
 	name: string;
-	value: Value;
+	value: unknown;
 };
 
 /**
@@ -18,11 +18,6 @@ export type EventPosition = {
 	x: number;
 	y: number;
 };
-
-/**
- * Property for an element
- */
-export type Property = Attribute<unknown>;
 
 /**
  * Event listener that can be removed

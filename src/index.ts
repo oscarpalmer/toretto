@@ -5,7 +5,7 @@ export {
 	isBooleanAttribute,
 	isEmptyNonBooleanAttribute,
 	isInvalidBooleanAttribute,
-} from './attribute';
+} from './attribute/index';
 export * from './data';
 export * from './event/index';
 export * from './find/index';

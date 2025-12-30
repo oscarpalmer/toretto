@@ -1,5 +1,28 @@
-import {updateValue, updateValues} from '../internal/attribute';
-import type {Attribute, Property} from '../models';
+import {updateAttribute} from '../internal/attribute';
+import {setElementValue, setElementValues} from '../internal/element-value';
+import type {Attribute} from '../models';
+
+//
+
+type DispatchedAttribute = 'checked' | 'open' | 'value';
+
+//
+
+/**
+ * Set an attribute on an element
+ *
+ * _(Or remove it, if value is `null` or `undefined`)_
+ * @param element Element for attribute
+ * @param name Attribute name
+ * @param value Attribute value
+ * @param dispatch Dispatch event for attribute? _(defaults to `true`)_
+ */
+export function setAttribute<Name extends DispatchedAttribute>(
+	element: Element,
+	name: Name,
+	value?: unknown,
+	dispatch?: boolean,
+): void;
 
 /**
  * Set an attribute on an element
@@ -17,11 +40,21 @@ export function setAttribute(element: Element, name: string, value?: unknown): v
  * _(Or remove it, if value is `null` or `undefined`)_
  * @param element Element for attribute
  * @param attribute Attribute to set
+ * @param dispatch Dispatch event for attribute? _(defaults to `true`)_
  */
-export function setAttribute(element: Element, attribute: Attr | Attribute): void;
+export function setAttribute(
+	element: Element,
+	attribute: Attr | Attribute,
+	dispatch?: boolean,
+): void;
 
-export function setAttribute(element: Element, first: unknown, second?: unknown): void {
-	updateValue(element, first, second);
+export function setAttribute(
+	element: Element,
+	first: unknown,
+	second?: unknown,
+	third?: unknown,
+): void {
+	setElementValue(element, first, second, third, updateAttribute);
 }
 
 /**
@@ -30,8 +63,13 @@ export function setAttribute(element: Element, first: unknown, second?: unknown)
  * _(Or remove them, if their value is `null` or `undefined`)_
  * @param element Element for attributes
  * @param attributes Attributes to set
+ * @param dispatch Dispatch events for relevant attributes? _(defaults to `true`)_
  */
-export function setAttributes(element: Element, attributes: Array<Attr | Attribute>): void;
+export function setAttributes(
+	element: Element,
+	attributes: Array<Attr | Attribute>,
+	dispatch?: boolean,
+): void;
 
 /**
  * Set one or more attributes on an element
@@ -39,60 +77,18 @@ export function setAttributes(element: Element, attributes: Array<Attr | Attribu
  * _(Or remove them, if their value is `null` or `undefined`)_
  * @param element Element for attributes
  * @param attributes Attributes to set
+ * @param dispatch Dispatch events for relevant attributes? _(defaults to `true`)_
  */
-export function setAttributes(element: Element, attributes: Record<string, unknown>): void;
+export function setAttributes(
+	element: Element,
+	attributes: Record<string, unknown>,
+	dispatch?: boolean,
+): void;
 
 export function setAttributes(
 	element: Element,
 	attributes: Attribute[] | Record<string, unknown>,
+	dispatch?: boolean,
 ): void {
-	updateValues(element, attributes);
-}
-
-/**
- * Set a property on an element
- *
- * _(Or remove it, if value is not an empty string or does not match the name)_
- * @param element Element for property
- * @param name Property name
- * @param value Property value
- */
-export function setProperty(element: Element, name: string, value: boolean | string): void;
-
-/**
- * Set a property on an element
- *
- * _(Or remove it, if value is not an empty string or does not match the name)_
- * @param element Element for property
- * @param property Property to set
- */
-export function setProperty(element: Element, property: Property): void;
-
-export function setProperty(element: Element, first: unknown, second?: unknown): void {
-	updateValue(element, first, second);
-}
-
-/**
- * Set one or more properties on an element
- *
- * _(Or remove them, if their value is not an empty string or does not match the name)_
- * @param element Element for properties
- * @param properties Properties to set
- */
-export function setProperties(element: Element, properties: Property[]): void;
-
-/**
- * Set one or more properties on an element
- *
- * _(Or remove them, if their value is not an empty string or does not match the name)_
- * @param element Element for properties
- * @param properties Properties to set
- */
-export function setProperties(element: Element, properties: Record<string, unknown>): void;
-
-export function setProperties(
-	element: Element,
-	properties: Property[] | Record<string, unknown>,
-): void {
-	updateValues(element, properties);
+	setElementValues(element, attributes, null, dispatch, updateAttribute);
 }

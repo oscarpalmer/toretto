@@ -1,11 +1,10 @@
 import type {PlainObject} from '@oscarpalmer/atoms';
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import {getString} from '@oscarpalmer/atoms/string';
-import type {Attribute, Property} from '../models';
-import {isHTMLOrSVGElement} from './is';
+import type {Attribute} from '../models';
+import {updateElementValue} from './element-value';
 
 function badAttributeHandler(name?: string, value?: string): boolean {
-	if (name == null || value == null) {
+	if (typeof name !== 'string' || name.trim().length === 0 || typeof value !== 'string') {
 		return true;
 	}
 
@@ -28,17 +27,19 @@ function badAttributeHandler(name?: string, value?: string): boolean {
 }
 
 function booleanAttributeHandler(name?: string, value?: string): boolean {
-	if (name == null || value == null) {
+	if (typeof name !== 'string' || name.trim().length === 0 || typeof value !== 'string') {
 		return true;
 	}
 
-	if (!booleanAttributesSet.has(name)) {
+	const normalizedName = name.toLowerCase();
+
+	if (!booleanAttributesSet.has(normalizedName)) {
 		return false;
 	}
 
-	const normalized = value.toLowerCase().trim();
+	const normalized = value.toLowerCase();
 
-	return !(normalized.length === 0 || normalized === name);
+	return !(normalized.length === 0 || normalized === normalizedName);
 }
 
 function decodeAttribute(value: string): string {
@@ -73,12 +74,12 @@ function handleAttribute(
 	return callback(name, value?.replace(EXPRESSION_WHITESPACE, ''));
 }
 
-function isAttribute(value: unknown): value is Attr | Attribute {
+export function isAttribute(value: unknown): value is Attr | Attribute {
 	return (
 		value instanceof Attr ||
 		(isPlainObject(value) &&
 			typeof (value as PlainObject).name === 'string' &&
-			typeof (value as PlainObject).value === 'string')
+			'value' in (value as PlainObject))
 	);
 }
 
@@ -117,67 +118,53 @@ export function _isInvalidBooleanAttribute(
 	return handleAttribute(booleanAttributeHandler, decode, first, second);
 }
 
-export function isProperty(value: unknown): value is Property {
-	return isPlainObject(value) && typeof (value as PlainObject).name === 'string';
-}
-
 function isValidSourceAttribute(name: string, value: string): boolean {
 	return EXPRESSION_SOURCE_NAME.test(name) && EXPRESSION_SOURCE_VALUE.test(value);
 }
 
-function updateAttribute(element: Element, name: string, value: unknown): void {
-	const isBoolean = booleanAttributesSet.has(name.toLowerCase());
-
-	if (isBoolean) {
-		updateProperty(element, name, value);
-	}
-
-	if (isBoolean ? value !== true : value == null) {
-		element.removeAttribute(name);
-	} else {
-		element.setAttribute(name, isBoolean ? '' : getString(value));
-	}
-}
-
-function updateProperty(element: Element, name: string, value: unknown): void {
-	const actual = name.toLowerCase();
-
-	(element as unknown as PlainObject)[actual] =
-		value === '' || (typeof value === 'string' && value.toLowerCase() === actual) || value === true;
-}
-
-export function updateValue(element: Element, first: unknown, second: unknown): void {
-	if (!isHTMLOrSVGElement(element)) {
-		return;
-	}
-
-	if (isProperty(first)) {
-		updateAttribute(element, (first as Attribute).name, (first as Attribute).value);
-	} else if (typeof first === 'string') {
-		updateAttribute(element, first as string, second);
-	}
-}
-
-export function updateValues(
+export function updateAttribute(
 	element: Element,
-	values: Attribute<unknown>[] | Record<string, unknown>,
+	name: string,
+	value: unknown,
+	dispatch?: unknown,
 ): void {
-	if (!isHTMLOrSVGElement(element)) {
+	const normalizedName = name.toLowerCase();
+
+	const isBoolean = booleanAttributesSet.has(normalizedName);
+
+	const next = isBoolean
+		? value === true ||
+			(typeof value === 'string' && (value === '' || value.toLowerCase() === normalizedName))
+		: value == null
+			? ''
+			: value;
+
+	if (name in element) {
+		updateProperty(element, normalizedName, next, dispatch);
+	}
+
+	updateElementValue(
+		element,
+		name,
+		isBoolean ? (next ? '' : null) : value,
+		element.setAttribute,
+		element.removeAttribute,
+		isBoolean,
+		false,
+	);
+}
+
+function updateProperty(element: Element, name: string, value: unknown, dispatch?: unknown): void {
+	if (Object.is((element as unknown as PlainObject)[name], value)) {
 		return;
 	}
 
-	const isArray = Array.isArray(values);
-	const entries = Object.entries(values);
-	const {length} = entries;
+	(element as unknown as PlainObject)[name] = value;
 
-	for (let index = 0; index < length; index += 1) {
-		const entry = entries[index];
+	const event = dispatch !== false && elementEvents[element.tagName]?.[name];
 
-		if (isArray) {
-			updateAttribute(element, (entry[1] as Attribute).name, (entry[1] as Attribute).value);
-		} else {
-			updateAttribute(element, entry[0], entry[1]);
-		}
+	if (typeof event === 'string') {
+		element.dispatchEvent(new Event(event, {bubbles: true}));
 	}
 }
 
@@ -200,6 +187,8 @@ const EXPRESSION_URI_VALUE =
 
 // oxlint-disable-next-line no-control-regex
 const EXPRESSION_WHITESPACE = /[\u0000-\u0020\u00A0\u1680\u180E\u2000-\u2029\u205F\u3000]/g;
+
+//
 
 /**
  * List of boolean attributes
@@ -232,6 +221,13 @@ export const booleanAttributes: readonly string[] = Object.freeze([
 ]);
 
 const booleanAttributesSet = new Set(booleanAttributes);
+
+const elementEvents: Record<string, Record<string, string>> = {
+	DETAILS: {open: 'toggle'},
+	INPUT: {checked: 'change', value: 'input'},
+	SELECT: {value: 'change'},
+	TEXTAREA: {value: 'input'},
+};
 
 const formElement = document.createElement('form');
 

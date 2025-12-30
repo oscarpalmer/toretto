@@ -1,5 +1,6 @@
 import {noop} from '@oscarpalmer/atoms/function';
 import {afterEach, expect, test} from 'vitest';
+import * as Attr from '../src/attribute/index';
 import * as Evt from '../src/event/index';
 import type {RemovableEventListener} from '../src/models';
 
@@ -126,6 +127,124 @@ test('dispatch:global', () =>
 			done();
 		}, 125);
 	}));
+
+test('dispatch:property', () => {
+	const checkbox = document.createElement('input');
+	const details = document.createElement('details');
+	const input = document.createElement('input');
+	const select = document.createElement('select');
+	const textarea = document.createElement('textarea');
+
+	checkbox.type = 'checkbox';
+
+	select.innerHTML = `<option value="" selected></option>
+<option value="one">One</option>
+<option value="two">Two</option>`;
+
+	document.body.append(checkbox, details, input, select, textarea);
+
+	const values = {
+		checkbox: 0,
+		details: 0,
+		input: 0,
+		select: 0,
+		textarea: 0,
+	};
+
+	Evt.on(checkbox, 'change', () => {
+		values.checkbox += 1;
+	});
+
+	Evt.on(details, 'toggle', () => {
+		values.details += 1;
+	});
+
+	Evt.on(input, 'input', () => {
+		values.input += 1;
+	});
+
+	Evt.on(select, 'change', () => {
+		values.select += 1;
+	});
+
+	Evt.on(textarea, 'input', () => {
+		values.textarea += 1;
+	});
+
+	expect(checkbox.checked).toBe(false);
+	expect(details.open).toBe(false);
+	expect(input.value).toBe('');
+	expect(select.value).toBe('');
+	expect(textarea.value).toBe('');
+
+	expect(values).toEqual({
+		checkbox: 0,
+		details: 0,
+		input: 0,
+		select: 0,
+		textarea: 0,
+	});
+
+	Attr.setAttribute(checkbox, 'checked', true);
+	Attr.setAttribute(details, 'open', true);
+	Attr.setAttribute(input, 'value', 'one');
+	Attr.setAttribute(select, 'value', 'one');
+	Attr.setAttribute(textarea, 'value', 'one', false);
+
+	expect(checkbox.checked).toBe(true);
+	expect(details.open).toBe(true);
+	expect(input.value).toBe('one');
+	expect(select.value).toBe('one');
+	expect(textarea.value).toBe('one');
+
+	expect(values).toEqual({
+		checkbox: 1,
+		details: 1,
+		input: 1,
+		select: 1,
+		textarea: 0,
+	});
+
+	Attr.setAttribute(checkbox, 'checked', false);
+	Attr.setAttribute(details, 'open', false);
+	Attr.setAttribute(input, 'value', 'two');
+	Attr.setAttribute(select, 'value', 'two');
+	Attr.setAttribute(textarea, 'value', 'two', false);
+
+	expect(checkbox.checked).toBe(false);
+	expect(details.open).toBe(false);
+	expect(input.value).toBe('two');
+	expect(select.value).toBe('two');
+	expect(textarea.value).toBe('two');
+
+	expect(values).toEqual({
+		checkbox: 2,
+		details: 2,
+		input: 2,
+		select: 2,
+		textarea: 0,
+	});
+
+	Attr.setAttribute(checkbox, 'checked', false);
+	Attr.setAttribute(details, 'open', false);
+	Attr.setAttribute(input, 'value', 'two');
+	Attr.setAttribute(select, 'value', 'two');
+	Attr.setAttribute(textarea, 'value', 'two', false);
+
+	expect(checkbox.checked).toBe(false);
+	expect(details.open).toBe(false);
+	expect(input.value).toBe('two');
+	expect(select.value).toBe('two');
+	expect(textarea.value).toBe('two');
+
+	expect(values).toEqual({
+		checkbox: 2,
+		details: 2,
+		input: 2,
+		select: 2,
+		textarea: 0,
+	});
+});
 
 test('getPosition', () => {
 	const event = new MouseEvent('click', {
