@@ -4,7 +4,7 @@
 		"url": "https://oscarpalmer.se"
 	},
 	"dependencies": {
-		"@oscarpalmer/atoms": "^0.119"
+		"@oscarpalmer/atoms": "^0.124"
 	},
 	"description": "A collection of badass DOM utilities.",
 	"devDependencies": {
@@ -93,5 +93,5 @@
 	},
 	"type": "module",
 	"types": "types/index.d.ts",
-	"version": "0.33.0"
+	"version": "0.34.0"
 }
