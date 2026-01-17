@@ -3,35 +3,37 @@
  *
  * - If no match is found, `null` is returned
  * - _(If you want to search upwards, downwards, and sideways, use {@link findRelatives})_
- * @param origin Element to start from
+ * @param origin Origin to start from
  * @param selector Selector to match
  * @returns Found ancestor or `null`
  */
 export function findAncestor(
-	origin: Element,
+	origin: Element | Event | EventTarget,
 	selector: string | ((element: Element) => boolean),
 ): Element | null {
-	if (!(origin instanceof Element) || selector == null) {
+	const element = getElement(origin);
+
+	if (element == null || selector == null) {
 		return null;
 	}
 
 	if (typeof selector === 'string') {
-		if (origin.matches?.(selector)) {
-			return origin;
+		if (element.matches?.(selector)) {
+			return element;
 		}
 
-		return origin.closest(selector);
+		return element.closest(selector);
 	}
 
 	if (typeof selector !== 'function') {
 		return null;
 	}
 
-	if (selector(origin)) {
-		return origin;
+	if (selector(element)) {
+		return element;
 	}
 
-	let parent: Element | null = origin.parentElement;
+	let parent: Element | null = element.parentElement;
 
 	while (parent != null && !selector(parent)) {
 		if (parent === document.body) {
@@ -95,9 +97,7 @@ export function findRelatives(
 		}
 	}
 
-	return distances
-		.filter(found => found.distance === minimum)
-		.map(found => found.element);
+	return distances.filter(found => found.distance === minimum).map(found => found.element);
 }
 
 /**
@@ -130,6 +130,14 @@ export function getDistance(origin: Element, target: Element): number {
 	const preceding = comparison & Node.DOCUMENT_POSITION_PRECEDING;
 
 	return traverse(preceding ? origin : target, preceding ? target : origin) ?? -1;
+}
+
+function getElement(origin: unknown): Element | undefined {
+	if (origin instanceof Element) {
+		return origin;
+	}
+
+	return origin instanceof Event && origin.target instanceof Element ? origin.target : undefined;
 }
 
 function traverse(from: Element, to: Element): number | undefined {

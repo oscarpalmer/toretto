@@ -29,16 +29,45 @@ test('findAncestor', () => {
 		return;
 	}
 
+	const event = new Event('click');
+
+	Object.defineProperty(event, 'target', {
+		value: origin,
+		writable: false,
+	});
+
 	expect(Find.findAncestor(origin, '#origin')).toBe(origin);
+	expect(Find.findAncestor(event, '#origin')).toBe(origin);
+	expect(Find.findAncestor(event.target!, '#origin')).toBe(origin);
+
 	expect(Find.findAncestor(origin, '.target')).toBe(target);
+	expect(Find.findAncestor(event, '.target')).toBe(target);
+	expect(Find.findAncestor(event.target!, '.target')).toBe(target);
 
 	expect(Find.findAncestor(origin, element => element.id === 'origin')).toBe(origin);
+	expect(Find.findAncestor(event, element => element.id === 'origin')).toBe(origin);
+	expect(Find.findAncestor(event.target!, element => element.id === 'origin')).toBe(origin);
 
 	expect(Find.findAncestor(origin, element => (element as HTMLElement).hidden)).toBe(hidden);
+	expect(Find.findAncestor(event, element => (element as HTMLElement).hidden)).toBe(hidden);
+	expect(Find.findAncestor(event.target!, element => (element as HTMLElement).hidden)).toBe(hidden);
 
 	expect(Find.findAncestor(origin, 'noop')).toBe(null);
+	expect(Find.findAncestor(event, 'noop')).toBe(null);
+	expect(Find.findAncestor(event.target!, 'noop')).toBe(null);
 
 	expect(Find.findAncestor(origin, element => element.tagName === 'noop')).toBe(null);
+	expect(Find.findAncestor(event, element => element.tagName === 'noop')).toBe(null);
+	expect(Find.findAncestor(event.target!, element => element.tagName === 'noop')).toBe(null);
+
+	const globalEvent = new Event('click');
+
+	Object.defineProperty(globalEvent, 'target', {
+		value: globalThis,
+		writable: false,
+	});
+
+	expect(Find.findAncestor(globalEvent, 'div')).toBe(null);
 
 	expect(Find.findAncestor(123 as never, 'span')).toBe(null);
 	expect(Find.findAncestor(origin, 123 as never)).toBe(null);
