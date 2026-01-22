@@ -1,4 +1,18 @@
 /**
+ * Find the closest ancestor element that matches the tag name
+ *
+ * - If no match is found, `null` is returned
+ * - _(If you want to search upwards, downwards, and sideways, use {@link findRelatives})_
+ * @param origin Origin to start from
+ * @param tagName Tag name to match
+ * @returns Found ancestor or `null`
+ */
+export function findAncestor<TagName extends keyof HTMLElementTagNameMap>(
+	origin: Element | Event | EventTarget,
+	tagName: TagName,
+): HTMLElementTagNameMap[TagName] | null;
+
+/**
  * Find the closest ancestor element that matches the selector _(string or callback)_
  *
  * - If no match is found, `null` is returned
@@ -7,6 +21,11 @@
  * @param selector Selector to match
  * @returns Found ancestor or `null`
  */
+export function findAncestor(
+	origin: Element | Event | EventTarget,
+	selector: string | ((element: Element) => boolean),
+): Element | null;
+
 export function findAncestor(
 	origin: Element | Event | EventTarget,
 	selector: string | ((element: Element) => boolean),
@@ -47,6 +66,21 @@ export function findAncestor(
 }
 
 /**
+ * Finds the closest elements to the origin element that matches the tag name
+ *
+ * Traverses up, down, and sideways in the _DOM_-tree. _(If you only want to traverse up, use {@link findAncestor})_
+ * @param origin Element to start from
+ * @param tagName Tag name to match
+ * @param context Context to search within
+ * @returns Found elements
+ */
+export function findRelatives<TagName extends keyof HTMLElementTagNameMap>(
+	origin: Element,
+	tagName: TagName,
+	context?: Document | Element,
+): HTMLElementTagNameMap[TagName][];
+
+/**
  * Finds the closest elements to the origin element that matches the selector
  *
  * Traverses up, down, and sideways in the _DOM_-tree. _(If you only want to traverse up, use {@link findAncestor})_
@@ -55,6 +89,12 @@ export function findAncestor(
  * @param context Context to search within
  * @returns Found elements
  */
+export function findRelatives(
+	origin: Element,
+	selector: string,
+	context?: Document | Element,
+): Element[];
+
 export function findRelatives(
 	origin: Element,
 	selector: string,

@@ -207,12 +207,12 @@ test('findRelatives', () => {
 	expect(buttonTargets.length).toBe(1);
 	expect(buttonTargets[0].textContent?.trim()).toBe('B3');
 
-	liTargets = Find.findRelatives(targetsOrigin, '.target', element);
+	liTargets = Find.findRelatives(targetsOrigin, '.target', element) as HTMLLIElement[];
 
 	expect(liTargets.length).toBe(6);
 	expect(liTargets.map(t => t.textContent?.trim())).toEqual(['L1', 'L2', 'L3', 'L5', 'L6', 'L7']);
 
-	liTargets = Find.findRelatives(targetsOrigin, '.origin', element);
+	liTargets = Find.findRelatives(targetsOrigin, '.origin', element) as HTMLLIElement[];
 
 	expect(liTargets.length).toBe(1);
 	expect(liTargets.map(t => t.textContent?.trim())).toEqual(['L4']);

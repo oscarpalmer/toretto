@@ -2,11 +2,24 @@ import type {PlainObject} from '@oscarpalmer/atoms';
 import type {Selector} from '../models';
 
 /**
+ * Find the first element that matches the tag name
+ * @param tagName Tag name of element to find
+ * @param context Context to search within _(defaults to `document`)_
+ * @returns Found element or `null`
+ */
+export function findElement<TagName extends keyof HTMLElementTagNameMap>(
+	tagName: TagName,
+	context?: Selector | null,
+): HTMLElementTagNameMap[TagName] | null;
+
+/**
  * Find the first element that matches the selector
  * @param selector Selector to find element for
  * @param context Context to search within _(defaults to `document`)_
  * @returns Found element or `null`
  */
+export function findElement(selector: string, context?: Selector | null): Element | null;
+
 export function findElement(selector: string, context?: Selector | null): Element | null {
 	return findElementOrElements(selector, context, true) as never;
 }
@@ -105,10 +118,23 @@ function findElementOrElementsFromNodes(
 
 /**
  * Find elements that match the selector
+ * @param tagName tagName to find elements for
+ * @param context Context to search within _(defaults to `document`)_
+ * @returns Found elements
+ */
+export function findElements(
+	tagName: keyof HTMLElementTagNameMap,
+	context?: Selector | null,
+): HTMLElementTagNameMap[typeof tagName][];
+
+/**
+ * Find elements that match the selector
  * @param selector Selector to find elements for
  * @param context Context to search within _(defaults to `document`)_
  * @returns Found elements
  */
+export function findElements(selector: Selector, context?: Selector | null): Element[];
+
 export function findElements(selector: Selector, context?: Selector | null): Element[] {
 	return findElementOrElements(selector, context, false) as never;
 }
