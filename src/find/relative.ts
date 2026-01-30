@@ -37,11 +37,11 @@ export function findAncestor(
 	}
 
 	if (typeof selector === 'string') {
-		if (element.matches?.(selector)) {
+		if (Element.prototype.matches.call(element, selector)) {
 			return element;
 		}
 
-		return element.closest(selector);
+		return Element.prototype.closest.call(element, selector);
 	}
 
 	if (typeof selector !== 'function') {
