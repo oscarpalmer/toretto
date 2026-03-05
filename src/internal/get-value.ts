@@ -1,4 +1,5 @@
-import {camelCase, kebabCase, parse} from '@oscarpalmer/atoms/string';
+import {parse} from '@oscarpalmer/atoms/string';
+import {camelCase, kebabCase} from '@oscarpalmer/atoms/string/case';
 
 export function getBoolean(value: unknown, defaultValue?: boolean): boolean {
 	return typeof value === 'boolean' ? value : (defaultValue ?? false);

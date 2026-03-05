@@ -1,5 +1,6 @@
 import type {PlainObject} from '@oscarpalmer/atoms';
-import {kebabCase, parse} from '@oscarpalmer/atoms/string';
+import {parse} from '@oscarpalmer/atoms/string';
+import {kebabCase} from '@oscarpalmer/atoms/string/case';
 import {setElementValues, updateElementValue} from './internal/element-value';
 import {EXPRESSION_DATA_PREFIX} from './internal/get-value';
 import {isHTMLOrSVGElement} from './internal/is';

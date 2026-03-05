@@ -25,6 +25,7 @@ export default defineConfig({
 				'@oscarpalmer/atoms/function',
 				'@oscarpalmer/atoms/is',
 				'@oscarpalmer/atoms/string',
+				'@oscarpalmer/atoms/string/case',
 			],
 			input: Object.fromEntries(files),
 			output: {

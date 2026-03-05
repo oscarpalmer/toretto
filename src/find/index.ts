@@ -1,4 +1,4 @@
-import type {PlainObject} from '@oscarpalmer/atoms';
+import type {PlainObject} from '@oscarpalmer/atoms/models';
 import type {Selector} from '../models';
 
 /**
