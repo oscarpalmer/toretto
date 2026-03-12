@@ -1,10 +1,15 @@
 import supportsTouch from './touch';
 
 export {
+	booleanAttributes,
+	getAttribute,
+	getAttributes,
 	isBadAttribute,
 	isBooleanAttribute,
 	isEmptyNonBooleanAttribute,
 	isInvalidBooleanAttribute,
+	setAttribute,
+	setAttributes,
 } from './attribute/index';
 export * from './data';
 export * from './event/index';
