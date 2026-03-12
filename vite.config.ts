@@ -21,12 +21,7 @@ export default defineConfig({
 		minify: false,
 		outDir: './dist',
 		rollupOptions: {
-			external: [
-				'@oscarpalmer/atoms/function',
-				'@oscarpalmer/atoms/is',
-				'@oscarpalmer/atoms/string',
-				'@oscarpalmer/atoms/string/case',
-			],
+			external: id => id.includes('@oscarpalmer'),
 			input: Object.fromEntries(files),
 			output: {
 				preserveModules: true,
