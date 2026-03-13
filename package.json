@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/toretto",
-	"version": "0.40.0",
+	"version": "0.41.0",
 	"description": "A collection of badass DOM utilities.",
 	"keywords": [
 		"dom",
@@ -79,7 +79,7 @@
 		"watch": "npx vite build --watch"
 	},
 	"dependencies": {
-		"@oscarpalmer/atoms": "^0.164"
+		"@oscarpalmer/atoms": "^0.165"
 	},
 	"devDependencies": {
 		"@types/node": "^25.5",
