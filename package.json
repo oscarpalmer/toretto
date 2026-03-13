@@ -1,76 +1,7 @@
 {
-	"author": {
-		"name": "Oscar Palmér",
-		"url": "https://oscarpalmer.se"
-	},
-	"dependencies": {
-		"@oscarpalmer/atoms": "^0.162"
-	},
+	"name": "@oscarpalmer/toretto",
+	"version": "0.40.0",
 	"description": "A collection of badass DOM utilities.",
-	"devDependencies": {
-		"@types/node": "^25.4",
-		"@vitest/coverage-istanbul": "^4",
-		"dts-bundle-generator": "^9.5",
-		"jsdom": "^28.1",
-		"oxfmt": "^0.39",
-		"oxlint": "^1.54",
-		"rolldown": "1.0.0-rc.9",
-		"tslib": "^2.8",
-		"typescript": "^5.9",
-		"vite": "8.0.0-beta.17",
-		"vitest": "^4"
-	},
-	"exports": {
-		"./package.json": "./package.json",
-		".": {
-			"types": "./types/index.d.ts",
-			"default": "./dist/toretto.full.js"
-		},
-		"./attribute": {
-			"types": "./types/attribute/index.d.ts",
-			"default": "./dist/attribute/index.js"
-		},
-		"./data": {
-			"types": "./types/data.d.ts",
-			"default": "./dist/data.js"
-		},
-		"./event": {
-			"types": "./types/event/index.d.ts",
-			"default": "./dist/event/index.js"
-		},
-		"./find": {
-			"types": "./types/find/index.d.ts",
-			"default": "./dist/find/index.js"
-		},
-		"./focusable": {
-			"types": "./types/focusable.d.ts",
-			"default": "./dist/focusable.js"
-		},
-		"./html": {
-			"types": "./types/html/index.d.ts",
-			"default": "./dist/html/index.js"
-		},
-		"./is": {
-			"types": "./types/is.d.ts",
-			"default": "./dist/is.js"
-		},
-		"./models": {
-			"types": "./types/models.d.ts"
-		},
-		"./style": {
-			"types": "./types/style.d.ts",
-			"default": "./dist/style.js"
-		},
-		"./touch": {
-			"types": "./types/touch.d.ts",
-			"default": "./dist/touch.js"
-		}
-	},
-	"files": [
-		"dist",
-		"src",
-		"types"
-	],
 	"keywords": [
 		"dom",
 		"html",
@@ -78,21 +9,87 @@
 		"utility"
 	],
 	"license": "MIT",
-	"module": "dist/index.js",
-	"name": "@oscarpalmer/toretto",
+	"author": {
+		"name": "Oscar Palmér",
+		"url": "https://oscarpalmer.se"
+	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/oscarpalmer/toretto.git"
 	},
+	"files": [
+		"dist",
+		"src"
+	],
+	"type": "module",
+	"module": "dist/index.mjs",
+	"types": "dist/index.d.mts",
+	"exports": {
+		"./package.json": "./package.json",
+		".": {
+			"types": "./dist/index.d.mts",
+			"default": "./dist/index.mjs"
+		},
+		"./attribute": {
+			"types": "./dist/attribute/index.d.mts",
+			"default": "./dist/attribute/index.mjs"
+		},
+		"./data": {
+			"types": "./dist/data.d.mts",
+			"default": "./dist/data.mjs"
+		},
+		"./event": {
+			"types": "./dist/event/index.d.mts",
+			"default": "./dist/event/index.mjs"
+		},
+		"./find": {
+			"types": "./dist/find/index.d.mts",
+			"default": "./dist/find/index.mjs"
+		},
+		"./focusable": {
+			"types": "./dist/focusable.d.mts",
+			"default": "./dist/focusable.mjs"
+		},
+		"./html": {
+			"types": "./dist/html/index.d.mts",
+			"default": "./dist/html/index.mjs"
+		},
+		"./is": {
+			"types": "./dist/is.d.mts",
+			"default": "./dist/is.mjs"
+		},
+		"./models": {
+			"types": "./dist/models.d.mts"
+		},
+		"./style": {
+			"types": "./dist/style.d.mts",
+			"default": "./dist/style.mjs"
+		},
+		"./touch": {
+			"types": "./dist/touch.d.mts",
+			"default": "./dist/touch.mjs"
+		}
+	},
 	"scripts": {
-		"build": "npm run clean && npx vite build && npm run rolldown:build && npx tsc && npx dts-bundle-generator --config ./dts.config.ts --silent",
-		"clean": "rm -rf ./dist && rm -rf ./types && rm -f ./tsconfig.tsbuildinfo",
-		"rolldown:build": "npx rolldown -c",
-		"rolldown:watch": "npx rolldown -c ./rolldown.config.js --watch",
-		"test": "npx vitest --coverage",
+		"build": "npx vp pack && npm run tsdown:build",
+		"tsdown:build": "npx tsdown -c ./tsdown.config.ts",
+		"tsdown:watch": "npx tsdown -c ./tsdown.config.ts --watch",
+		"test": "npx vp test run --coverage",
+		"test:leak": "npx vp test run --detect-async-leaks --coverage",
 		"watch": "npx vite build --watch"
 	},
-	"type": "module",
-	"types": "types/index.d.ts",
-	"version": "0.39.2"
+	"dependencies": {
+		"@oscarpalmer/atoms": "^0.164"
+	},
+	"devDependencies": {
+		"@types/node": "^25.5",
+		"@vitest/coverage-istanbul": "^4.1",
+		"jsdom": "^28.1",
+		"tsdown": "^0.21",
+		"typescript": "^5.9",
+		"vite": "npm:@voidzero-dev/vite-plus-core@latest",
+		"vite-plus": "latest",
+		"vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+	},
+	"packageManager": "npm@11.11.1"
 }
