@@ -354,37 +354,6 @@ test('isBooleanAttribute', () => {
 	expect(Attribute.isBooleanAttribute(123 as never)).toBe(false);
 });
 
-test('isEmptyNonBooleanAttribute', () => {
-	let {length} = Attribute.booleanAttributes;
-
-	for (let index = 0; index < length; index += 1) {
-		expect(
-			Attribute.isEmptyNonBooleanAttribute({
-				name: Attribute.booleanAttributes[index],
-				value: '',
-			}),
-		).toBe(false);
-	}
-
-	length = nonBooleanAttributes.length;
-
-	for (let index = 0; index < length; index += 1) {
-		const name = nonBooleanAttributes[index];
-
-		expect(Attribute.isEmptyNonBooleanAttribute({name, value: ''})).toBe(true);
-
-		expect(Attribute.isEmptyNonBooleanAttribute({name, value: '  '})).toBe(true);
-
-		expect(Attribute.isEmptyNonBooleanAttribute({name, value: name})).toBe(false);
-	}
-
-	expect(Attribute.isEmptyNonBooleanAttribute(123 as never)).toBe(false);
-
-	expect(Attribute.isEmptyNonBooleanAttribute({name: 123 as never, value: ''})).toBe(false);
-
-	expect(Attribute.isEmptyNonBooleanAttribute({name: '', value: 123 as never})).toBe(false);
-});
-
 test('isInvalidBooleanAttribute', () => {
 	let {length} = Attribute.booleanAttributes;
 

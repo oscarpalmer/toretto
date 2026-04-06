@@ -96,20 +96,6 @@ export function _isBooleanAttribute(first: unknown, decode: boolean): boolean {
 	);
 }
 
-export function _isEmptyNonBooleanAttribute(
-	first: unknown,
-	second: unknown,
-	decode: boolean,
-): boolean {
-	return handleAttribute(
-		(name, value) =>
-			name != null && value != null && !booleanAttributesSet.has(name) && value.trim().length === 0,
-		decode,
-		first,
-		second,
-	);
-}
-
 export function _isInvalidBooleanAttribute(
 	first: unknown,
 	second: unknown,

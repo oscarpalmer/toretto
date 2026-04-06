@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/toretto",
-	"version": "0.41.0",
+	"version": "0.42.0",
 	"description": "A collection of badass DOM utilities.",
 	"keywords": [
 		"dom",
@@ -33,6 +33,10 @@
 		"./attribute": {
 			"types": "./dist/attribute/index.d.mts",
 			"default": "./dist/attribute/index.mjs"
+		},
+		"./create": {
+			"types": "./dist/create.d.mts",
+			"default": "./dist/create.mjs"
 		},
 		"./data": {
 			"types": "./dist/data.d.mts",
@@ -75,16 +79,15 @@
 		"tsdown:build": "npx tsdown -c ./tsdown.config.ts",
 		"tsdown:watch": "npx tsdown -c ./tsdown.config.ts --watch",
 		"test": "npx vp test run --coverage",
-		"test:leak": "npx vp test run --detect-async-leaks --coverage",
-		"watch": "npx vite build --watch"
+		"test:leak": "npx vp test run --detect-async-leaks --coverage"
 	},
 	"dependencies": {
-		"@oscarpalmer/atoms": "^0.165"
+		"@oscarpalmer/atoms": "^0.172"
 	},
 	"devDependencies": {
 		"@types/node": "^25.5",
 		"@vitest/coverage-istanbul": "^4.1",
-		"jsdom": "^28.1",
+		"jsdom": "^29",
 		"tsdown": "^0.21",
 		"typescript": "^5.9",
 		"vite": "npm:@voidzero-dev/vite-plus-core@latest",

@@ -14,6 +14,8 @@ export type StyleToggler = {
 	remove(): void;
 };
 
+type Styles = Partial<Record<keyof CSSStyleDeclaration, unknown>>;
+
 /**
  * Get a style from an element
  * @param element Element to get the style from
@@ -27,7 +29,7 @@ export function getStyle(
 	computed?: boolean,
 ): string | undefined {
 	if (!isHTMLOrSVGElement(element) || typeof property !== 'string') {
-		return undefined;
+		return;
 	}
 
 	return getStyleValue(element, property, computed === true);
@@ -95,7 +97,7 @@ export function getTextDirection(element: Element, computed?: boolean): TextDire
 export function setStyle(
 	element: Element,
 	property: keyof CSSStyleDeclaration,
-	value?: string,
+	value?: unknown,
 ): void {
 	setElementValues(element, property as string, value, null, updateStyleProperty);
 }
@@ -105,7 +107,7 @@ export function setStyle(
  * @param element Element to set the styles on
  * @param styles Styles to set
  */
-export function setStyles(element: Element, styles: Partial<CSSStyleDeclaration>): void {
+export function setStyles(element: Element, styles: Styles): void {
 	setElementValues(element, styles as never, null, null, updateStyleProperty);
 }
 
@@ -115,11 +117,11 @@ export function setStyles(element: Element, styles: Partial<CSSStyleDeclaration>
  * @param styles Styles to be set or removed
  * @returns Style toggler
  */
-export function toggleStyles(element: Element, styles: Partial<CSSStyleDeclaration>): StyleToggler {
+export function toggleStyles(element: Element, styles: Styles): StyleToggler {
 	function toggle(set: boolean): void {
 		hasSet = set;
 
-		let next: Partial<CSSStyleDeclaration>;
+		let next: Styles;
 
 		if (set) {
 			values = getStyles(element, keys);
@@ -130,8 +132,8 @@ export function toggleStyles(element: Element, styles: Partial<CSSStyleDeclarati
 
 			values = {};
 
-			for (const key of keys) {
-				values[key as never] = undefined;
+			for (let index = 0; index < length; index += 1) {
+				values[keys[index] as never] = undefined;
 			}
 		}
 
@@ -139,6 +141,7 @@ export function toggleStyles(element: Element, styles: Partial<CSSStyleDeclarati
 	}
 
 	const keys = Object.keys(styles) as (keyof CSSStyleDeclaration)[];
+	const {length} = keys;
 
 	let hasSet = false;
 	let values: Record<string, string | undefined> = {};
@@ -162,8 +165,8 @@ function updateStyleProperty(element: Element, key: string, value: unknown): voi
 		element,
 		key,
 		value,
-		function (this: Element, property: string, style: string) {
-			(this as HTMLElement).style[property as never] = style;
+		function (this: Element, property: string, style: unknown) {
+			(this as HTMLElement).style[property as never] = String(style);
 		},
 		function (this: Element, property: string) {
 			(this as HTMLElement).style[property as never] = '';

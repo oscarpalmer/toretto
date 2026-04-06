@@ -1,16 +1,13 @@
 import {setAttribute} from '../attribute/set';
-import {
-	_isBadAttribute,
-	_isEmptyNonBooleanAttribute,
-	_isInvalidBooleanAttribute,
-} from '../internal/attribute';
+import {_isBadAttribute, _isInvalidBooleanAttribute} from '../internal/attribute';
 
 function handleElement(element: Element, depth: number): void {
 	if (depth === 0) {
-		const removable = element.querySelectorAll(REMOVE_SELECTOR);
+		const removable = [...element.querySelectorAll(REMOVE_SELECTOR)];
+		const {length} = removable;
 
-		for (const item of removable) {
-			item.remove();
+		for (let index = 0; index < length; index += 1) {
+			removable[index].remove();
 		}
 	}
 
@@ -49,7 +46,7 @@ export function sanitizeAttributes(element: Element, attributes: Attr[]): void {
 	for (let index = 0; index < length; index += 1) {
 		const {name, value} = attributes[index];
 
-		if (_isBadAttribute(name, value, false) || _isEmptyNonBooleanAttribute(name, value, false)) {
+		if (_isBadAttribute(name, value, false)) {
 			element.removeAttribute(name);
 		} else if (_isInvalidBooleanAttribute(name, value, false)) {
 			setAttribute(element, name, true);

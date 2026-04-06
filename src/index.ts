@@ -6,11 +6,11 @@ export {
 	getAttributes,
 	isBadAttribute,
 	isBooleanAttribute,
-	isEmptyNonBooleanAttribute,
 	isInvalidBooleanAttribute,
 	setAttribute,
 	setAttributes,
 } from './attribute/index';
+export * from './create';
 export * from './data';
 export * from './event/index';
 export * from './find/index';

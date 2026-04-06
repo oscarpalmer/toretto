@@ -1,7 +1,6 @@
 import {
 	_isBadAttribute,
 	_isBooleanAttribute,
-	_isEmptyNonBooleanAttribute,
 	_isInvalidBooleanAttribute,
 } from '../internal/attribute';
 import type {Attribute} from '../models';
@@ -41,25 +40,6 @@ export function isBooleanAttribute(name: string): boolean;
 
 export function isBooleanAttribute(first: unknown): boolean {
 	return _isBooleanAttribute(first, true);
-}
-
-/**
- * Is the attribute empty and not a boolean attribute?
- * @param attribute Attribute to check
- * @returns `true` if attribute is empty and not a boolean attribute
- */
-export function isEmptyNonBooleanAttribute(attribute: Attr | Attribute): boolean;
-
-/**
- * Is the attribute empty and not a boolean attribute?
- * @param name Attribute name
- * @param value Attribute value
- * @returns `true` if attribute is empty and not a boolean attribute
- */
-export function isEmptyNonBooleanAttribute(name: string, value: string): boolean;
-
-export function isEmptyNonBooleanAttribute(first: unknown, second?: unknown): boolean {
-	return _isEmptyNonBooleanAttribute(first, second, true);
 }
 
 /**
