@@ -1,6 +1,8 @@
 import {parse} from '@oscarpalmer/atoms/string';
 import {camelCase, kebabCase} from '@oscarpalmer/atoms/string/case';
 
+// #region Functions
+
 export function getBoolean(value: unknown, defaultValue?: boolean): boolean {
 	return typeof value === 'boolean' ? value : (defaultValue ?? false);
 }
@@ -27,4 +29,10 @@ export function getStyleValue(
 		: (element as HTMLElement).style[name as never];
 }
 
+// #endregion
+
+// #region Variables
+
 export const EXPRESSION_DATA_PREFIX = /^data-/i;
+
+// #endregion

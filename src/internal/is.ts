@@ -1,3 +1,5 @@
+// #region Functions
+
 /**
  * Is the value an event target?
  * @param value Value to check
@@ -21,3 +23,5 @@ export function isEventTarget(value: unknown): value is EventTarget {
 export function isHTMLOrSVGElement(value: unknown): value is HTMLElement | SVGElement {
 	return value instanceof HTMLElement || value instanceof SVGElement;
 }
+
+// #endregion

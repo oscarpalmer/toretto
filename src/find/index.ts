@@ -1,6 +1,8 @@
 import type {PlainObject} from '@oscarpalmer/atoms/models';
 import type {Selector} from '../models';
 
+// #region Functions
+
 /**
  * Find the first element that matches the tag name
  * @param tagName Tag name of element to find
@@ -180,7 +182,9 @@ function isContext(value: unknown): boolean {
 	);
 }
 
-//
+// #endregion
+
+// #region Variables
 
 const QUERY_SELECTOR_ALL = 'querySelectorAll';
 
@@ -194,7 +198,11 @@ const SUFFIX_HOVER = ':hover';
 
 const TAG_HEAD = 'HEAD';
 
-//
+// #endregion
 
-export {findElement as $, findElements as $$};
+// #region Exports
+
 export {findAncestor, findRelatives, getDistance} from './relative';
+export {findElement as $, findElements as $$};
+
+// #endregion

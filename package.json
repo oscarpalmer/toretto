@@ -65,6 +65,10 @@
 		"./models": {
 			"types": "./dist/models.d.mts"
 		},
+		"./property": {
+			"types": "./dist/property/index.d.mts",
+			"default": "./dist/property/index.mjs"
+		},
 		"./style": {
 			"types": "./dist/style.d.mts",
 			"default": "./dist/style.mjs"

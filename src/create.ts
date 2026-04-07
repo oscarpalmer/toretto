@@ -1,12 +1,19 @@
 import type {Primitive} from '@oscarpalmer/atoms/models';
 import {setAttributes} from './attribute';
 import {setStyles} from './style';
+import {setProperties} from './property';
 
-type Properties<Element extends HTMLElement> = Partial<{
-	[key in keyof Element]: Element[key] extends Primitive ? Element[key] : never;
-}>;
+// #region Types
+
+type Properties<Target extends Element> = {
+	[Property in keyof Target]?: Target[Property] extends Primitive ? Target[Property] : never;
+};
 
 type Styles = Partial<Record<keyof CSSStyleDeclaration, unknown>>;
+
+// #endregion
+
+// #region Functions
 
 /**
  * Creates an HTML element with the specified tag name together with optional properties, attributes, and styles
@@ -36,7 +43,7 @@ export function createElement(
 	properties?: Properties<HTMLElement>,
 	attributes?: Record<string, unknown>,
 	styles?: Styles,
-): HTMLElement;
+): HTMLUnknownElement;
 
 export function createElement(
 	tag: string,
@@ -44,10 +51,14 @@ export function createElement(
 	attributes?: Record<string, unknown>,
 	styles?: Styles,
 ): HTMLElement {
+	if (typeof tag !== 'string') {
+		throw new TypeError(MESSAGE);
+	}
+
 	const element = document.createElement(tag);
 
 	if (properties != null) {
-		Object.assign(element, properties);
+		setProperties(element, properties);
 	}
 
 	if (attributes != null) {
@@ -60,3 +71,11 @@ export function createElement(
 
 	return element;
 }
+
+// #endregion
+
+// #region Variables
+
+const MESSAGE = 'Tag name must be a string';
+
+// #endregion

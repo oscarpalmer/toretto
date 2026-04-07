@@ -10,7 +10,7 @@ import {
 	removeDelegatedListener,
 } from './delegation';
 
-//
+// #region Types
 
 type EventOptions = {
 	capture: boolean;
@@ -19,7 +19,9 @@ type EventOptions = {
 	signal?: AbortSignal;
 };
 
-//
+// #endregion
+
+// #region Functions
 
 function createDispatchOptions(options: EventInit): EventInit {
 	return {
@@ -219,6 +221,10 @@ export function on(
 	};
 }
 
-//
+// #endregion
+
+// #region Variables
 
 const PROPERTY_DETAIL = 'detail';
+
+// #endregion

@@ -67,7 +67,7 @@ test('getTextDirection', () => {
 
 	parent.innerHTML = `<div id="outer" dir="rtl">
 	<div id="inner">
-		<span id="text" style="direction: ltr"></span>
+		<span id="text" style="direction: ltr">A little bit of text</span>
 	</div>
 </div>`;
 
@@ -75,12 +75,14 @@ test('getTextDirection', () => {
 	const outerElement = fragment.getElementById('outer');
 	const innerElement = fragment.getElementById('inner');
 	const textElement = fragment.getElementById('text');
+	const textNode = textElement?.firstChild;
 
 	if (
 		parentElement == null ||
 		outerElement == null ||
 		innerElement == null ||
-		textElement == null
+		textElement == null ||
+		textNode == null
 	) {
 		return;
 	}
@@ -88,11 +90,20 @@ test('getTextDirection', () => {
 	expect(Style.getTextDirection(parentElement)).toBe('ltr');
 	expect(Style.getTextDirection(outerElement)).toBe('rtl');
 	expect(Style.getTextDirection(textElement)).toBe('ltr');
+	expect(Style.getTextDirection(innerElement)).toBe('rtl');
 
-	// Should be inherited from parent and be 'rtl', but does not seem to be; JSDOM?
-	expect(Style.getTextDirection(innerElement)).toBe('ltr');
+	expect(Style.getTextDirection(textNode as never)).toBe('ltr');
 
-	expect(Style.getTextDirection(123 as never)).toBeUndefined();
+	expect(Style.getTextDirection(123 as never)).toBe('ltr');
+	expect(Style.getTextDirection()).toBe('ltr');
+
+	parentElement.ownerDocument.documentElement.setAttribute('dir', 'rtl');
+
+	expect(Style.getTextDirection()).toBe('rtl');
+
+	parentElement.ownerDocument.documentElement.style.direction = 'ltr';
+
+	expect(Style.getTextDirection()).toBe('ltr');
 });
 
 test('toggleStyles', () => {

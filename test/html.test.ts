@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {html, sanitize} from '../src/html';
+import {createElement, html, sanitize} from '../src';
 
 const cases = [
 	// Basic sanitization
@@ -149,6 +149,53 @@ test('html: cases', () => {
 	}
 
 	html.clear();
+});
+
+test('html: tagged', () => {
+	document.body.append(
+		createElement('img', {
+			src: 'https://example.com/image_1.jpg',
+			alt: 'Example image #1',
+		}),
+		createElement('img', {
+			src: 'https://example.com/image_2.jpg',
+			alt: 'Example image #2',
+		}),
+	);
+
+	const paragraph = createElement('p', {
+		innerHTML: 'Hello, world!',
+	});
+
+	const items = Array.from({length: 5}, (_, index) =>
+		index === 1 || index === 3
+			? index
+			: createElement('li', {
+					innerHTML: `#${index + 1}`,
+				}),
+	);
+
+	const nodes = html`<div>
+<!-- a comment ignored by temporary comment usage -->
+${[null, undefined, false, true, 123, 123n, 'abc', [1, 2, 3], {foo: 'bar'}]}
+<hr />
+${paragraph}
+<hr />
+<ul>${items}</ul>
+<hr />
+${document.querySelectorAll('img')}
+</div>`;
+
+	expect(join(nodes)).toBe(`<div>
+<!-- a comment ignored by temporary comment usage -->
+falsetrue123123abc1,2,3{"foo":"bar"}
+<hr>
+<p>Hello, world!</p>
+<hr>
+<ul><li>#1</li>1<li>#3</li>3<li>#5</li></ul>
+<hr>
+<img src="https://example.com/image_1.jpg" alt="Example image #1"><img src="https://example.com/image_2.jpg" alt="Example image #2">
+</div>`);
 });
 
 test('html: templates', () => {

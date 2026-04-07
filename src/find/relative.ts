@@ -1,3 +1,5 @@
+// #region Functions
+
 /**
  * Find the closest ancestor element that matches the tag name
  *
@@ -211,3 +213,5 @@ function traverse(from: Element, to: Element): number | undefined {
 		parent = parent.parentElement;
 	}
 }
+
+// #endregion

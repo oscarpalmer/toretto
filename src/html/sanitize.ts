@@ -1,5 +1,7 @@
-import {setAttribute} from '../attribute/set';
+import {setAttribute} from '../attribute/set.attribute';
 import {_isBadAttribute, _isInvalidBooleanAttribute} from '../internal/attribute';
+
+// #region Functions
 
 function handleElement(element: Element, depth: number): void {
 	if (depth === 0) {
@@ -100,8 +102,12 @@ export function sanitizeNodes(nodes: Node[], depth: number): Node[] {
 	return nodes;
 }
 
-//
+// #endregion
+
+// #region Variables
 
 const COMMENT_HARMFUL = /<[/\w]/g;
 
 const REMOVE_SELECTOR = 'script, toretto-temporary';
+
+// #endregion

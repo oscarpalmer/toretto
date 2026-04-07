@@ -2,11 +2,13 @@ import {updateAttribute} from '../internal/attribute';
 import {setElementValue, setElementValues} from '../internal/element-value';
 import type {Attribute} from '../models';
 
-//
+// #region Types
 
-type DispatchedAttribute = 'checked' | 'open' | 'value';
+export type DispatchedAttributeName = 'checked' | 'open' | 'value';
 
-//
+// #endregion
+
+// #region Functions
 
 /**
  * Set an attribute on an element
@@ -17,9 +19,9 @@ type DispatchedAttribute = 'checked' | 'open' | 'value';
  * @param value Attribute value
  * @param dispatch Dispatch event for attribute? _(defaults to `true`)_
  */
-export function setAttribute<Name extends DispatchedAttribute>(
+export function setAttribute(
 	element: Element,
-	name: Name,
+	name: DispatchedAttributeName,
 	value?: unknown,
 	dispatch?: boolean,
 ): void;
@@ -92,3 +94,5 @@ export function setAttributes(
 ): void {
 	setElementValues(element, attributes, null, dispatch, updateAttribute);
 }
+
+// #endregion

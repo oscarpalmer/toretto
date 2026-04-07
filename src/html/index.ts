@@ -1,9 +1,9 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import {sanitizeNodes} from './sanitize';
 import {SizedMap} from '@oscarpalmer/atoms/sized/map';
 import {getString} from '@oscarpalmer/atoms/string';
+import {sanitizeNodes} from './sanitize';
 
-//
+// #region Types
 
 type HtmlOptions = {
 	/**
@@ -19,7 +19,9 @@ type Tagged = {
 	template: string;
 };
 
-//
+// #endregion
+
+// #region Functions
 
 function createHtml(value: string | HTMLTemplateElement): string {
 	const parsed = getParser().parseFromString(getHtml(value), PARSE_TYPE_HTML);
@@ -126,6 +128,12 @@ function getTagged(strings: TemplateStringsArray, values: unknown[]): Tagged {
 					tagged.template += getString(item);
 				}
 			}
+		} else if (Array.isArray(value)) {
+			const valueLength = value.length;
+
+			for (let valueIndex = 0; valueIndex < valueLength; valueIndex += 1) {
+				tagged.template += getString(value[valueIndex]);
+			}
 		} else {
 			tagged.template += getString(value);
 		}
@@ -224,7 +232,7 @@ function replaceComments(origin: NodeList | Node[], replacements: Node[]): void 
 		const node = nodes[nodeIndex];
 
 		if (node instanceof Comment) {
-			const [, index] = EXPRESSION_COMMENT.exec(node.textContent ?? '') ?? [];
+			const [, index] = EXPRESSION_COMMENT.exec(node.textContent) ?? [];
 
 			if (index != null) {
 				node.replaceWith(replacements[Number(index)]);
@@ -249,7 +257,9 @@ export function sanitize(value: Node | Node[]): Node[] {
 	return sanitizeNodes(Array.isArray(value) ? value : [value], 0);
 }
 
-//
+// #endregion
+
+// #region Variables
 
 const COMMENT_INDEX = '<index>';
 
@@ -271,3 +281,5 @@ let parser: DOMParser;
 
 // @ts-expect-error debug
 window.templates = templates;
+
+// #endregion

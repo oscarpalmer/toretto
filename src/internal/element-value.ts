@@ -1,13 +1,16 @@
 import {isNullableOrWhitespace} from '@oscarpalmer/atoms/is';
+import {kebabCase} from '@oscarpalmer/atoms/string/case';
 import {isHTMLOrSVGElement} from '../is';
 import {isAttribute} from './attribute';
+
+// #region Functions
 
 export function setElementValue(
 	element: Element,
 	first: unknown,
 	second: unknown,
 	third: unknown,
-	callback: (element: Element, key: string, value: unknown) => void,
+	callback: (element: Element, key: string, value: unknown, dispatch: boolean) => void,
 ): void {
 	if (!isHTMLOrSVGElement(element)) {
 		return;
@@ -25,14 +28,16 @@ export function setElementValues(
 	first: unknown,
 	second: unknown,
 	third: unknown,
-	callback: (element: Element, key: string, value: unknown, dispatch?: unknown) => void,
+	callback: (element: Element, key: string, value: unknown, dispatch: boolean) => void,
 ): void {
 	if (!isHTMLOrSVGElement(element)) {
 		return;
 	}
 
+	const dispatch = third !== false;
+
 	if (typeof first === 'string') {
-		callback(element, first, second, third);
+		callback(element, kebabCase(first), second, dispatch);
 
 		return;
 	}
@@ -50,7 +55,7 @@ export function setElementValues(
 		const entry = entries[index];
 
 		if (typeof entry === 'object' && typeof entry?.name === 'string') {
-			callback(element, entry.name, entry.value, third);
+			callback(element, kebabCase(entry.name), entry.value, dispatch);
 		}
 	}
 }
@@ -70,3 +75,5 @@ export function updateElementValue(
 		set.call(element, key, json ? JSON.stringify(value) : String(value));
 	}
 }
+
+// #endregion Functions

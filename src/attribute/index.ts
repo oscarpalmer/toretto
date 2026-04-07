@@ -5,6 +5,8 @@ import {
 } from '../internal/attribute';
 import type {Attribute} from '../models';
 
+// #region Functions
+
 /**
  * Is the attribute considered bad and potentially harmful?
  * @param attribute Attribute to check
@@ -65,6 +67,12 @@ export function isInvalidBooleanAttribute(first: unknown, second?: unknown): boo
 	return _isInvalidBooleanAttribute(first, second, true);
 }
 
+// #endregion
+
+// #region Exports
+
 export {booleanAttributes} from '../internal/attribute';
-export * from './get';
-export * from './set';
+export * from './get.attribute';
+export {setAttribute, setAttributes} from './set.attribute';
+
+// #endregion

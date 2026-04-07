@@ -1,12 +1,16 @@
 import {isEventTarget} from '../internal/is';
 import type {CustomEventListener, RemovableEventListener} from '../models';
 
-//
+// #region Types
 
 export type EventTargetWithListeners = EventTarget &
 	Partial<{
 		[key: string]: Set<EventListener | CustomEventListener>;
 	}>;
+
+// #endregion
+
+// #region Functions
 
 function addDelegatedHandler(doc: Document, type: string, name: string, passive: boolean): void {
 	if (DELEGATED.has(name)) {
@@ -44,7 +48,20 @@ function delegatedEventHandler(this: boolean, event: Event): void {
 	const items = event.composedPath();
 	const {length} = items;
 
+	let cancelled = false;
 	let target = items[0];
+
+	// oxlint-disable-next-line typescript/unbound-method: using `.call` to ensure correct `this` context
+	const originalStopPropagation = event.stopPropagation;
+
+	event.stopPropagation = function () {
+		cancelled = true;
+
+		originalStopPropagation.call(event);
+	};
+
+	// Event is one and the same for all listeners, so stopping propagation should work the same, regardless of stop type
+	event.stopImmediatePropagation = event.stopPropagation.bind(event);
 
 	Object.defineProperties(event, {
 		currentTarget: {
@@ -72,7 +89,7 @@ function delegatedEventHandler(this: boolean, event: Event): void {
 		for (const listener of listeners) {
 			(listener as EventListener).call(item, event);
 
-			if (event.cancelBubble) {
+			if (cancelled) {
 				return;
 			}
 		}
@@ -115,7 +132,9 @@ export function removeDelegatedListener(
 	return true;
 }
 
-//
+// #endregion
+
+// #region Variables
 
 const DELEGATED = new Set<string>();
 
@@ -153,3 +172,5 @@ const EVENT_TYPES: Set<string> = new Set([
 const HANDLER_ACTIVE = delegatedEventHandler.bind(false);
 
 const HANDLER_PASSIVE = delegatedEventHandler.bind(true);
+
+// #endregion

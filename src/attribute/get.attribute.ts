@@ -1,5 +1,14 @@
+import {kebabCase} from '@oscarpalmer/atoms/string/case';
 import {getAttributeValue} from '../internal/get-value';
 import {isHTMLOrSVGElement} from '../internal/is';
+
+// #region Types
+
+type DataPrefixedName = `data-${string}`;
+
+// #endregion
+
+// #region Functions
 
 /**
  * Get the value of a specific attribute from an element
@@ -8,7 +17,7 @@ import {isHTMLOrSVGElement} from '../internal/is';
  * @param parse Parse value? _(defaults to `true`)_
  * @returns Attribute value _(or `undefined`)_
  */
-export function getAttribute(element: Element, name: `data-${string}`, parse?: boolean): unknown;
+export function getAttribute(element: Element, name: DataPrefixedName, parse?: boolean): unknown;
 
 /**
  * Get the value of a specific attribute from an element
@@ -20,7 +29,7 @@ export function getAttribute(element: Element, name: string): unknown;
 
 export function getAttribute(element: Element, name: string, parseValues?: boolean): unknown {
 	if (isHTMLOrSVGElement(element) && typeof name === 'string') {
-		return getAttributeValue(element, name, parseValues !== false);
+		return getAttributeValue(element, kebabCase(name), parseValues !== false);
 	}
 }
 
@@ -50,9 +59,11 @@ export function getAttributes<Key extends string>(
 		const name = names[index];
 
 		if (typeof name === 'string') {
-			attributes[name] = getAttributeValue(element, name, shouldParse);
+			attributes[name] = getAttributeValue(element, kebabCase(name), shouldParse);
 		}
 	}
 
 	return attributes;
 }
+
+// #endregion

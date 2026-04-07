@@ -3,6 +3,8 @@ import {getStyleValue} from './internal/get-value';
 import {isHTMLOrSVGElement} from './internal/is';
 import type {TextDirection} from './models';
 
+// #region Types
+
 export type StyleToggler = {
 	/**
 	 * Set the provided styles on the element
@@ -16,6 +18,10 @@ export type StyleToggler = {
 
 type Styles = Partial<Record<keyof CSSStyleDeclaration, unknown>>;
 
+// #endregion
+
+// #region Functions
+
 /**
  * Get a style from an element
  * @param element Element to get the style from
@@ -28,11 +34,9 @@ export function getStyle(
 	property: keyof CSSStyleDeclaration,
 	computed?: boolean,
 ): string | undefined {
-	if (!isHTMLOrSVGElement(element) || typeof property !== 'string') {
-		return;
+	if (isHTMLOrSVGElement(element) && typeof property === 'string') {
+		return getStyleValue(element, property, computed === true);
 	}
-
-	return getStyleValue(element, property, computed === true);
 }
 
 /**
@@ -67,25 +71,37 @@ export function getStyles<Property extends keyof CSSStyleDeclaration>(
 }
 
 /**
- * Get the text direction of an element
- * @param element Element to get the text direction from
- * @param computed Get the computed text direction? _(defaults to `false`)_
+ * Get the text direction of a node or element _(or document, if element is invalid)_
+ * @param node Node or element to get the text direction from
  * @returns Text direction
  */
-export function getTextDirection(element: Element, computed?: boolean): TextDirection {
-	if (!(element instanceof Element)) {
-		return undefined as never;
+export function getTextDirection(node: Element | Node): TextDirection;
+
+/**
+ * Get the text direction of the document
+ * @returns Text direction
+ */
+export function getTextDirection(): TextDirection;
+
+export function getTextDirection(node?: Element | Node): TextDirection {
+	let target: HTMLElement | SVGElement;
+
+	if (isHTMLOrSVGElement(node)) {
+		target = node;
+	} else {
+		target =
+			node instanceof Node
+				? (node.ownerDocument?.documentElement ?? document.documentElement)
+				: document.documentElement;
 	}
 
-	const direction = element.getAttribute(ATTRIBUTE_DIRECTION);
+	let {direction} = target.style;
 
-	if (direction != null && EXPRESSION_DIRECTION.test(direction)) {
-		return direction.toLowerCase() as TextDirection;
+	if (direction === '') {
+		direction = getStyleValue(target, PROPETY_DIRECTION, true)!;
 	}
 
-	const value = getStyleValue(element, 'direction', computed === true);
-
-	return value === 'rtl' ? value : 'ltr';
+	return direction === DIRECTION_RTL ? DIRECTION_RTL : DIRECTION_LTR;
 }
 
 /**
@@ -176,8 +192,14 @@ function updateStyleProperty(element: Element, key: string, value: unknown): voi
 	);
 }
 
-//
+// #endregion
 
-const ATTRIBUTE_DIRECTION = 'dir';
+// #region Variables
 
-const EXPRESSION_DIRECTION = /^(ltr|rtl)$/i;
+const DIRECTION_LTR = 'ltr';
+
+const DIRECTION_RTL = 'rtl';
+
+const PROPETY_DIRECTION = 'direction';
+
+// #endregion

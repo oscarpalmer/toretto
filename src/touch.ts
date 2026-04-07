@@ -1,3 +1,5 @@
+// #region Types
+
 type NavigatorWithMsMaxTouchPoints = Navigator & {
 	msMaxTouchPoints: number;
 };
@@ -17,7 +19,9 @@ type SupporsTouch = {
 	update(): boolean;
 };
 
-//
+// #endregion
+
+// #region Functions
 
 function getSupport(): boolean {
 	if (window == null || navigator == null) {
@@ -50,7 +54,9 @@ function getSupport(): boolean {
 	return false;
 }
 
-//
+// #endregion
+
+// #region Variables
 
 /**
  * Does the device support touch events?
@@ -78,4 +84,10 @@ const supportsTouch: SupporsTouch = (() => {
 	return instance;
 })();
 
+// #endregion
+
+// #region Exports
+
 export default supportsTouch;
+
+// #endregion

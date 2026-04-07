@@ -18,6 +18,7 @@ export * from './focusable';
 export * from './html/index';
 export * from './is';
 export * from './models';
+export * from './property/index';
 export * from './style';
 
 export {supportsTouch};

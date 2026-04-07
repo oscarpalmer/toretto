@@ -1,9 +1,11 @@
 import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {parse} from '@oscarpalmer/atoms/string';
-import {kebabCase} from '@oscarpalmer/atoms/string/case';
+import {camelCase, kebabCase} from '@oscarpalmer/atoms/string/case';
 import {setElementValues, updateElementValue} from './internal/element-value';
 import {EXPRESSION_DATA_PREFIX} from './internal/get-value';
 import {isHTMLOrSVGElement} from './internal/is';
+
+// #region Functions
 
 /**
  * Get a keyed data value from an element
@@ -32,16 +34,16 @@ export function getData(element: Element, keys: string | string[], parseValues?:
 		return;
 	}
 
-	const shouldParse = parseValues !== false;
+	const noParse = parseValues === false;
 
 	if (typeof keys === 'string') {
-		const value = element.dataset[keys];
+		const value = element.dataset[camelCase(keys)];
 
 		if (value === undefined) {
 			return;
 		}
 
-		return shouldParse ? parse(value) : value;
+		return noParse ? value : parse(value);
 	}
 
 	const {length} = keys;
@@ -50,12 +52,12 @@ export function getData(element: Element, keys: string | string[], parseValues?:
 
 	for (let index = 0; index < length; index += 1) {
 		const key = keys[index];
-		const value = element.dataset[key];
+		const value = element.dataset[camelCase(key)];
 
 		if (value == null) {
 			data[key] = undefined;
 		} else {
-			data[key] = shouldParse ? parse(value) : value;
+			data[key] = noParse ? value : parse(value);
 		}
 	}
 
@@ -63,7 +65,7 @@ export function getData(element: Element, keys: string | string[], parseValues?:
 }
 
 function getName(original: string): string {
-	return `${ATTRIBUTE_DATA_PREFIX}${kebabCase(original).replace(EXPRESSION_DATA_PREFIX, '')}`;
+	return `${ATTRIBUTE_DATA_PREFIX}${kebabCase(original.replace(EXPRESSION_DATA_PREFIX, ''))}`;
 }
 
 /**
@@ -90,13 +92,19 @@ function updateDataAttribute(element: Element, key: string, value: unknown): voi
 		element,
 		getName(key),
 		value,
+		// oxlint-disable-next-line typescript/unbound-method: using .call in `updateElementValue`
 		element.setAttribute,
+		// oxlint-disable-next-line typescript/unbound-method: using .call in `updateElementValue`
 		element.removeAttribute,
 		false,
 		true,
 	);
 }
 
-//
+// #endregion
+
+// #region Variables
 
 const ATTRIBUTE_DATA_PREFIX = 'data-';
+
+// #endregion

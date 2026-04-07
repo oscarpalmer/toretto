@@ -1,3 +1,5 @@
+// #region Functions
+
 /**
  * Is the value a child node?
  * @param value Value to check
@@ -36,7 +38,9 @@ export function isInDocument(node: Node, doc?: Document): boolean {
 		: node.ownerDocument === doc && doc.contains(node);
 }
 
-//
+// #endregion
+
+// #region Variables
 
 const CHILD_NODE_TYPES: Set<number> = new Set([
 	Node.ELEMENT_NODE,
@@ -46,6 +50,10 @@ const CHILD_NODE_TYPES: Set<number> = new Set([
 	Node.DOCUMENT_TYPE_NODE,
 ]);
 
-//
+// #endregion
+
+// #region Exports
 
 export {isEventTarget, isHTMLOrSVGElement} from './internal/is';
+
+// #endregion

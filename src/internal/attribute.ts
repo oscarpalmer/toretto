@@ -1,7 +1,11 @@
-import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {isPlainObject} from '@oscarpalmer/atoms/is';
+import type {PlainObject} from '@oscarpalmer/atoms/models';
+import {kebabCase} from '@oscarpalmer/atoms/string/case';
 import type {Attribute} from '../models';
 import {updateElementValue} from './element-value';
+import {updateProperty} from './property';
+
+// #region Functions
 
 function badAttributeHandler(name?: string, value?: string): boolean {
 	if (typeof name !== 'string' || name.trim().length === 0 || typeof value !== 'string') {
@@ -67,6 +71,10 @@ function handleAttribute(
 		value = second;
 	}
 
+	if (name != null) {
+		name = kebabCase(name);
+	}
+
 	if (decode && value != null) {
 		value = decodeAttribute(value);
 	}
@@ -112,49 +120,39 @@ export function updateAttribute(
 	element: Element,
 	name: string,
 	value: unknown,
-	dispatch?: unknown,
+	dispatch: boolean,
 ): void {
-	const normalizedName = name.toLowerCase();
+	const lowerCaseName = name.toLowerCase();
 
-	const isBoolean = booleanAttributesSet.has(normalizedName);
+	const isBoolean = booleanAttributesSet.has(lowerCaseName);
 
 	const next = isBoolean
 		? value === true ||
-			(typeof value === 'string' && (value === '' || value.toLowerCase() === normalizedName))
+			(typeof value === 'string' && (value === '' || value.toLowerCase() === lowerCaseName))
 		: value == null
 			? ''
 			: value;
 
-	if (name in element) {
-		updateProperty(element, normalizedName, next, dispatch);
+	if (isBoolean || dispatchedAttributes.has(name)) {
+		updateProperty(element, name, next, dispatch);
 	}
 
 	updateElementValue(
 		element,
 		name,
 		isBoolean ? (next ? '' : null) : value,
+		// oxlint-disable-next-line typescript/unbound-method: using `.call` in `updateElementValue`
 		element.setAttribute,
+		// oxlint-disable-next-line typescript/unbound-method: using `.call` in `updateElementValue`
 		element.removeAttribute,
 		isBoolean,
 		false,
 	);
 }
 
-function updateProperty(element: Element, name: string, value: unknown, dispatch?: unknown): void {
-	if (Object.is((element as unknown as PlainObject)[name], value)) {
-		return;
-	}
+// #endregion
 
-	(element as unknown as PlainObject)[name] = value;
-
-	const event = dispatch !== false && elementEvents[element.tagName]?.[name];
-
-	if (typeof event === 'string') {
-		element.dispatchEvent(new Event(event, {bubbles: true}));
-	}
-}
-
-//
+// #region Variables
 
 const EXPRESSION_CLOBBERED_NAME = /^(id|name)$/i;
 
@@ -206,15 +204,12 @@ export const booleanAttributes: readonly string[] = Object.freeze([
 	'selected',
 ]);
 
-const booleanAttributesSet = new Set(booleanAttributes);
+export const booleanAttributesSet = new Set(booleanAttributes);
 
-const elementEvents: Record<string, Record<string, string>> = {
-	DETAILS: {open: 'toggle'},
-	INPUT: {checked: 'change', value: 'input'},
-	SELECT: {value: 'change'},
-	TEXTAREA: {value: 'input'},
-};
+export const dispatchedAttributes = new Set(['checked', 'open', 'value']);
 
 const formElement = document.createElement('form');
 
 let textArea: HTMLTextAreaElement;
+
+// #endregion

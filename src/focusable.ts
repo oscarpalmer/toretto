@@ -1,5 +1,7 @@
 // Based on https://github.com/focus-trap/tabbable :-)
 
+// #region Types
+
 type ElementWithTabIndex = {
 	element: Element;
 	tabIndex: number;
@@ -9,7 +11,9 @@ type Filter = (item: ElementWithTabIndex) => boolean;
 
 type InertElement = Element & {inert: boolean};
 
-//
+// #endregion
+
+// #region Functions
 
 /**
  * Get a list of focusable elements within a parent element
@@ -230,7 +234,9 @@ function isValidElement(element: Element, filters: Filter[], tabbable: boolean):
 	return !filters.some(filter => filter(item));
 }
 
-//
+// #endregion
+
+// #region Variables
 
 const ATTRIBUTE_CONTENTEDITABLE = 'contenteditable';
 
@@ -294,3 +300,5 @@ const TABINDEX_BASE = 0;
 const TABINDEX_DEFAULT = -1;
 
 const TYPE_RADIO = 'radio';
+
+// #endregion
