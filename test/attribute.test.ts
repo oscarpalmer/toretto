@@ -400,4 +400,13 @@ test('getAttribute + setAttribute: allow/ignore', () => {
 
 	expect(Attribute.getAttribute(input, 'value')).toBe('test');
 	expect(Attribute.getAttribute(textarea, 'value')).toBe(undefined);
+
+	Attribute.setAttribute(input, 'value', {abc: 123});
+	Attribute.setAttribute(textarea, 'value', {abc: 123});
+
+	expect(input.value).toBe('{"abc":123}');
+	expect(textarea.value).toBe('{"abc":123}');
+
+	expect(Attribute.getAttribute(input, 'value')).toBe('{"abc":123}');
+	expect(Attribute.getAttribute(textarea, 'value')).toBe(undefined);
 });

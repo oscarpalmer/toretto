@@ -63,3 +63,13 @@ test('isInDocument', () =>
 			done();
 		}, 125);
 	}));
+
+test('isInputElement', () => {
+	for (let index = 0; index < length; index += 1) {
+		expect(Is.isInputElement(values[index])).toBe(false);
+	}
+
+	expect(Is.isInputElement(document.createElement('input'))).toBe(true);
+	expect(Is.isInputElement(document.createElement('select'))).toBe(true);
+	expect(Is.isInputElement(document.createElement('textarea'))).toBe(true);
+});

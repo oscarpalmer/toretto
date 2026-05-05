@@ -54,6 +54,6 @@ const CHILD_NODE_TYPES: Set<number> = new Set([
 
 // #region Exports
 
-export {isEventTarget, isHTMLOrSVGElement} from './internal/is';
+export {isEventTarget, isHTMLOrSVGElement, isInputElement} from './internal/is';
 
 // #endregion

@@ -24,4 +24,19 @@ export function isHTMLOrSVGElement(value: unknown): value is HTMLElement | SVGEl
 	return value instanceof HTMLElement || value instanceof SVGElement;
 }
 
+/**
+ * Is the value an input element? _(`<input>`, `<select>`, or `<textarea>`)_
+ * @param value Value to check
+ * @returns `true` if it's an input element, otherwise `false`
+ */
+export function isInputElement(
+	value: unknown,
+): value is HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement {
+	return (
+		value instanceof HTMLInputElement ||
+		value instanceof HTMLSelectElement ||
+		value instanceof HTMLTextAreaElement
+	);
+}
+
 // #endregion
