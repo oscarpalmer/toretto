@@ -24,7 +24,7 @@ export function updateProperty(
 	const event = dispatch && elementEvents[element.tagName]?.[property];
 
 	if (typeof event === 'string') {
-		element.dispatchEvent(new Event(event, {bubbles: true}));
+		element.dispatchEvent(new Event(event, {bubbles: true, cancelable: true}));
 	}
 }
 

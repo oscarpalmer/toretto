@@ -5,6 +5,8 @@ import type {TextDirection} from './models';
 
 // #region Types
 
+type CSSStyleValues = Variables & CSSStyleDeclaration;
+
 export type StyleToggler = {
 	/**
 	 * Set the provided styles on the element
@@ -16,7 +18,13 @@ export type StyleToggler = {
 	remove(): void;
 };
 
-type Styles = Partial<Record<keyof CSSStyleDeclaration, unknown>>;
+type Styles = Partial<Record<keyof CSSStyleValues, unknown>>;
+
+type Variables<
+	Value extends Record<string, string | undefined> = Record<string, string | undefined>,
+> = {
+	[property in keyof Value as `--${string & property}`]?: string | undefined;
+};
 
 // #endregion
 
@@ -31,7 +39,7 @@ type Styles = Partial<Record<keyof CSSStyleDeclaration, unknown>>;
  */
 export function getStyle(
 	element: Element,
-	property: keyof CSSStyleDeclaration,
+	property: keyof CSSStyleValues,
 	computed?: boolean,
 ): string | undefined {
 	if (isHTMLOrSVGElement(element) && typeof property === 'string') {
@@ -46,7 +54,7 @@ export function getStyle(
  * @param computed Get the computed styles? _(defaults to `false`)_
  * @returns Style values
  */
-export function getStyles<Property extends keyof CSSStyleDeclaration>(
+export function getStyles<Property extends keyof CSSStyleValues>(
 	element: Element,
 	properties: Property[],
 	computed?: boolean,
@@ -98,7 +106,7 @@ export function getTextDirection(node?: Element | Node): TextDirection {
 	let {direction} = target.style;
 
 	if (direction === '') {
-		direction = getStyleValue(target, PROPETY_DIRECTION, true)!;
+		direction = getStyleValue(target, PROPERTY_DIRECTION, true)!;
 	}
 
 	return direction === DIRECTION_RTL ? DIRECTION_RTL : DIRECTION_LTR;
@@ -110,12 +118,8 @@ export function getTextDirection(node?: Element | Node): TextDirection {
  * @param property Style name
  * @param value Style value
  */
-export function setStyle(
-	element: Element,
-	property: keyof CSSStyleDeclaration,
-	value?: unknown,
-): void {
-	setElementValues(element, property as string, value, null, updateStyleProperty);
+export function setStyle(element: Element, property: keyof CSSStyleValues, value?: unknown): void {
+	setElementValues(element, property as string, value, null, updateStyleProperty, true);
 }
 
 /**
@@ -124,7 +128,7 @@ export function setStyle(
  * @param styles Styles to set
  */
 export function setStyles(element: Element, styles: Styles): void {
-	setElementValues(element, styles as never, null, null, updateStyleProperty);
+	setElementValues(element, styles as never, null, null, updateStyleProperty, true);
 }
 
 /**
@@ -182,10 +186,22 @@ function updateStyleProperty(element: Element, key: string, value: unknown): voi
 		key,
 		value,
 		function (this: Element, property: string, style: unknown) {
-			(this as HTMLElement).style[property as never] = String(style);
+			if (property.startsWith(VARIABLE_PREFIX)) {
+				(this as HTMLElement).style.setProperty(property, String(style));
+			} else {
+				(this as HTMLElement).style[property as never] = String(style);
+			}
 		},
 		function (this: Element, property: string) {
-			(this as HTMLElement).style[property as never] = '';
+			if (property.startsWith(VARIABLE_PREFIX)) {
+				(this as HTMLElement).style.removeProperty(property);
+			} else {
+				(this as HTMLElement).style[property as never] = '';
+			}
+
+			if ((this as HTMLElement).getAttribute(ATTRIBUTE_STYLE) === '') {
+				(this as HTMLElement).removeAttribute(ATTRIBUTE_STYLE);
+			}
 		},
 		false,
 		false,
@@ -196,10 +212,14 @@ function updateStyleProperty(element: Element, key: string, value: unknown): voi
 
 // #region Variables
 
+const ATTRIBUTE_STYLE = 'style';
+
 const DIRECTION_LTR = 'ltr';
 
 const DIRECTION_RTL = 'rtl';
 
-const PROPETY_DIRECTION = 'direction';
+const PROPERTY_DIRECTION = 'direction';
+
+const VARIABLE_PREFIX = '--';
 
 // #endregion

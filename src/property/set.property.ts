@@ -46,13 +46,7 @@ export function setProperties<Target extends Element>(
 	const {length} = keys;
 
 	for (let index = 0; index < length; index += 1) {
-		const key = keys[index];
-
-		if (booleanAttributesSet.has(key.toLowerCase()) || dispatchedAttributes.has(key)) {
-			setAttribute(target, key as never, (properties as PlainObject)[key], shouldDispatch);
-		} else {
-			updateProperty(target, key, (properties as PlainObject)[key], shouldDispatch);
-		}
+		setPropertyValue(target, keys[index], (properties as PlainObject)[keys[index]], shouldDispatch);
 	}
 }
 
@@ -88,14 +82,21 @@ export function setProperty<Target extends Element, Property extends keyof SetPr
 	value: SetProperties<Target>[Property],
 	dispatch?: boolean,
 ): void {
-	if (!isHTMLOrSVGElement(target) || typeof property !== 'string') {
-		return;
+	if (isHTMLOrSVGElement(target) && typeof property === 'string') {
+		setPropertyValue(target, property, value, dispatch !== false);
 	}
+}
 
+function setPropertyValue(
+	element: Element,
+	property: string,
+	value: unknown,
+	dispatch: boolean,
+): void {
 	if (booleanAttributesSet.has(property.toLowerCase()) || dispatchedAttributes.has(property)) {
-		setAttribute(target, property as never, value, dispatch !== false);
+		setAttribute(element, property as never, value, dispatch);
 	} else {
-		updateProperty(target, property, value, dispatch !== false);
+		updateProperty(element, property, value, dispatch);
 	}
 }
 

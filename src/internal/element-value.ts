@@ -5,21 +5,26 @@ import {isAttribute} from './attribute';
 
 // #region Functions
 
+function normalizeKey(key: string, style?: boolean): string {
+	return style && key.startsWith(CSS_VARIABLE_PREFIX) ? key : kebabCase(key);
+}
+
 export function setElementValue(
 	element: Element,
 	first: unknown,
 	second: unknown,
 	third: unknown,
 	callback: (element: Element, key: string, value: unknown, dispatch: boolean) => void,
+	style?: boolean,
 ): void {
 	if (!isHTMLOrSVGElement(element)) {
 		return;
 	}
 
 	if (typeof first === 'string') {
-		setElementValues(element, first, second, third, callback);
+		setElementValues(element, first, second, third, callback, style);
 	} else if (isAttribute(first)) {
-		setElementValues(element, first.name, first.value, third, callback);
+		setElementValues(element, first.name, first.value, third, callback, style);
 	}
 }
 
@@ -29,6 +34,7 @@ export function setElementValues(
 	second: unknown,
 	third: unknown,
 	callback: (element: Element, key: string, value: unknown, dispatch: boolean) => void,
+	style?: boolean,
 ): void {
 	if (!isHTMLOrSVGElement(element)) {
 		return;
@@ -37,7 +43,7 @@ export function setElementValues(
 	const dispatch = third !== false;
 
 	if (typeof first === 'string') {
-		callback(element, kebabCase(first), second, dispatch);
+		callback(element, normalizeKey(first, style), second, dispatch);
 
 		return;
 	}
@@ -55,7 +61,7 @@ export function setElementValues(
 		const entry = entries[index];
 
 		if (typeof entry === 'object' && typeof entry?.name === 'string') {
-			callback(element, kebabCase(entry.name), entry.value, dispatch);
+			callback(element, normalizeKey(entry.name, style), entry.value, dispatch);
 		}
 	}
 }
@@ -77,3 +83,9 @@ export function updateElementValue(
 }
 
 // #endregion Functions
+
+// #region Variables
+
+const CSS_VARIABLE_PREFIX = '--';
+
+// #endregion

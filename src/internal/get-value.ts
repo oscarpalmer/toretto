@@ -22,6 +22,10 @@ export function getStyleValue(
 	property: string,
 	computed: boolean,
 ): string | undefined {
+	if (property.startsWith(CSS_VARIABLE_PREFIX)) {
+		return (element as HTMLElement).style.getPropertyValue(property);
+	}
+
 	const name = camelCase(property);
 
 	return computed
@@ -34,5 +38,7 @@ export function getStyleValue(
 // #region Variables
 
 export const EXPRESSION_DATA_PREFIX = /^data-/i;
+
+const CSS_VARIABLE_PREFIX = '--';
 
 // #endregion

@@ -9,7 +9,10 @@ test('getStyle(s) & setStyle(s)', () =>
 
 		Style.setStyle(div, 'color', 'red');
 
+		Style.setStyle(div, '--custom-1', 'customValue');
+
 		Style.setStyles(div, {
+			'--custom-2': 'anotherCustomValue',
 			backgroundColor: 'green',
 			position: 'absolute',
 		});
@@ -20,6 +23,8 @@ test('getStyle(s) & setStyle(s)', () =>
 		setTimeout(() => {
 			expect(
 				Style.getStyles(div, [
+					'--custom-1',
+					'--custom-2',
 					'color',
 					'display',
 					'backgroundColor',
@@ -28,6 +33,8 @@ test('getStyle(s) & setStyle(s)', () =>
 					(() => {}) as never,
 				]),
 			).toEqual({
+				'--custom-1': 'customValue',
+				'--custom-2': 'anotherCustomValue',
 				color: 'red',
 				display: 'none',
 				backgroundColor: 'green',
@@ -37,20 +44,33 @@ test('getStyle(s) & setStyle(s)', () =>
 			expect(
 				Style.getStyles(
 					div,
-					['color', 'display', 'backgroundColor', 'position', 123 as never, (() => {}) as never],
+					[
+						'--custom-1',
+						'--custom-2',
+						'color',
+						'display',
+						'backgroundColor',
+						'position',
+						123 as never,
+						(() => {}) as never,
+					],
 					true,
 				),
 			).toEqual({
+				'--custom-1': 'customValue',
+				'--custom-2': 'anotherCustomValue',
 				color: 'rgb(255, 0, 0)',
 				display: 'none',
 				backgroundColor: 'rgb(0, 128, 0)',
 				position: 'absolute',
 			});
 
+			Style.setStyle(div, '--custom-1');
 			Style.setStyle(div, 'display');
 		}, 125);
 
 		setTimeout(() => {
+			expect(Style.getStyle(div, '--custom-1')).toBe('');
 			expect(Style.getStyle(div, 'display')).toBe('');
 
 			done();
