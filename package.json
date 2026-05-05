@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/toretto",
-	"version": "0.43.0",
+	"version": "0.44.0",
 	"description": "A collection of badass DOM utilities.",
 	"keywords": [
 		"dom",

@@ -1,5 +1,6 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
 import type {PlainObject} from '@oscarpalmer/atoms/models';
+import {getString} from '@oscarpalmer/atoms/string';
 import {kebabCase} from '@oscarpalmer/atoms/string/case';
 import type {Attribute} from '../models';
 import {updateElementValue} from './element-value';
@@ -65,7 +66,7 @@ function handleAttribute(
 
 	if (isAttribute(first)) {
 		name = first.name;
-		value = String(first.value);
+		value = getString(first.value);
 	} else if (typeof first === 'string' && typeof second === 'string') {
 		name = first;
 		value = second;

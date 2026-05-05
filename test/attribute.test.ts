@@ -381,3 +381,23 @@ test('isInvalidBooleanAttribute', () => {
 
 	expect(Attribute.isInvalidBooleanAttribute({name: '', value: 123 as never})).toBe(true);
 });
+
+test('getAttribute + setAttribute: allow/ignore', () => {
+	const input = document.createElement('input');
+	const textarea = document.createElement('textarea');
+
+	expect(input.value).toBe('');
+	expect(textarea.value).toBe('');
+
+	expect(Attribute.getAttribute(input, 'value')).toBe(undefined);
+	expect(Attribute.getAttribute(textarea, 'value')).toBe(undefined);
+
+	Attribute.setAttribute(input, 'value', 'test');
+	Attribute.setAttribute(textarea, 'value', 'test');
+
+	expect(input.value).toBe('test');
+	expect(textarea.value).toBe('test');
+
+	expect(Attribute.getAttribute(input, 'value')).toBe('test');
+	expect(Attribute.getAttribute(textarea, 'value')).toBe(undefined);
+});

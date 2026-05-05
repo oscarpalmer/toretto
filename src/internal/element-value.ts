@@ -1,9 +1,18 @@
 import {isNullableOrWhitespace} from '@oscarpalmer/atoms/is';
+import {getString} from '@oscarpalmer/atoms/string';
 import {kebabCase} from '@oscarpalmer/atoms/string/case';
 import {isHTMLOrSVGElement} from '../is';
 import {isAttribute} from './attribute';
 
 // #region Functions
+
+function ignoreSetAttribute(element: Element, name: string): boolean {
+	if (element instanceof HTMLTextAreaElement && name === 'value') {
+		return true;
+	}
+
+	return false;
+}
 
 function normalizeKey(key: string, style?: boolean): string {
 	return style && key.startsWith(CSS_VARIABLE_PREFIX) ? key : kebabCase(key);
@@ -77,8 +86,8 @@ export function updateElementValue(
 ): void {
 	if (isBoolean ? value == null : isNullableOrWhitespace(value)) {
 		remove.call(element, key);
-	} else {
-		set.call(element, key, json ? JSON.stringify(value) : String(value));
+	} else if (!ignoreSetAttribute(element, key)) {
+		set.call(element, key, json ? JSON.stringify(value) : getString(value));
 	}
 }
 

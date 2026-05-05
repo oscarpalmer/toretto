@@ -1,3 +1,4 @@
+import {getString} from '@oscarpalmer/atoms/string';
 import {setElementValues, updateElementValue} from './internal/element-value';
 import {getStyleValue} from './internal/get-value';
 import {isHTMLOrSVGElement} from './internal/is';
@@ -187,9 +188,9 @@ function updateStyleProperty(element: Element, key: string, value: unknown): voi
 		value,
 		function (this: Element, property: string, style: unknown) {
 			if (property.startsWith(VARIABLE_PREFIX)) {
-				(this as HTMLElement).style.setProperty(property, String(style));
+				(this as HTMLElement).style.setProperty(property, getString(style));
 			} else {
-				(this as HTMLElement).style[property as never] = String(style);
+				(this as HTMLElement).style[property as never] = getString(style);
 			}
 		},
 		function (this: Element, property: string) {
