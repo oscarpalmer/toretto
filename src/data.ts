@@ -9,6 +9,7 @@ import {isHTMLOrSVGElement} from './internal/is';
 
 /**
  * Get a keyed data value from an element
+ *
  * @param element Element to get data from
  * @param key Data key
  * @param parse Parse values? _(defaults to `true`)_
@@ -18,6 +19,7 @@ export function getData(element: Element, key: string, parse?: boolean): unknown
 
 /**
  * Get keyed data values from an element
+ *
  * @param element Element to get data from
  * @param keys Keys of the data values to get
  * @param parse Parse values? _(defaults to `true`)_
@@ -70,6 +72,7 @@ function getName(original: string): string {
 
 /**
  * Set data values on an element
+ *
  * @param element Element to set data on
  * @param data Data to set
  */
@@ -77,6 +80,7 @@ export function setData(element: Element, data: PlainObject): void;
 
 /**
  * Set a data value on an element
+ *
  * @param element Element to set data on
  * @param key Data key
  * @param value Data value

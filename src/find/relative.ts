@@ -5,6 +5,7 @@
  *
  * - If no match is found, `null` is returned
  * - _(If you want to search upwards, downwards, and sideways, use {@link findRelatives})_
+ *
  * @param origin Origin to start from
  * @param tagName Tag name to match
  * @returns Found ancestor or `null`
@@ -19,6 +20,7 @@ export function findAncestor<TagName extends keyof HTMLElementTagNameMap>(
  *
  * - If no match is found, `null` is returned
  * - _(If you want to search upwards, downwards, and sideways, use {@link findRelatives})_
+ *
  * @param origin Origin to start from
  * @param selector Selector to match
  * @returns Found ancestor or `null`
@@ -71,6 +73,7 @@ export function findAncestor(
  * Finds the closest elements to the origin element that matches the tag name
  *
  * Traverses up, down, and sideways in the _DOM_-tree. _(If you only want to traverse up, use {@link findAncestor})_
+ *
  * @param origin Element to start from
  * @param tagName Tag name to match
  * @param context Context to search within
@@ -86,6 +89,7 @@ export function findRelatives<TagName extends keyof HTMLElementTagNameMap>(
  * Finds the closest elements to the origin element that matches the selector
  *
  * Traverses up, down, and sideways in the _DOM_-tree. _(If you only want to traverse up, use {@link findAncestor})_
+ *
  * @param origin Element to start from
  * @param selector Selector to match
  * @param context Context to search within
@@ -144,6 +148,7 @@ export function findRelatives(
 
 /**
  * Get the distance between two elements _(i.e., the amount of nodes of between them)_
+ *
  * @param origin Origin element
  * @param target Target element
  * @returns Distance between elements, or `-1` if distance cannot be calculated

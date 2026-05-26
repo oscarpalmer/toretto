@@ -11,10 +11,14 @@ type SupporsTouch = {
 	readonly value: boolean;
 	/**
 	 * Are touch events supported?
+	 *
+	 * @returns `true` if touch events are supported, otherwise `false`
 	 */
 	get(): boolean;
 	/**
 	 * Re-evaluate if touch events are supported
+	 *
+	 * @returns `true` if touch events are supported, otherwise `false`
 	 */
 	update(): boolean;
 };

@@ -17,6 +17,7 @@ type Styles = Partial<Record<keyof CSSStyleDeclaration, unknown>>;
 
 /**
  * Creates an HTML element with the specified tag name together with optional properties, attributes, and styles
+ *
  * @param tag Tag name
  * @param properties Element properties
  * @param attributes Element attributes
@@ -32,6 +33,7 @@ export function createElement<TagName extends keyof HTMLElementTagNameMap>(
 
 /**
  * Creates an HTML element with the specified tag name together with optional properties, attributes, and styles
+ *
  * @param tag Tag name
  * @param properties Element properties
  * @param attributes Element attributes

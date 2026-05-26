@@ -25,6 +25,17 @@ test('isChildNode', () => {
 	}
 });
 
+test('isEventPosition', () => {
+	const position = {x: 0, y: 0};
+
+	expect(Is.isEventPosition(position)).toBe(true);
+	expect(Is.isEventPosition({x: '0', y: 0})).toBe(false);
+	expect(Is.isEventPosition({x: 0, y: '0'})).toBe(false);
+	expect(Is.isEventPosition({x: 0})).toBe(false);
+	expect(Is.isEventPosition({y: 0})).toBe(false);
+	expect(Is.isEventPosition({})).toBe(false);
+});
+
 test('isHTMLOrSVGElement', () => {
 	for (let index = 0; index < length; index += 1) {
 		expect(Is.isHTMLOrSVGElement(values[index])).toBe(index >= 11);

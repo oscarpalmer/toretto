@@ -1,8 +1,9 @@
 import {noop} from '@oscarpalmer/atoms/function';
 import {isPlainObject} from '@oscarpalmer/atoms/is';
+import type {EventPosition} from '@oscarpalmer/atoms/models';
 import {getBoolean} from '../internal/get-value';
 import {isEventTarget} from '../internal/is';
-import type {CustomEventListener, EventPosition, RemovableEventListener} from '../models';
+import type {CustomEventListener, RemovableEventListener} from '../models';
 import {
 	addDelegatedListener,
 	type EventTargetWithListeners,
@@ -55,6 +56,7 @@ function createEventOptions(options?: AddEventListenerOptions): EventOptions {
 
 /**
  * Dispatch an event for a target
+ *
  * @param target Event target
  * @param type Type of event
  * @param options Options for event _(bubbles and is cancelable by default)_
@@ -67,6 +69,7 @@ export function dispatch<Type extends keyof HTMLElementEventMap>(
 
 /**
  * Dispatch an event for a target
+ *
  * @param target Event target
  * @param type Type of event
  * @param options Options for event _(bubbles and is cancelable by default)_
@@ -85,6 +88,7 @@ export function dispatch<Type extends keyof HTMLElementEventMap>(
 
 /**
  * Get the X- and Y-coordinates from a pointer event
+ *
  * @param event Pointer event
  * @returns X- and Y-coordinates
  */
@@ -105,6 +109,7 @@ export function getPosition(event: MouseEvent | TouchEvent): EventPosition | und
 
 /**
  * Remove an event listener
+ *
  * @param target Event target
  * @param type Type of event
  * @param listener Event listener
@@ -119,6 +124,7 @@ export function off(
 
 /**
  * Remove an event listener
+ *
  * @param target Event target
  * @param type Type of event
  * @param listener Event listener
@@ -133,6 +139,7 @@ export function off(
 
 /**
  * Remove an event listener
+ *
  * @param target Event target
  * @param type Type of event
  * @param listener Event listener
@@ -161,6 +168,7 @@ export function off(
 
 /**
  * Add an event listener
+ *
  * @param target Event target
  * @param type Type of event
  * @param listener Event listener
@@ -175,6 +183,7 @@ export function on<Type extends keyof HTMLElementEventMap>(
 
 /**
  * Add an event listener
+ *
  * @param target Event target
  * @param type Type of event
  * @param listener Event listener

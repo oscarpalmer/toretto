@@ -27,6 +27,7 @@ type SetProperties<Target extends Element> = {
  * Set the values of one or more properties on an element
  *
  * Also updates attributes for boolean/dispatchable properties, and if `dispatch` is `true`, will dispatch events for dispatchable properties
+ *
  * @param target Target element
  * @param properties Properties to set
  * @param dispatch Dispatch events for properties? _(defaults to `true`)_
@@ -52,6 +53,7 @@ export function setProperties<Target extends Element>(
 
 /**
  * Set the value for a dispatchable property on an element
+ *
  * @param target Target element
  * @param property Property to set
  * @param value Value to set
@@ -66,6 +68,7 @@ export function setProperty<Target extends Element, Property extends DispatchedA
 
 /**
  * Set the value for a property on an element
+ *
  * @param target Target element
  * @param property Property to set
  * @param value Value to set

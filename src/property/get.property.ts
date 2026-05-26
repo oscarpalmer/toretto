@@ -16,6 +16,7 @@ type GetProperties<Target extends Element> = {
 
 /**
  * Get the values of one or more properties on an element
+ *
  * @param target Target element
  * @param properties Properties to get
  * @returns Property values
@@ -45,6 +46,7 @@ export function getProperties<Target extends Element, Property extends keyof Get
 
 /**
  * Get the value of a property on an element
+ *
  * @param target Target element
  * @param property Property to get
  * @returns Property value

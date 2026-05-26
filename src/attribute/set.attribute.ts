@@ -14,6 +14,7 @@ export type DispatchedAttributeName = 'checked' | 'open' | 'value';
  * Set an attribute on an element
  *
  * _(Or remove it, if value is `null` or `undefined`)_
+ *
  * @param element Element for attribute
  * @param name Attribute name
  * @param value Attribute value
@@ -30,6 +31,7 @@ export function setAttribute(
  * Set an attribute on an element
  *
  * _(Or remove it, if value is `null` or `undefined`)_
+ *
  * @param element Element for attribute
  * @param name Attribute name
  * @param value Attribute value
@@ -40,6 +42,7 @@ export function setAttribute(element: Element, name: string, value?: unknown): v
  * Set an attribute on an element
  *
  * _(Or remove it, if value is `null` or `undefined`)_
+ *
  * @param element Element for attribute
  * @param attribute Attribute to set
  * @param dispatch Dispatch event for attribute? _(defaults to `true`)_
@@ -63,6 +66,7 @@ export function setAttribute(
  * Set one or more attributes on an element
  *
  * _(Or remove them, if their value is `null` or `undefined`)_
+ *
  * @param element Element for attributes
  * @param attributes Attributes to set
  * @param dispatch Dispatch events for relevant attributes? _(defaults to `true`)_
@@ -77,6 +81,7 @@ export function setAttributes(
  * Set one or more attributes on an element
  *
  * _(Or remove them, if their value is `null` or `undefined`)_
+ *
  * @param element Element for attributes
  * @param attributes Attributes to set
  * @param dispatch Dispatch events for relevant attributes? _(defaults to `true`)_

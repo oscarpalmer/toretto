@@ -175,12 +175,14 @@ function hasNodes(value: unknown): value is HTMLCollection | NodeList | Node[] {
 
 /**
  * Create nodes from a template string
+ *
  * @returns Created nodes
  */
 export function html(strings: TemplateStringsArray, ...values: unknown[]): Node[];
 
 /**
  * Create nodes from an HTML string or a template element
+ *
  * @param value HTML string or id for a template element
  * @param options Options for creating nodes
  * @returns Created nodes
@@ -189,6 +191,7 @@ export function html(value: string, options?: HtmlOptions): Node[];
 
 /**
  * Create nodes from a template element
+ *
  * @param template Template element
  * @param options Options for creating nodes
  * @returns Created nodes
@@ -214,6 +217,7 @@ html.clear = (): void => {
 
 /**
  * Remove cached template element for an HTML string or id
+ *
  * @param template HTML string or id for a template element
  */
 html.remove = (template: string): void => {

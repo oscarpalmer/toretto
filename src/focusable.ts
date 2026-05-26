@@ -17,6 +17,7 @@ type InertElement = Element & {inert: boolean};
 
 /**
  * Get a list of focusable elements within a parent element
+ *
  * @param parent Parent element
  * @returns Focusable elements
  */
@@ -33,6 +34,7 @@ function getItem(element: Element, tabbable: boolean): ElementWithTabIndex {
 
 /**
  * Get a list of tabbable elements within a parent element
+ *
  * @param parent Parent element
  * @returns Tabbable elements
  */
@@ -137,6 +139,7 @@ function isEditable(element: Element): boolean {
 
 /**
  * Is the element focusable?
+ *
  * @param element Element to check
  * @returns `true` if focusable, otherwise `false`
  */
@@ -221,6 +224,7 @@ function isSummarised(item: ElementWithTabIndex): boolean {
 
 /**
  * Is the element tabbable?
+ *
  * @param element Element to check
  * @returns `true` if tabbable, otherwise `false`
  */

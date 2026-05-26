@@ -12,14 +12,6 @@ export type Attribute = {
 export type CustomEventListener = (event: CustomEvent) => void;
 
 /**
- * The position of an event
- */
-export type EventPosition = {
-	x: number;
-	y: number;
-};
-
-/**
  * Event listener that can be removed
  */
 export type RemovableEventListener = () => void;

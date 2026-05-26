@@ -21,6 +21,7 @@ export function getAttribute(element: Element, name: DataPrefixedName, parse?: b
 
 /**
  * Get the value of a specific attribute from an element
+ *
  * @param element Element to get attribute from
  * @param name Attribute name
  * @returns Attribute value _(or `undefined`)_
@@ -35,6 +36,7 @@ export function getAttribute(element: Element, name: string, parseValues?: boole
 
 /**
  * Get specific attributes from an element
+ *
  * @param element Element to get attributes from
  * @param names Attribute names
  * @param parseData Parse data values? _(defaults to `true`)_

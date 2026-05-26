@@ -2,6 +2,7 @@
 
 /**
  * Is the value a child node?
+ *
  * @param value Value to check
  * @returns `true` if it's a child node, otherwise `false`
  */
@@ -11,6 +12,7 @@ export function isChildNode(value: unknown): value is ChildNode {
 
 /**
  * Is the node inside a document?
+ *
  * @param node Node to check
  * @returns `true` if it's inside a document, otherwise `false`
  */
@@ -18,6 +20,7 @@ export function isInDocument(node: Node): boolean;
 
 /**
  * Is the node inside a specific document?
+ *
  * @param node Node to check
  * @param document Document to check within
  * @returns `true` if it's inside the document, otherwise `false`
@@ -54,6 +57,6 @@ const CHILD_NODE_TYPES: Set<number> = new Set([
 
 // #region Exports
 
-export {isEventTarget, isHTMLOrSVGElement, isInputElement} from './internal/is';
+export {isEventPosition, isEventTarget, isHTMLOrSVGElement, isInputElement} from './internal/is';
 
 // #endregion

@@ -16,6 +16,10 @@ afterAll(() => {
 	document.body.innerHTML = '';
 });
 
+test('getElementFromPosition', () => {
+	expect(Find.getElementFromPosition({x: 0, y: 0})).toEqual([]);
+});
+
 test('getElementUnderPointer', () => {
 	// TODO: find a way to test hover, etc.
 });

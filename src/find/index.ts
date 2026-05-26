@@ -1,10 +1,12 @@
-import type {PlainObject} from '@oscarpalmer/atoms/models';
+import type {EventPosition, PlainObject} from '@oscarpalmer/atoms/models';
+import {isEventPosition} from '../internal/is';
 import type {Selector} from '../models';
 
 // #region Functions
 
 /**
  * Find the first element that matches the tag name
+ *
  * @param tagName Tag name of element to find
  * @param context Context to search within _(defaults to `document`)_
  * @returns Found element or `null`
@@ -16,6 +18,7 @@ export function findElement<TagName extends keyof HTMLElementTagNameMap>(
 
 /**
  * Find the first element that matches the selector
+ *
  * @param selector Selector to find element for
  * @param context Context to search within _(defaults to `document`)_
  * @returns Found element or `null`
@@ -120,6 +123,7 @@ function findElementOrElementsFromNodes(
 
 /**
  * Find elements that match the selector
+ *
  * @param tagName tagName to find elements for
  * @param context Context to search within _(defaults to `document`)_
  * @returns Found elements
@@ -131,6 +135,7 @@ export function findElements(
 
 /**
  * Find elements that match the selector
+ *
  * @param selector Selector to find elements for
  * @param context Context to search within _(defaults to `document`)_
  * @returns Found elements
@@ -142,10 +147,64 @@ export function findElements(selector: Selector, context?: Selector | null): Ele
 }
 
 /**
+ * Get elements from an event position
+ *
+ * @param position Event position
+ * @returns Elements at the event position
+ */
+export function getElementFromPosition(position: EventPosition): Element[] {
+	if (!isEventPosition(position) || typeof document.elementFromPoint !== 'function') {
+		return [];
+	}
+
+	const {x, y} = position;
+
+	const elements: Element[] = [];
+	const events: {value: string; priority: string}[] = [];
+
+	let current: Element | null;
+
+	while (true) {
+		current = document.elementFromPoint(x, y);
+
+		if (current == null || elements.indexOf(current) !== -1) {
+			break;
+		}
+
+		if (!(current instanceof HTMLElement)) {
+			continue;
+		}
+
+		elements.push(current);
+
+		events.push({
+			value: current.style.getPropertyValue(STYLE_POINTER_EVENTS),
+			priority: current.style.getPropertyPriority(STYLE_POINTER_EVENTS),
+		});
+
+		current.style.setProperty(STYLE_POINTER_EVENTS, STYLE_NONE, STYLE_IMPORTANT);
+	}
+
+	const {length} = elements;
+
+	for (let index = 0; index < length; index += 1) {
+		const element = elements[index];
+		const event = events[index];
+
+		if (element instanceof HTMLElement) {
+			element.style.setProperty(STYLE_POINTER_EVENTS, event.value ?? '', event.priority);
+		}
+	}
+
+	return elements;
+}
+
+/**
  * Get the most specific element under the pointer
  *
  * - Ignores elements with `pointer-events: none` and `visibility: hidden`
  * - _(If `skipIgnore` is `true`, no elements are ignored)_
+ *
  * @param skipIgnore Skip ignored elements?
  * @returns Found element or `null`
  */
@@ -192,7 +251,11 @@ const QUERY_SELECTOR_SINGLE = 'querySelector';
 
 const STYLE_HIDDEN = 'hidden';
 
+const STYLE_IMPORTANT = 'important';
+
 const STYLE_NONE = 'none';
+
+const STYLE_POINTER_EVENTS = 'pointer-events';
 
 const SUFFIX_HOVER = ':hover';
 

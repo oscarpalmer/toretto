@@ -1,7 +1,25 @@
+import type {EventPosition} from '@oscarpalmer/atoms/models';
+
 // #region Functions
 
 /**
+ * Is the value an event position?
+ *
+ * @param value Value to check
+ * @returns `true` if it's an event position, otherwise `false`
+ */
+export function isEventPosition(value: unknown): value is EventPosition {
+	return (
+		typeof value === 'object' &&
+		value != null &&
+		typeof (value as EventPosition).x === 'number' &&
+		typeof (value as EventPosition).y === 'number'
+	);
+}
+
+/**
  * Is the value an event target?
+ *
  * @param value Value to check
  * @returns `true` if it's an event target, otherwise `false`
  */
@@ -17,6 +35,7 @@ export function isEventTarget(value: unknown): value is EventTarget {
 
 /**
  * Is the value an HTML or SVG element?
+ *
  * @param value Value to check
  * @returns `true` if it's an HTML or SVG element, otherwise `false`
  */
@@ -26,6 +45,7 @@ export function isHTMLOrSVGElement(value: unknown): value is HTMLElement | SVGEl
 
 /**
  * Is the value an input element? _(`<input>`, `<select>`, or `<textarea>`)_
+ *
  * @param value Value to check
  * @returns `true` if it's an input element, otherwise `false`
  */

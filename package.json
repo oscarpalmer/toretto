@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/toretto",
-	"version": "0.45.0",
+	"version": "0.46.0",
 	"description": "A collection of badass DOM utilities.",
 	"keywords": [
 		"dom",
@@ -86,15 +86,15 @@
 		"test:leak": "npx vp test run --detect-async-leaks --coverage"
 	},
 	"dependencies": {
-		"@oscarpalmer/atoms": "^0.185"
+		"@oscarpalmer/atoms": "^0.187.2"
 	},
 	"devDependencies": {
-		"@oxlint/plugins": "^1.62",
-		"@types/node": "^25.6",
+		"@oxlint/plugins": "^1.67",
+		"@types/node": "^25.9",
 		"@vitest/coverage-istanbul": "^4.1",
 		"jsdom": "^29.1",
-		"tsdown": "^0.21",
-		"typescript": "^5.9",
+		"tsdown": "^0.22",
+		"typescript": "^6",
 		"vite": "npm:@voidzero-dev/vite-plus-core@latest",
 		"vite-plus": "latest",
 		"vitest": "npm:@voidzero-dev/vite-plus-test@latest"

@@ -33,6 +33,7 @@ type Variables<
 
 /**
  * Get a style from an element
+ *
  * @param element Element to get the style from
  * @param property Style name
  * @param computed Get the computed style? _(defaults to `false`)_
@@ -50,6 +51,7 @@ export function getStyle(
 
 /**
  * Get styles from an element
+ *
  * @param element Element to get the styles from
  * @param properties Styles to get
  * @param computed Get the computed styles? _(defaults to `false`)_
@@ -81,6 +83,7 @@ export function getStyles<Property extends keyof CSSStyleValues>(
 
 /**
  * Get the text direction of a node or element _(or document, if element is invalid)_
+ *
  * @param node Node or element to get the text direction from
  * @returns Text direction
  */
@@ -88,6 +91,7 @@ export function getTextDirection(node: Element | Node): TextDirection;
 
 /**
  * Get the text direction of the document
+ *
  * @returns Text direction
  */
 export function getTextDirection(): TextDirection;
@@ -115,6 +119,7 @@ export function getTextDirection(node?: Element | Node): TextDirection {
 
 /**
  * Set a style on an element
+ *
  * @param element Element to set the style on
  * @param property Style name
  * @param value Style value
@@ -125,6 +130,7 @@ export function setStyle(element: Element, property: keyof CSSStyleValues, value
 
 /**
  * Set styles on an element
+ *
  * @param element Element to set the styles on
  * @param styles Styles to set
  */
@@ -134,6 +140,7 @@ export function setStyles(element: Element, styles: Styles): void {
 
 /**
  * Toggle styles for an element
+ *
  * @param element Element to style
  * @param styles Styles to be set or removed
  * @returns Style toggler
