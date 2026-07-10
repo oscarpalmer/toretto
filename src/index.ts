@@ -1,5 +1,6 @@
 import supportsTouch from './touch';
 
+export * from './aria';
 export {
 	booleanAttributes,
 	getAttribute,

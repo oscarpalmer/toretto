@@ -1,7 +1,7 @@
 import type {Primitive} from '@oscarpalmer/atoms/models';
 import {setAttributes} from './attribute';
-import {setStyles} from './style';
 import {setProperties} from './property';
+import {setStyles} from './style';
 
 // #region Types
 
@@ -16,7 +16,7 @@ type Styles = Partial<Record<keyof CSSStyleDeclaration, unknown>>;
 // #region Functions
 
 /**
- * Creates an HTML element with the specified tag name together with optional properties, attributes, and styles
+ * Creates an _HTML_ element with the specified tag name together with optional properties, attributes, and styles
  *
  * @param tag Tag name
  * @param properties Element properties
@@ -32,7 +32,7 @@ export function createElement<TagName extends keyof HTMLElementTagNameMap>(
 ): HTMLElementTagNameMap[TagName];
 
 /**
- * Creates an HTML element with the specified tag name together with optional properties, attributes, and styles
+ * Creates an _HTML_ element with the specified tag name together with optional properties, attributes, and styles
  *
  * @param tag Tag name
  * @param properties Element properties

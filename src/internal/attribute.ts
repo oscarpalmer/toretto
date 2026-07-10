@@ -142,9 +142,11 @@ export function updateAttribute(
 		element,
 		name,
 		isBoolean ? (next ? '' : null) : value,
-		// oxlint-disable-next-line typescript/unbound-method: using `.call` in `updateElementValue`
+		// Using `.call` in `updateElementValue`
+		// oxlint-disable-next-line typescript/unbound-method
 		element.setAttribute,
-		// oxlint-disable-next-line typescript/unbound-method: using `.call` in `updateElementValue`
+		// Using `.call` in `updateElementValue`
+		// oxlint-disable-next-line typescript/unbound-method
 		element.removeAttribute,
 		isBoolean,
 		false,

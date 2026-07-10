@@ -34,10 +34,10 @@ export function isEventTarget(value: unknown): value is EventTarget {
 }
 
 /**
- * Is the value an HTML or SVG element?
+ * Is the value an _HTML_ or _SVG_ element?
  *
  * @param value Value to check
- * @returns `true` if it's an HTML or SVG element, otherwise `false`
+ * @returns `true` if it's an _HTML_ or _SVG_ element, otherwise `false`
  */
 export function isHTMLOrSVGElement(value: unknown): value is HTMLElement | SVGElement {
 	return value instanceof HTMLElement || value instanceof SVGElement;

@@ -1,7 +1,6 @@
 import {isNullableOrWhitespace} from '@oscarpalmer/atoms/is';
 import {getString} from '@oscarpalmer/atoms/string';
 import {kebabCase} from '@oscarpalmer/atoms/string/case';
-import {isHTMLOrSVGElement} from '../is';
 import {isAttribute} from './attribute';
 
 // #region Functions
@@ -26,7 +25,7 @@ export function setElementValue(
 	callback: (element: Element, key: string, value: unknown, dispatch: boolean) => void,
 	style?: boolean,
 ): void {
-	if (!isHTMLOrSVGElement(element)) {
+	if (!(element instanceof Element)) {
 		return;
 	}
 
@@ -45,7 +44,7 @@ export function setElementValues(
 	callback: (element: Element, key: string, value: unknown, dispatch: boolean) => void,
 	style?: boolean,
 ): void {
-	if (!isHTMLOrSVGElement(element)) {
+	if (!(element instanceof Element)) {
 		return;
 	}
 

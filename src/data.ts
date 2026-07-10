@@ -3,7 +3,6 @@ import {parse} from '@oscarpalmer/atoms/string';
 import {camelCase, kebabCase} from '@oscarpalmer/atoms/string/case';
 import {setElementValues, updateElementValue} from './internal/element-value';
 import {EXPRESSION_DATA_PREFIX} from './internal/get-value';
-import {isHTMLOrSVGElement} from './internal/is';
 
 // #region Functions
 
@@ -32,14 +31,14 @@ export function getData<Key extends string>(
 ): Record<Key, unknown>;
 
 export function getData(element: Element, keys: string | string[], parseValues?: boolean): unknown {
-	if (!isHTMLOrSVGElement(element)) {
+	if (!(element instanceof Element)) {
 		return;
 	}
 
 	const noParse = parseValues === false;
 
 	if (typeof keys === 'string') {
-		const value = element.dataset[camelCase(keys)];
+		const value = (element as HTMLElement).dataset[camelCase(keys)];
 
 		if (value === undefined) {
 			return;
@@ -54,7 +53,7 @@ export function getData(element: Element, keys: string | string[], parseValues?:
 
 	for (let index = 0; index < length; index += 1) {
 		const key = keys[index];
-		const value = element.dataset[camelCase(key)];
+		const value = (element as HTMLElement).dataset[camelCase(key)];
 
 		if (value == null) {
 			data[key] = undefined;
@@ -96,9 +95,11 @@ function updateDataAttribute(element: Element, key: string, value: unknown): voi
 		element,
 		getName(key),
 		value,
-		// oxlint-disable-next-line typescript/unbound-method: using .call in `updateElementValue`
+		// Using `.call` in `updateElementValue`
+		// oxlint-disable-next-line typescript/unbound-method
 		element.setAttribute,
-		// oxlint-disable-next-line typescript/unbound-method: using .call in `updateElementValue`
+		// Using `.call` in `updateElementValue`
+		// oxlint-disable-next-line typescript/unbound-method
 		element.removeAttribute,
 		false,
 		true,

@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/toretto",
-	"version": "0.46.0",
+	"version": "0.47.0",
 	"description": "A collection of badass DOM utilities.",
 	"keywords": [
 		"dom",
@@ -29,6 +29,10 @@
 		".": {
 			"types": "./dist/index.d.mts",
 			"default": "./dist/index.mjs"
+		},
+		"./aria": {
+			"types": "./dist/aria.d.mts",
+			"default": "./dist/aria.mjs"
 		},
 		"./attribute": {
 			"types": "./dist/attribute/index.d.mts",
@@ -86,11 +90,11 @@
 		"test:leak": "npx vp test run --detect-async-leaks --coverage"
 	},
 	"dependencies": {
-		"@oscarpalmer/atoms": "^0.187.2"
+		"@oscarpalmer/atoms": "^0.188.1"
 	},
 	"devDependencies": {
-		"@oxlint/plugins": "^1.67",
-		"@types/node": "^25.9",
+		"@oxlint/plugins": "^1.73",
+		"@types/node": "^26.1",
 		"@vitest/coverage-istanbul": "^4.1",
 		"jsdom": "^29.1",
 		"tsdown": "^0.22",

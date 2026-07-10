@@ -1,7 +1,6 @@
 import {getString} from '@oscarpalmer/atoms/string';
 import {setElementValues, updateElementValue} from './internal/element-value';
 import {getStyleValue} from './internal/get-value';
-import {isHTMLOrSVGElement} from './internal/is';
 import type {TextDirection} from './models';
 
 // #region Types
@@ -44,7 +43,7 @@ export function getStyle(
 	property: keyof CSSStyleValues,
 	computed?: boolean,
 ): string | undefined {
-	if (isHTMLOrSVGElement(element) && typeof property === 'string') {
+	if (element instanceof Element && typeof property === 'string') {
 		return getStyleValue(element, property, computed === true);
 	}
 }
@@ -64,7 +63,7 @@ export function getStyles<Property extends keyof CSSStyleValues>(
 ): Record<Property, string | undefined> {
 	const styles = {} as Record<Property, string | undefined>;
 
-	if (!(isHTMLOrSVGElement(element) && Array.isArray(properties))) {
+	if (!(element instanceof Element && Array.isArray(properties))) {
 		return styles;
 	}
 
@@ -97,10 +96,10 @@ export function getTextDirection(node: Element | Node): TextDirection;
 export function getTextDirection(): TextDirection;
 
 export function getTextDirection(node?: Element | Node): TextDirection {
-	let target: HTMLElement | SVGElement;
+	let target: HTMLElement;
 
-	if (isHTMLOrSVGElement(node)) {
-		target = node;
+	if (node instanceof Element) {
+		target = node as HTMLElement;
 	} else {
 		target =
 			node instanceof Node

@@ -1,6 +1,5 @@
 import {kebabCase} from '@oscarpalmer/atoms/string/case';
 import {getAttributeValue} from '../internal/get-value';
-import {isHTMLOrSVGElement} from '../internal/is';
 
 // #region Types
 
@@ -12,6 +11,7 @@ type DataPrefixedName = `data-${string}`;
 
 /**
  * Get the value of a specific attribute from an element
+ *
  * @param element Element to get attribute from
  * @param name Attribute name
  * @param parse Parse value? _(defaults to `true`)_
@@ -29,7 +29,7 @@ export function getAttribute(element: Element, name: DataPrefixedName, parse?: b
 export function getAttribute(element: Element, name: string): unknown;
 
 export function getAttribute(element: Element, name: string, parseValues?: boolean): unknown {
-	if (isHTMLOrSVGElement(element) && typeof name === 'string') {
+	if (element instanceof Element && typeof name === 'string') {
 		return getAttributeValue(element, kebabCase(name), parseValues !== false);
 	}
 }
@@ -49,7 +49,7 @@ export function getAttributes<Key extends string>(
 ): Record<Key, unknown> {
 	const attributes: Record<string, unknown> = {};
 
-	if (!(isHTMLOrSVGElement(element) && Array.isArray(names))) {
+	if (!(element instanceof Element && Array.isArray(names))) {
 		return attributes;
 	}
 

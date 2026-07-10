@@ -43,7 +43,7 @@ export function addDelegatedListener(
 }
 
 function delegatedEventHandler(this: boolean, event: Event): void {
-	const key = `${EVENT_PREFIX}${event.type}${this ? EVENT_SUFFIX_PASSIVE : EVENT_SUFFIX_ACTIVE}`;
+	const key = `@${event.type}${this ? EVENT_SUFFIX_PASSIVE : EVENT_SUFFIX_ACTIVE}`;
 
 	const items = event.composedPath();
 	const {length} = items;
@@ -51,7 +51,8 @@ function delegatedEventHandler(this: boolean, event: Event): void {
 	let cancelled = false;
 	let target = items[0];
 
-	// oxlint-disable-next-line typescript/unbound-method: using `.call` to ensure correct `this` context
+	// Using `.call` to ensure correct `this` context
+	// oxlint-disable-next-line typescript/unbound-method
 	const originalStopPropagation = event.stopPropagation;
 
 	event.stopPropagation = function () {
@@ -108,7 +109,7 @@ export function getDelegatedName(
 		!options.once &&
 		options.signal == null
 	) {
-		return `${EVENT_PREFIX}${type}${options.passive ? EVENT_SUFFIX_PASSIVE : EVENT_SUFFIX_ACTIVE}`;
+		return `@${type}${options.passive ? EVENT_SUFFIX_PASSIVE : EVENT_SUFFIX_ACTIVE}`;
 	}
 }
 
@@ -138,13 +139,11 @@ export function removeDelegatedListener(
 
 const DELEGATED = new Set<string>();
 
-const EVENT_PREFIX = '@';
-
 const EVENT_SUFFIX_ACTIVE = ':active';
 
 const EVENT_SUFFIX_PASSIVE = ':passive';
 
-const EVENT_TYPES: Set<string> = new Set([
+const EVENT_TYPES = new Set([
 	'beforeinput',
 	'click',
 	'dblclick',

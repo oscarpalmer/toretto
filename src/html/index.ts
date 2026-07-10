@@ -5,9 +5,9 @@ import {sanitizeNodes} from './sanitize';
 
 // #region Types
 
-type HtmlOptions = {
+export type HtmlOptions = {
 	/**
-	 * Cache template element for the HTML string? _(defaults to `true`)_
+	 * Cache template element for the _HTML_ string? _(defaults to `true`)_
 	 */
 	cache?: boolean;
 };
@@ -181,9 +181,9 @@ function hasNodes(value: unknown): value is HTMLCollection | NodeList | Node[] {
 export function html(strings: TemplateStringsArray, ...values: unknown[]): Node[];
 
 /**
- * Create nodes from an HTML string or a template element
+ * Create nodes from an _HTML_ string or a template element
  *
- * @param value HTML string or id for a template element
+ * @param value _HTML_ string or ID for a template element
  * @param options Options for creating nodes
  * @returns Created nodes
  */
@@ -216,9 +216,9 @@ html.clear = (): void => {
 };
 
 /**
- * Remove cached template element for an HTML string or id
+ * Remove cached template element for an _HTML_ string or _ID_
  *
- * @param template HTML string or id for a template element
+ * @param template _HTML_ string or ID for a template element
  */
 html.remove = (template: string): void => {
 	templates.delete(template);
@@ -253,6 +253,7 @@ function replaceComments(origin: NodeList | Node[], replacements: Node[]): void 
 
 /**
  * Sanitize one or more nodes, recursively
+ *
  * @param value Node or nodes to sanitize
  * @param options Sanitization options
  * @returns Sanitized nodes
@@ -282,8 +283,5 @@ const TEMPORARY_ELEMENT = '<toretto-temporary></toretto-temporary>';
 const templates = new SizedMap<string, HTMLTemplateElement>(128);
 
 let parser: DOMParser;
-
-// @ts-expect-error debug
-window.templates = templates;
 
 // #endregion

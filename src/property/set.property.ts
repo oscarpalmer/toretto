@@ -4,7 +4,6 @@ import {setAttribute} from '../attribute';
 import type {DispatchedAttributeName} from '../attribute/set.attribute';
 import {booleanAttributesSet, dispatchedAttributes} from '../internal/attribute';
 import {updateProperty} from '../internal/property';
-import {isHTMLOrSVGElement} from '../is';
 
 // #region Types
 
@@ -37,7 +36,7 @@ export function setProperties<Target extends Element>(
 	properties: SetProperties<Target>,
 	dispatch?: boolean,
 ): void {
-	if (!isHTMLOrSVGElement(target) || !isPlainObject(properties)) {
+	if (!(target instanceof Element) || !isPlainObject(properties)) {
 		return;
 	}
 
@@ -85,7 +84,7 @@ export function setProperty<Target extends Element, Property extends keyof SetPr
 	value: SetProperties<Target>[Property],
 	dispatch?: boolean,
 ): void {
-	if (isHTMLOrSVGElement(target) && typeof property === 'string') {
+	if (target instanceof Element && typeof property === 'string') {
 		setPropertyValue(target, property, value, dispatch !== false);
 	}
 }

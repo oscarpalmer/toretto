@@ -1,6 +1,5 @@
 import type {Primitive} from '@oscarpalmer/atoms/models';
 import {camelCase} from '@oscarpalmer/atoms/string/case';
-import {isHTMLOrSVGElement} from '../internal/is';
 
 // #region Types
 
@@ -27,7 +26,7 @@ export function getProperties<Target extends Element, Property extends keyof Get
 ): Pick<GetProperties<Target>, Property> {
 	const values: Partial<GetProperties<Target>> = {};
 
-	if (!isHTMLOrSVGElement(target) || !Array.isArray(properties)) {
+	if (!(target instanceof Element && Array.isArray(properties))) {
 		return values as Pick<GetProperties<Target>, Property>;
 	}
 
@@ -55,12 +54,12 @@ export function getProperty<Target extends Element, Property extends keyof GetPr
 	target: Target,
 	property: Property,
 ): GetProperties<Target>[Property] {
-	if (isHTMLOrSVGElement(target) && typeof property === 'string') {
+	if (target instanceof Element && typeof property === 'string') {
 		return getPropertyValue(target, property) as GetProperties<Target>[Property];
 	}
 }
 
-function getPropertyValue(element: HTMLElement, property: string): unknown {
+function getPropertyValue(element: Element, property: string): unknown {
 	let actual = property;
 
 	if (!(actual in element)) {
@@ -68,7 +67,7 @@ function getPropertyValue(element: HTMLElement, property: string): unknown {
 	}
 
 	if (actual in element) {
-		return element[actual as keyof HTMLElement];
+		return element[actual as keyof Element];
 	}
 }
 
