@@ -269,16 +269,16 @@ test('getAttribute + setAttribute', () => {
 	expect(second.beta).toBe(undefined);
 	expect(second.gamma).toBe('false');
 
-	Attribute.setAttributes(element, [{name: 'alpha', value: null}]);
+	Attribute.setAttributes(element, [{name: 'alpha', value: null}, {name: 'beta', value: ''}]);
 
 	expect(Attribute.getAttribute(element, 'alpha')).toBe(undefined);
-	expect(Attribute.getAttribute(element, 'beta')).toBe(undefined);
+	expect(Attribute.getAttribute(element, 'beta')).toBe('');
 	expect(Attribute.getAttribute(element, 'gamma')).toBe('false');
 
 	second = Attribute.getAttributes(element, ['alpha', 'beta', 'gamma']);
 
 	expect(second.alpha).toBe(undefined);
-	expect(second.beta).toBe(undefined);
+	expect(second.beta).toBe('');
 	expect(second.gamma).toBe('false');
 
 	const properties = [

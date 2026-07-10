@@ -1,4 +1,3 @@
-import {isNullableOrWhitespace} from '@oscarpalmer/atoms/is';
 import {getString} from '@oscarpalmer/atoms/string';
 import {kebabCase} from '@oscarpalmer/atoms/string/case';
 import {isAttribute} from './attribute';
@@ -83,7 +82,7 @@ export function updateElementValue(
 	isBoolean: boolean,
 	json: boolean,
 ): void {
-	if (isBoolean ? value == null : isNullableOrWhitespace(value)) {
+	if (value == null) {
 		remove.call(element, key);
 	} else if (!ignoreSetAttribute(element, key)) {
 		set.call(element, key, json ? JSON.stringify(value) : getString(value));
