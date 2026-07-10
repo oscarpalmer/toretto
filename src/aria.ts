@@ -88,7 +88,7 @@ export function getRole(element: Element): unknown {
  * @param attribute _ARIA_ attribute to set
  * @param value _ARIA_ attribute value
  */
-export function setAria(element: Element, attribute: AnyAriaAttribute, value?: string): void;
+export function setAria(element: Element, attribute: AnyAriaAttribute, value?: unknown): void;
 
 /**
  * Set one or more _ARIA_ attributes on an element
