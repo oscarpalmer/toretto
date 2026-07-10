@@ -73,7 +73,7 @@ function getName(value: string): string {
  * @param element Element to get role from
  * @returns Element role _(or `undefined`)_
  */
-export function getRole(element: Element): unknown {
+export function getRole(element: Element): string | undefined {
 	if (element instanceof Element) {
 		return element.getAttribute('role') ?? undefined;
 	}

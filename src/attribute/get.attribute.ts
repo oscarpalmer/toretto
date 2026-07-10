@@ -1,12 +1,6 @@
 import {kebabCase} from '@oscarpalmer/atoms/string/case';
 import {getAttributeValue} from '../internal/get-value';
 
-// #region Types
-
-type DataPrefixedName = `data-${string}`;
-
-// #endregion
-
 // #region Functions
 
 /**
@@ -17,7 +11,7 @@ type DataPrefixedName = `data-${string}`;
  * @param parse Parse value? _(defaults to `true`)_
  * @returns Attribute value _(or `undefined`)_
  */
-export function getAttribute(element: Element, name: DataPrefixedName, parse?: boolean): unknown;
+export function getAttribute(element: Element, name: `data-${string}`, parse?: boolean): unknown;
 
 /**
  * Get the value of a specific attribute from an element
@@ -26,7 +20,7 @@ export function getAttribute(element: Element, name: DataPrefixedName, parse?: b
  * @param name Attribute name
  * @returns Attribute value _(or `undefined`)_
  */
-export function getAttribute(element: Element, name: string): unknown;
+export function getAttribute(element: Element, name: string): string | undefined;
 
 export function getAttribute(element: Element, name: string, parseValues?: boolean): unknown {
 	if (element instanceof Element && typeof name === 'string') {
