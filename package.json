@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/toretto",
-	"version": "0.47.3",
+	"version": "0.48.0",
 	"description": "A collection of badass DOM utilities.",
 	"keywords": [
 		"dom",
@@ -93,7 +93,7 @@
 		"@oscarpalmer/atoms": "^0.188.1"
 	},
 	"devDependencies": {
-		"@oxlint/plugins": "^1.73",
+		"@oxlint/plugins": "^1.74",
 		"@types/node": "^26.1",
 		"@vitest/coverage-istanbul": "^4.1",
 		"jsdom": "^29.1",

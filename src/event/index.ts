@@ -32,7 +32,7 @@ function createDispatchOptions(options: EventInit): EventInit {
 	};
 }
 
-function createEvent(type: string, options?: CustomEventInit): Event {
+function createEvent(type: string, options?: CustomEventInit): CustomEvent | Event {
 	const hasOptions = isPlainObject(options);
 
 	if (hasOptions && 'detail' in (options as CustomEventInit)) {
@@ -61,11 +61,11 @@ function createEventOptions(options?: AddEventListenerOptions): EventOptions {
  * @param type Type of event
  * @param options Options for event _(bubbles and is cancelable by default)_
  */
-export function dispatch<Type extends keyof HTMLElementEventMap>(
+export function dispatch<Type extends keyof HTMLElementEventMap, Options extends CustomEventInit>(
 	target: EventTarget,
 	type: Type,
-	options?: CustomEventInit,
-): void;
+	options?: Options,
+): Options extends {detail: infer Detail} ? CustomEvent<Detail> : Event;
 
 /**
  * Dispatch an event for a target
@@ -74,16 +74,26 @@ export function dispatch<Type extends keyof HTMLElementEventMap>(
  * @param type Type of event
  * @param options Options for event _(bubbles and is cancelable by default)_
  */
-export function dispatch(target: EventTarget, type: string, options?: CustomEventInit): void;
+export function dispatch<Options extends CustomEventInit>(
+	target: EventTarget,
+	type: string,
+	options?: Options,
+): Options extends {detail: infer Detail} ? CustomEvent<Detail> : Event;
 
 export function dispatch<Type extends keyof HTMLElementEventMap>(
 	target: EventTarget,
 	type: Type | string,
 	options?: CustomEventInit,
-): void {
-	if (isEventTarget(target) && typeof type === 'string') {
-		target.dispatchEvent(createEvent(type, options));
+): CustomEvent | Event | undefined {
+	if (!isEventTarget(target) || typeof type !== 'string') {
+		return;
 	}
+
+	const event = createEvent(type, options);
+
+	target.dispatchEvent(event);
+
+	return event;
 }
 
 /**

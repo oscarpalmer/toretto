@@ -32,7 +32,7 @@ afterEach(() => {
 test('dispatch', () => {
 	let value = 0;
 
-	function custom(event: Event): void {
+	function onCustom(event: Event): void {
 		value += 1;
 
 		expect(event).toBeInstanceOf(value === 3 ? CustomEvent : Event);
@@ -48,7 +48,7 @@ test('dispatch', () => {
 		target.textContent = String(value);
 	}
 
-	function native(event: Event): void {
+	function onNative(event: Event): void {
 		value += 1;
 
 		expect(event).toBeInstanceOf(Event);
@@ -66,14 +66,17 @@ test('dispatch', () => {
 
 	document.body.append(target);
 
-	Evt.on(target, 'click', native, {capture: true});
-	Evt.on(target, 'focus', native);
-	Evt.on(target, 'dblclick', custom);
-	Evt.on(target, 'hello', custom);
+	Evt.on(target, 'click', onNative, {capture: true});
+	Evt.on(target, 'focus', onNative);
+	Evt.on(target, 'dblclick', onCustom);
+	Evt.on(target, 'hello', onCustom);
 
 	expect(target.textContent).toBe('Hello, world!');
 
-	Evt.dispatch(target, 'click');
+	const click = Evt.dispatch(target, 'click');
+
+	expect(click).toBeInstanceOf(Event);
+
 	Evt.dispatch(123 as never, 'click');
 	Evt.dispatch(target, 123 as never);
 
@@ -87,10 +90,12 @@ test('dispatch', () => {
 
 	expect(target.textContent).toBe('2');
 
-	Evt.dispatch(target, 'dblclick', {
+	const custom = Evt.dispatch(target, 'dblclick', {
 		composed: true,
 		detail: {a: {b: 'c'}},
 	});
+
+	expect(custom).toBeInstanceOf(CustomEvent);
 
 	expect(target.textContent).toBe('3');
 
