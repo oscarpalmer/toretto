@@ -1,11 +1,9 @@
 import {getString} from '@oscarpalmer/atoms/string';
 import {setElementValues, updateElementValue} from './internal/element-value';
 import {getStyleValue} from './internal/get-value';
-import type {TextDirection} from './models';
+import type {CSSValues, TextDirection} from './models';
 
 // #region Types
-
-type CSSStyleValues = Variables & CSSStyleDeclaration;
 
 export type StyleToggler = {
 	/**
@@ -18,14 +16,6 @@ export type StyleToggler = {
 	remove(): void;
 };
 
-type Styles = Partial<Record<keyof CSSStyleValues, unknown>>;
-
-type Variables<
-	Value extends Record<string, string | undefined> = Record<string, string | undefined>,
-> = {
-	[property in keyof Value as `--${string & property}`]?: string | undefined;
-};
-
 // #endregion
 
 // #region Functions
@@ -34,17 +24,17 @@ type Variables<
  * Get a style from an element
  *
  * @param element Element to get the style from
- * @param property Style name
+ * @param name Style name
  * @param computed Get the computed style? _(defaults to `false`)_
  * @returns Style value
  */
 export function getStyle(
 	element: Element,
-	property: keyof CSSStyleValues,
+	name: keyof CSSValues,
 	computed?: boolean,
 ): string | undefined {
-	if (element instanceof Element && typeof property === 'string') {
-		return getStyleValue(element, property, computed === true);
+	if (element instanceof Element && typeof name === 'string') {
+		return getStyleValue(element, name, computed === true);
 	}
 }
 
@@ -52,28 +42,28 @@ export function getStyle(
  * Get styles from an element
  *
  * @param element Element to get the styles from
- * @param properties Styles to get
+ * @param names Styles to get
  * @param computed Get the computed styles? _(defaults to `false`)_
  * @returns Style values
  */
-export function getStyles<Property extends keyof CSSStyleValues>(
+export function getStyles<Name extends keyof CSSValues>(
 	element: Element,
-	properties: Property[],
+	names: Name[],
 	computed?: boolean,
-): Record<Property, string | undefined> {
-	const styles = {} as Record<Property, string | undefined>;
+): Record<Name, string | undefined> {
+	const styles = {} as Record<Name, string | undefined>;
 
-	if (!(element instanceof Element && Array.isArray(properties))) {
+	if (!(element instanceof Element && Array.isArray(names))) {
 		return styles;
 	}
 
-	const {length} = properties;
+	const {length} = names;
 
 	for (let index = 0; index < length; index += 1) {
-		const property = properties[index];
+		const name = names[index];
 
-		if (typeof property === 'string') {
-			styles[property] = getStyleValue(element, property, computed === true) as never;
+		if (typeof name === 'string') {
+			styles[name] = getStyleValue(element, name, computed === true) as never;
 		}
 	}
 
@@ -120,11 +110,11 @@ export function getTextDirection(node?: Element | Node): TextDirection {
  * Set a style on an element
  *
  * @param element Element to set the style on
- * @param property Style name
+ * @param name Style name
  * @param value Style value
  */
-export function setStyle(element: Element, property: keyof CSSStyleValues, value?: unknown): void {
-	setElementValues(element, property as string, value, null, updateStyleProperty, true);
+export function setStyle(element: Element, name: keyof CSSValues, value?: unknown): void {
+	setElementValues(element, name as string, value, null, updateStyleProperty, true);
 }
 
 /**
@@ -133,7 +123,7 @@ export function setStyle(element: Element, property: keyof CSSStyleValues, value
  * @param element Element to set the styles on
  * @param styles Styles to set
  */
-export function setStyles(element: Element, styles: Styles): void {
+export function setStyles(element: Element, styles: Partial<CSSValues>): void {
 	setElementValues(element, styles as never, null, null, updateStyleProperty, true);
 }
 
@@ -144,11 +134,11 @@ export function setStyles(element: Element, styles: Styles): void {
  * @param styles Styles to be set or removed
  * @returns Style toggler
  */
-export function toggleStyles(element: Element, styles: Styles): StyleToggler {
+export function toggleStyles(element: Element, styles: Partial<CSSValues>): StyleToggler {
 	function toggle(set: boolean): void {
 		hasSet = set;
 
-		let next: Styles;
+		let next: Partial<CSSValues>;
 
 		if (set) {
 			values = getStyles(element, keys);
@@ -171,7 +161,7 @@ export function toggleStyles(element: Element, styles: Styles): StyleToggler {
 	const {length} = keys;
 
 	let hasSet = false;
-	let values: Record<string, string | undefined> = {};
+	let values: Record<string, unknown> = {};
 
 	return {
 		set(): void {
@@ -192,18 +182,18 @@ function updateStyleProperty(element: Element, key: string, value: unknown): voi
 		element,
 		key,
 		value,
-		function (this: Element, property: string, style: unknown) {
-			if (property.startsWith(VARIABLE_PREFIX)) {
-				(this as HTMLElement).style.setProperty(property, getString(style));
+		function (this: Element, name: string, style: unknown) {
+			if (name.startsWith(VARIABLE_PREFIX)) {
+				(this as HTMLElement).style.setProperty(name, getString(style));
 			} else {
-				(this as HTMLElement).style[property as never] = getString(style);
+				(this as HTMLElement).style[name as never] = getString(style);
 			}
 		},
-		function (this: Element, property: string) {
-			if (property.startsWith(VARIABLE_PREFIX)) {
-				(this as HTMLElement).style.removeProperty(property);
+		function (this: Element, name: string) {
+			if (name.startsWith(VARIABLE_PREFIX)) {
+				(this as HTMLElement).style.removeProperty(name);
 			} else {
-				(this as HTMLElement).style[property as never] = '';
+				(this as HTMLElement).style[name as never] = '';
 			}
 
 			if ((this as HTMLElement).getAttribute(ATTRIBUTE_STYLE) === '') {

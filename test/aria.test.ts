@@ -17,11 +17,25 @@ test('getAria + setAria', () => {
 	setAria(element, {
 		label: 'Name (updated)',
 		hidden: true,
+		selected: 'FALSE',
 	});
 
-	expect(getAria(element, [123 as never, 'aria-label', 'hidden'])).toEqual({
+	expect(getAria(element, [123 as never, 'aria-label', 'hidden', 'selected'])).toEqual({
 		label: 'Name (updated)',
-		hidden: 'true',
+		hidden: true,
+		selected: false,
+	});
+
+	setAria(element, {
+		label: 'Name (updated, again)',
+		hidden: undefined,
+		selected: 'tRuE',
+	});
+
+	expect(getAria(element, ['label', 'hidden', 'selected'])).toEqual({
+		label: 'Name (updated, again)',
+		hidden: undefined,
+		selected: true,
 	});
 
 	expect(getAria(123 as never, 'label')).toBeUndefined();

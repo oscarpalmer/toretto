@@ -1,13 +1,11 @@
 import {setElementValues, updateElementValue} from './internal/element-value';
-import type {AriaAttribute, AriaAttributeUnprefixed, AriaRole} from './models';
+import type {AnyAriaAttribute, AnyAriaBooleanAttribute, AriaRole} from './models';
 
 // #region Types
 
-type AnyAriaAttribute = AriaAttribute | AriaAttributeUnprefixed;
-
-type AriaAttributeItem = {
-	name: AnyAriaAttribute;
-	value?: string;
+type AriaAttributeItem<Name extends AnyAriaAttribute = AnyAriaAttribute> = {
+	name: Name;
+	value?: Name extends AnyAriaBooleanAttribute ? boolean | string : string;
 };
 
 // #endregion
@@ -18,10 +16,22 @@ type AriaAttributeItem = {
  * Get the value of a specific _ARIA_ attribute from an element
  *
  * @param element Element to get _ARIA_ attribute from
- * @param name _ARIA_ name
+ * @param name _ARIA_ attribute name
  * @returns _ARIA_ value _(or `undefined`)_
  */
-export function getAria(element: Element, attribute: AnyAriaAttribute): string | undefined;
+export function getAria(
+	element: Element,
+	name: AnyAriaBooleanAttribute,
+): boolean | string | undefined;
+
+/**
+ * Get the value of a specific _ARIA_ attribute from an element
+ *
+ * @param element Element to get _ARIA_ attribute from
+ * @param name _ARIA_ attribute name
+ * @returns _ARIA_ value _(or `undefined`)_
+ */
+export function getAria(element: Element, name: AnyAriaAttribute): string | undefined;
 
 /**
  * Get specific _ARIA_ attributes from an element
@@ -32,8 +42,12 @@ export function getAria(element: Element, attribute: AnyAriaAttribute): string |
  */
 export function getAria<Attribute extends AnyAriaAttribute>(
 	element: Element,
-	attributes: Attribute[],
-): Record<Attribute, string | undefined>;
+	names: Attribute[],
+): {
+	[Key in Attribute as Key extends `aria-${infer Name}`
+		? Name
+		: Key]: Key extends AnyAriaBooleanAttribute ? boolean | string | undefined : string | undefined;
+};
 
 export function getAria(element: Element, value: string | string[]): unknown {
 	if (!(element instanceof Element)) {
@@ -44,7 +58,7 @@ export function getAria(element: Element, value: string | string[]): unknown {
 		return typeof value === 'string' ? getAriaValue(element, value) : undefined;
 	}
 
-	const arias = {} as Record<string, string | undefined>;
+	const arias = {} as Record<string, unknown>;
 
 	const {length} = value;
 
@@ -59,8 +73,20 @@ export function getAria(element: Element, value: string | string[]): unknown {
 	return arias;
 }
 
-function getAriaValue(element: Element, attribute: string): string | undefined {
-	return element.getAttribute(getName(attribute)) ?? undefined;
+function getAriaValue(element: Element, attribute: string): unknown {
+	const name = getName(attribute);
+
+	const value = element.getAttribute(name) ?? undefined;
+
+	if (
+		ariaBooleanAttributesSet.has(name as never) &&
+		typeof value === 'string' &&
+		EXPRESSION_BOOLEAN.test(value)
+	) {
+		return value.toLowerCase() === 'true';
+	}
+
+	return value;
 }
 
 function getName(value: string): string {
@@ -88,7 +114,22 @@ export function getRole(element: Element): string | undefined {
  * @param attribute _ARIA_ attribute to set
  * @param value _ARIA_ attribute value
  */
-export function setAria(element: Element, attribute: AnyAriaAttribute, value?: unknown): void;
+export function setAria(
+	element: Element,
+	attribute: AnyAriaBooleanAttribute,
+	value?: boolean | string,
+): void;
+
+/**
+ * Set an _ARIA_ attribute on an element
+ *
+ * _(Or remove it, if value is `null` or `undefined`)_
+ *
+ * @param element Element for _ARIA_ attribute
+ * @param attribute _ARIA_ attribute to set
+ * @param value _ARIA_ attribute value
+ */
+export function setAria(element: Element, attribute: AnyAriaAttribute, value?: string): void;
 
 /**
  * Set one or more _ARIA_ attributes on an element
@@ -110,14 +151,12 @@ export function setAria(element: Element, attributes: AriaAttributeItem[]): void
  */
 export function setAria(
 	element: Element,
-	attributes: Partial<Record<AnyAriaAttribute, unknown>>,
+	attributes: {
+		[Key in AnyAriaAttribute]?: Key extends AnyAriaBooleanAttribute ? boolean | string : string;
+	},
 ): void;
 
-export function setAria(
-	element: Element,
-	first: AnyAriaAttribute | AriaAttributeItem[] | Partial<Record<AnyAriaAttribute, unknown>>,
-	second?: unknown,
-): void {
+export function setAria(element: Element, first: unknown, second?: unknown): void {
 	setElementValues(element, first, second, null, updateAriaAttribute);
 }
 
@@ -140,10 +179,22 @@ export function setRole(element: Element, role?: AriaRole): void {
 }
 
 function updateAriaAttribute(element: Element, key: string, value: unknown): void {
+	const name = getName(key);
+
+	let actual = value;
+
+	if (
+		ariaBooleanAttributesSet.has(name as never) &&
+		typeof value === 'string' &&
+		EXPRESSION_BOOLEAN.test(value)
+	) {
+		actual = value.toLowerCase() === 'true';
+	}
+
 	updateElementValue(
 		element,
-		getName(key),
-		value,
+		name,
+		actual,
 		// Using `.call` in `updateElementValue`
 		// oxlint-disable-next-line typescript/unbound-method
 		element.setAttribute,
@@ -162,5 +213,34 @@ function updateAriaAttribute(element: Element, key: string, value: unknown): voi
 const ATTRIBUTE_ARIA_PREFIX = 'aria-';
 
 const EXPRESSION_ARIA_PREFIX = /^aria-/i;
+
+const EXPRESSION_BOOLEAN = /^(true|false)$/i;
+
+/**
+ * List of _ARIA_ attributes that can be treated as boolean values
+ */
+export const ariaBooleanAttributes: readonly AnyAriaBooleanAttribute[] = Object.freeze([
+	'aria-atomic',
+	'aria-busy',
+	'aria-checked',
+	'aria-current',
+	'aria-disabled',
+	'aria-expanded',
+	'aria-haspopup',
+	'aria-hidden',
+	'aria-invalid',
+	'aria-modal',
+	'aria-multiline',
+	'aria-multiselectable',
+	'aria-pressed',
+	'aria-readonly',
+	'aria-required',
+	'aria-selected',
+]);
+
+/**
+ * Set of _ARIA_ attributes that can be treated as boolean values
+ */
+export const ariaBooleanAttributesSet = new Set(ariaBooleanAttributes);
 
 // #endregion

@@ -7,24 +7,34 @@ test('', () => {
 	expect(div).toBeInstanceOf(HTMLDivElement);
 	expect(div.outerHTML).toBe('<div></div>');
 
-	const input = createElement(
-		'input',
-		{
+	const span = createElement('span', {});
+
+	expect(span).toBeInstanceOf(HTMLSpanElement);
+	expect(span.outerHTML).toBe('<span></span>');
+
+	const input = createElement('input', {
+		aria: {
+			selected: true,
+		},
+		attribute: {
+			'aria-label': 'testing aria label',
+			dataFoo: 'testing data value',
+		},
+		data: {
+			bar: 123,
+		},
+		property: {
 			checked: true,
 			notAProperty: 'should be ignored',
 			type: 'checkbox',
 		} as never,
-		{
-			dataTest: 'testing data value',
-		},
-		{
+		style: {
 			color: 'red',
 			opacity: 0,
 		},
-	);
+	});
 
 	expect(input).toBeInstanceOf(HTMLInputElement);
-	// expect(input.outerHTML).toBe('<input checked="" type="checkbox" data-test="testing data value" style="color: red; opacity: 0;">');
 
 	expect(input.checked).toBe(true);
 	expect(input.type).toBe('checkbox');
@@ -32,8 +42,15 @@ test('', () => {
 	expect((input as any).notAProperty).toBeUndefined();
 	expect(input.getAttribute('not-a-property')).toBeNull();
 
-	expect(input.dataset.test).toBe('testing data value');
-	expect(input.getAttribute('data-test')).toBe('testing data value');
+	expect(input.dataset.foo).toBe('testing data value');
+	expect(input.getAttribute('data-foo')).toBe('testing data value');
+	expect(input.dataset.bar).toBe('123');
+	expect(input.getAttribute('data-bar')).toBe('123');
+
+	expect(input.ariaLabel).toBe('testing aria label');
+	expect(input.getAttribute('aria-label')).toBe('testing aria label');
+	expect(input.ariaSelected).toBe('true');
+	expect(input.getAttribute('aria-selected')).toBe('true');
 
 	expect(input.style.color).toBe('red');
 	expect(input.style.opacity).toBe('0');

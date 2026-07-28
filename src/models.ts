@@ -1,4 +1,14 @@
 /**
+ * Any _ARIA_ attribute for an element _(both prefixed and unprefixed)_
+ */
+export type AnyAriaAttribute = AriaAttribute | AriaAttributeUnprefixed;
+
+/**
+ * Any _ARIA_ attribute for an element that can be set to a boolean value _(both prefixed and unprefixed)_
+ */
+export type AnyAriaBooleanAttribute = AriaBooleanAttribute | AriaBooleanAttributeUnprefixed;
+
+/**
  * _ARIA_ attribute for an element
  *
  * _(https://www.w3.org/TR/wai-aria-1.3/#aria-attributes)_
@@ -11,11 +21,39 @@ export type AriaAttribute = keyof AriaAttributes;
  * _(https://www.w3.org/TR/wai-aria-1.3/#aria-attributes)_
  */
 export type AriaAttributeUnprefixed = keyof {
-	[Key in AriaAttribute as Key extends `aria-${infer Name}` ? Name : never]: string | null;
+	[Key in AriaAttribute as Key extends `aria-${infer Name}` ? Name : never]: unknown;
 };
 
 type AriaAttributes = {
-	[Key in keyof ARIAMixin as NormalizedName<Key>]: string | null;
+	[Key in keyof ARIAMixin as NormalizedName<Key>]: unknown;
+};
+
+/**
+ * _ARIA_ attribute for an element that can be set to a boolean value
+ */
+export type AriaBooleanAttribute =
+	| 'aria-atomic'
+	| 'aria-busy'
+	| 'aria-checked'
+	| 'aria-current'
+	| 'aria-disabled'
+	| 'aria-expanded'
+	| 'aria-haspopup'
+	| 'aria-hidden'
+	| 'aria-invalid'
+	| 'aria-modal'
+	| 'aria-multiline'
+	| 'aria-multiselectable'
+	| 'aria-pressed'
+	| 'aria-readonly'
+	| 'aria-required'
+	| 'aria-selected';
+
+/**
+ * _ARIA_ attribute for an element that can be set to a boolean value, without the `aria-` prefix
+ */
+export type AriaBooleanAttributeUnprefixed = keyof {
+	[Key in AriaBooleanAttribute as Key extends `aria-${infer Name}` ? Name : never]: string | null;
 };
 
 type NormalizedName<Key extends string> = Key extends `aria${infer Name}`
@@ -126,6 +164,23 @@ export type AriaRole =
 export type Attribute = {
 	name: string;
 	value: unknown;
+};
+
+/**
+ * CSS styles for an element
+ */
+export type CSSStyles = Record<keyof CSSStyleDeclaration, unknown>;
+
+/**
+ * CSSS values for an element _(both styles and variables)_
+ */
+export type CSSValues = CSSVariables & CSSStyles;
+
+/**
+ * CSS variables for an element
+ */
+export type CSSVariables<Value extends Record<string, unknown> = Record<string, unknown>> = {
+	[Property in keyof Value as `--${string & Property}`]?: unknown;
 };
 
 /**

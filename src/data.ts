@@ -7,28 +7,46 @@ import {EXPRESSION_DATA_PREFIX} from './internal/get-value';
 // #region Functions
 
 /**
- * Get a keyed data value from an element
+ * Get a keyed data value from an element, without parsing the value
  *
  * @param element Element to get data from
  * @param key Data key
- * @param parse Parse values? _(defaults to `true`)_
+ * @param parse Parse the value?
  * @returns Data value
  */
-export function getData(element: Element, key: string, parse?: boolean): unknown;
+export function getData(element: Element, key: string, parse: false): string | undefined;
 
 /**
- * Get keyed data values from an element
+ * Get a keyed data value from an element and parse the value
+ *
+ * @param element Element to get data from
+ * @param key Data key
+ * @returns Data value
+ */
+export function getData(element: Element, key: string): unknown;
+
+/**
+ * Get keyed data values from an element, without parsing the values
  *
  * @param element Element to get data from
  * @param keys Keys of the data values to get
- * @param parse Parse values? _(defaults to `true`)_
+ * @param parse Parse the values?
  * @returns Keyed data values
  */
 export function getData<Key extends string>(
 	element: Element,
 	keys: Key[],
-	parse?: boolean,
-): Record<Key, unknown>;
+	parse: false,
+): Record<Key, string | undefined>;
+
+/**
+ * Get keyed data values from an element and parse the values
+ *
+ * @param element Element to get data from
+ * @param keys Keys of the data values to get
+ * @returns Keyed data values
+ */
+export function getData<Key extends string>(element: Element, keys: Key[]): Record<Key, unknown>;
 
 export function getData(element: Element, keys: string | string[], parseValues?: boolean): unknown {
 	if (!(element instanceof Element)) {
