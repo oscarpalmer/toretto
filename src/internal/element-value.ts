@@ -4,6 +4,14 @@ import {isAttribute} from './attribute';
 
 // #region Functions
 
+function getValueForAttribute(value: unknown, json: boolean): string | undefined {
+	if (typeof value === 'string') {
+		return value;
+	}
+
+	return json ? JSON.stringify(value) : getString(value);
+}
+
 function ignoreSetAttribute(element: Element, name: string): boolean {
 	if (element instanceof HTMLTextAreaElement && name === 'value') {
 		return true;
@@ -79,13 +87,12 @@ export function updateElementValue(
 	value: unknown,
 	set: (key: string, value: string) => void,
 	remove: (key: string) => void,
-	isBoolean: boolean,
 	json: boolean,
 ): void {
 	if (value == null) {
 		remove.call(element, key);
 	} else if (!ignoreSetAttribute(element, key)) {
-		set.call(element, key, json ? JSON.stringify(value) : getString(value));
+		set.call(element, key, getValueForAttribute(value, json) as string);
 	}
 }
 

@@ -149,12 +149,7 @@ export function setAria(element: Element, attributes: AriaAttributeItem[]): void
  * @param element Element for _ARIA_ attributes
  * @param attributes _ARIA_ attributes to set
  */
-export function setAria(
-	element: Element,
-	attributes: {
-		[Key in AnyAriaAttribute]?: Key extends AnyAriaBooleanAttribute ? boolean | string : string;
-	},
-): void;
+export function setAria(element: Element, attributes: Record<string, unknown>): void;
 
 export function setAria(element: Element, first: unknown, second?: unknown): void {
 	setElementValues(element, first, second, null, updateAriaAttribute);
@@ -201,7 +196,6 @@ function updateAriaAttribute(element: Element, key: string, value: unknown): voi
 		// Using `.call` in `updateElementValue`
 		// oxlint-disable-next-line typescript/unbound-method
 		element.removeAttribute,
-		false,
 		false,
 	);
 }

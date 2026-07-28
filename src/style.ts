@@ -201,7 +201,6 @@ function updateStyleProperty(element: Element, key: string, value: unknown): voi
 			}
 		},
 		false,
-		false,
 	);
 }
 

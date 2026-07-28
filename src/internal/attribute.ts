@@ -148,7 +148,6 @@ export function updateAttribute(
 		// Using `.call` in `updateElementValue`
 		// oxlint-disable-next-line typescript/unbound-method
 		element.removeAttribute,
-		isBoolean,
 		false,
 	);
 }

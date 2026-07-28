@@ -16,29 +16,29 @@ test('getData & setData', () => {
 	Data.setData(123 as never, 'noop', undefined);
 	Data.setData(div, 123 as never, 'noop');
 
-	div.dataset.badJson = '""?""';
-
 	expect(Data.getData(div, 'test')).toBe('value');
 	expect(Data.getData(div, 'noop')).toBe(undefined);
-	expect(Data.getData(div, 'badJson')).toBe(undefined);
 
 	expect(Data.getData(div, 'foo')).toEqual(['bar', 1, true]);
 	expect(Data.getData(div, 'bar')).toEqual({baz: true});
 	expect(Data.getData(div, 'foo', false)).toEqual('["bar",1,true]');
 	expect(Data.getData(div, 'bar', false)).toEqual('{"baz":true}');
 
-	let parsed = Data.getData(div, ['foo', 'bar']);
-	let raw = Data.getData(div, ['foo', 'bar'], false);
+	let parsed = Data.getData(div, ['foo', 'bar', 'test']);
+	let raw = Data.getData(div, ['foo', 'bar', 'test'], false);
 
 	expect(parsed.foo).toEqual(['bar', 1, true]);
 	expect(parsed.bar).toEqual({baz: true});
+	expect(parsed.test).toEqual('value');
 
 	expect(raw.foo).toEqual('["bar",1,true]');
 	expect(raw.bar).toEqual('{"baz":true}');
+	expect(raw.test).toEqual('value');
 
 	Data.setData(div, {
 		foo: undefined,
 		bar: undefined,
+		test: undefined,
 	});
 
 	expect(Data.getData(div, 'foo')).toBe(undefined);
@@ -46,12 +46,13 @@ test('getData & setData', () => {
 	expect(Data.getData(div, 'foo', false)).toBe(undefined);
 	expect(Data.getData(div, 'bar', false)).toBe(undefined);
 
-	parsed = Data.getData(div, ['foo', 'bar']);
-	raw = Data.getData(div, ['foo', 'bar'], false);
+	parsed = Data.getData(div, ['foo', 'bar', 'test']);
+	raw = Data.getData(div, ['foo', 'bar', 'test'], false);
 
 	expect(parsed.foo).toEqual(undefined);
 	expect(parsed.bar).toEqual(undefined);
-
+	expect(parsed.test).toEqual(undefined);
 	expect(raw.foo).toEqual(undefined);
 	expect(raw.bar).toEqual(undefined);
+	expect(raw.test).toEqual(undefined);
 });

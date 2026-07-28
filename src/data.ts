@@ -56,13 +56,7 @@ export function getData(element: Element, keys: string | string[], parseValues?:
 	const noParse = parseValues === false;
 
 	if (typeof keys === 'string') {
-		const value = (element as HTMLElement).dataset[camelCase(keys)];
-
-		if (value === undefined) {
-			return;
-		}
-
-		return noParse ? value : parse(value);
+		return getDataValue(element, keys, noParse);
 	}
 
 	const {length} = keys;
@@ -71,16 +65,25 @@ export function getData(element: Element, keys: string | string[], parseValues?:
 
 	for (let index = 0; index < length; index += 1) {
 		const key = keys[index];
-		const value = (element as HTMLElement).dataset[camelCase(key)];
 
-		if (value == null) {
-			data[key] = undefined;
-		} else {
-			data[key] = noParse ? value : parse(value);
-		}
+		data[key] = getDataValue(element, key, noParse);
 	}
 
 	return data;
+}
+
+function getDataValue(element: Element, key: string, noParse: boolean): unknown {
+	const value = (element as HTMLElement).dataset[camelCase(key)];
+
+	if (value == null) {
+		return;
+	}
+
+	if (noParse) {
+		return value;
+	}
+
+	return parse(value) ?? value;
 }
 
 function getName(original: string): string {
@@ -119,7 +122,6 @@ function updateDataAttribute(element: Element, key: string, value: unknown): voi
 		// Using `.call` in `updateElementValue`
 		// oxlint-disable-next-line typescript/unbound-method
 		element.removeAttribute,
-		false,
 		true,
 	);
 }
