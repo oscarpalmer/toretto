@@ -251,7 +251,7 @@ test('dispatch:property', () => {
 	});
 });
 
-test('getPosition', () => {
+test('getEventPosition', () => {
 	const event = new MouseEvent('click', {
 		clientX: 10,
 		clientY: 20,
@@ -268,8 +268,8 @@ test('getPosition', () => {
 		],
 	});
 
-	const position = Evt.getPosition(event);
-	const touchPosition = Evt.getPosition(touchEvent);
+	const position = Evt.getEventPosition(event);
+	const touchPosition = Evt.getEventPosition(touchEvent);
 
 	expect(position?.x).toBe(10);
 	expect(position?.y).toBe(20);
@@ -278,10 +278,10 @@ test('getPosition', () => {
 	expect(touchPosition?.y).toBe(10);
 
 	// @ts-expect-error Testing invalid input
-	expect(Evt.getPosition(123)).toBeUndefined();
+	expect(Evt.getEventPosition(123)).toBeUndefined();
 
 	// @ts-expect-error Testing invalid input
-	expect(Evt.getPosition([])).toBeUndefined();
+	expect(Evt.getEventPosition([])).toBeUndefined();
 });
 
 test('on & off (direct)', () => {

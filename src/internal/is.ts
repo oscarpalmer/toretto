@@ -1,4 +1,4 @@
-import type {EventPosition} from '@oscarpalmer/atoms/models';
+import type {EventPosition} from '../models';
 
 // #region Functions
 

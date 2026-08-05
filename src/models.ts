@@ -189,6 +189,14 @@ export type CSSVariables<Value extends Record<string, unknown> = Record<string, 
 export type CustomEventListener = (event: CustomEvent) => void;
 
 /**
+ * Event position for mouse and touch events
+ */
+export type EventPosition = {
+	x: number;
+	y: number;
+};
+
+/**
  * Event listener that can be removed
  */
 export type RemovableEventListener = () => void;

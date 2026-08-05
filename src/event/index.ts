@@ -1,9 +1,8 @@
 import {noop} from '@oscarpalmer/atoms/function';
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import type {EventPosition} from '@oscarpalmer/atoms/models';
 import {getBoolean} from '../internal/get-value';
 import {isEventTarget} from '../internal/is';
-import type {CustomEventListener, RemovableEventListener} from '../models';
+import type {CustomEventListener, EventPosition, RemovableEventListener} from '../models';
 import {
 	addDelegatedListener,
 	type EventTargetWithListeners,
@@ -102,7 +101,7 @@ export function dispatch<Type extends keyof HTMLElementEventMap>(
  * @param event Pointer event
  * @returns X- and Y-coordinates
  */
-export function getPosition(event: MouseEvent | TouchEvent): EventPosition | undefined {
+export function getEventPosition(event: MouseEvent | TouchEvent): EventPosition | undefined {
 	let x: number | undefined;
 	let y: number | undefined;
 

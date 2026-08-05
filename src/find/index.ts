@@ -1,6 +1,6 @@
-import type {EventPosition, PlainObject} from '@oscarpalmer/atoms/models';
+import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {isEventPosition} from '../internal/is';
-import type {Selector} from '../models';
+import type {EventPosition, Selector} from '../models';
 
 // #region Functions
 
