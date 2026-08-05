@@ -96,19 +96,19 @@ export function dispatch<Type extends keyof HTMLElementEventMap>(
 }
 
 /**
- * Get the X- and Y-coordinates from a pointer event
+ * Get the X- and Y-coordinates from an event
  *
- * @param event Pointer event
- * @returns X- and Y-coordinates
+ * @param event Event
+ * @returns Event position, or `undefined` if the event is not a mouse or touch event
  */
-export function getEventPosition(event: MouseEvent | TouchEvent): EventPosition | undefined {
+export function getEventPosition(event: Event): EventPosition | undefined {
 	let x: number | undefined;
 	let y: number | undefined;
 
 	if (event instanceof MouseEvent) {
 		x = event.clientX;
 		y = event.clientY;
-	} else if (event instanceof TouchEvent) {
+	} else if (globalThis.TouchEvent && event instanceof TouchEvent) {
 		x = event.touches[0]?.clientX;
 		y = event.touches[0]?.clientY;
 	}
