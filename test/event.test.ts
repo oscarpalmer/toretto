@@ -35,6 +35,8 @@ test('dispatch', () => {
 	function onCustom(event: Event): void {
 		value += 1;
 
+		console.log('onCustom', event.type, value);
+
 		expect(event).toBeInstanceOf(value === 3 ? CustomEvent : Event);
 		expect(event.type).toBe(value === 3 ? 'dblclick' : 'hello');
 		expect(event.bubbles).toBe(true);
@@ -51,11 +53,13 @@ test('dispatch', () => {
 	function onNative(event: Event): void {
 		value += 1;
 
+		console.log('onNative', event.type, value);
+
 		expect(event).toBeInstanceOf(Event);
-		expect(event.type).toBe(value === 1 ? 'click' : 'focus');
-		expect(event.bubbles).toBe(value === 1);
-		expect(event.cancelable).toBe(value === 1);
-		expect(event.composed).toBe(value !== 1);
+		expect(event.type).toBe(value === 2 ? 'focus' : 'click');
+		expect(event.bubbles).toBe(value !== 2);
+		expect(event.cancelable).toBe(value !== 2);
+		expect(event.composed).toBe(value === 2);
 
 		target.textContent = String(value);
 	}
@@ -102,6 +106,10 @@ test('dispatch', () => {
 	Evt.dispatch(target, 'hello');
 
 	expect(target.textContent).toBe('4');
+
+	Evt.dispatch(target, new Event('click', {bubbles: true, cancelable: true, composed: false}));
+
+	expect(target.textContent).toBe('5');
 });
 
 test('dispatch:global', () =>

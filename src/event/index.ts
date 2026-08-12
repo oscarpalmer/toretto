@@ -59,6 +59,7 @@ function createEventOptions(options?: AddEventListenerOptions): EventOptions {
  * @param target Event target
  * @param type Type of event
  * @param options Options for event _(bubbles and is cancelable by default)_
+ * @returns Dispatched event
  */
 export function dispatch<Type extends keyof HTMLElementEventMap, Options extends CustomEventInit>(
 	target: EventTarget,
@@ -72,6 +73,7 @@ export function dispatch<Type extends keyof HTMLElementEventMap, Options extends
  * @param target Event target
  * @param type Type of event
  * @param options Options for event _(bubbles and is cancelable by default)_
+ * @returns Dispatched event
  */
 export function dispatch<Options extends CustomEventInit>(
 	target: EventTarget,
@@ -79,16 +81,25 @@ export function dispatch<Options extends CustomEventInit>(
 	options?: Options,
 ): Options extends {detail: infer Detail} ? CustomEvent<Detail> : Event;
 
+/**
+ * Dispatch an event for a target
+ *
+ * @param target Event target
+ * @param event Event to dispatch
+ * @returns Dispatched event
+ */
+export function dispatch<Evt extends Event>(target: EventTarget, event: Evt): Evt;
+
 export function dispatch<Type extends keyof HTMLElementEventMap>(
 	target: EventTarget,
-	type: Type | string,
-	options?: CustomEventInit,
+	first: Event | Type | string,
+	second?: CustomEventInit,
 ): CustomEvent | Event | undefined {
-	if (!isEventTarget(target) || typeof type !== 'string') {
+	if (!isEventTarget(target) || !(first instanceof Event || typeof first === 'string')) {
 		return;
 	}
 
-	const event = createEvent(type, options);
+	const event = first instanceof Event ? first : createEvent(first, second);
 
 	target.dispatchEvent(event);
 
