@@ -21,18 +21,18 @@ test('getStyle(s) & setStyle(s)', () =>
 		expect(Style.getStyles(123 as never, ['color'])).toEqual({});
 
 		setTimeout(() => {
-			expect(
-				Style.getStyles(div, [
-					'--custom-1',
-					'--custom-2',
-					'color',
-					'display',
-					'backgroundColor',
-					'position',
-					123 as never,
-					(() => {}) as never,
-				]),
-			).toEqual({
+			const names = [
+				'--custom-1',
+				'--custom-2',
+				'color',
+				'display',
+				'backgroundColor',
+				'position',
+				123 as never,
+				(() => {}) as never,
+			] as never;
+
+			expect(Style.getStyles(div, names)).toEqual({
 				'--custom-1': 'customValue',
 				'--custom-2': 'anotherCustomValue',
 				color: 'red',
@@ -41,22 +41,7 @@ test('getStyle(s) & setStyle(s)', () =>
 				position: 'absolute',
 			});
 
-			expect(
-				Style.getStyles(
-					div,
-					[
-						'--custom-1',
-						'--custom-2',
-						'color',
-						'display',
-						'backgroundColor',
-						'position',
-						123 as never,
-						(() => {}) as never,
-					],
-					true,
-				),
-			).toEqual({
+			expect(Style.getStyles(div, names, true)).toEqual({
 				'--custom-1': 'customValue',
 				'--custom-2': 'anotherCustomValue',
 				color: 'rgb(255, 0, 0)',
@@ -65,6 +50,15 @@ test('getStyle(s) & setStyle(s)', () =>
 				position: 'absolute',
 			});
 
+			const computedStyles = Style.getStyles(div, true);
+			const uncomputedStyles = Style.getStyles(div);
+
+			expect(computedStyles).toBeInstanceOf(CSSStyleDeclaration);
+			expect(uncomputedStyles).toBeInstanceOf(CSSStyleDeclaration);
+
+			expect(computedStyles.color).toBe('rgb(255, 0, 0)');
+			expect(uncomputedStyles.color).toBe('red');
+
 			Style.setStyle(div, '--custom-1');
 			Style.setStyle(div, 'display');
 		}, 125);
@@ -72,6 +66,17 @@ test('getStyle(s) & setStyle(s)', () =>
 		setTimeout(() => {
 			expect(Style.getStyle(div, '--custom-1')).toBe('');
 			expect(Style.getStyle(div, 'display')).toBe('');
+
+			Style.setStyles(div, {
+				'--custom-1': undefined,
+				'--custom-2': undefined,
+				color: undefined,
+				display: undefined,
+				backgroundColor: undefined,
+				position: undefined,
+			});
+
+			expect(div.hasAttribute('style')).toBe(false);
 
 			done();
 		}, 250);

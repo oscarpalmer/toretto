@@ -1,5 +1,6 @@
 import {parse} from '@oscarpalmer/atoms/string';
 import {camelCase, kebabCase} from '@oscarpalmer/atoms/string/case';
+import {EXPRESSION_ARIA_PREFIX, getAriaValue} from './aria';
 
 // #region Functions
 
@@ -12,9 +13,17 @@ export function getAttributeValue(element: Element, name: string, parseValue: bo
 	const attribute = element.attributes[normalized as keyof NamedNodeMap];
 	const value = attribute instanceof Attr ? attribute.value : undefined;
 
-	return EXPRESSION_DATA_PREFIX.test(normalized) && typeof value === 'string' && parseValue
-		? (parse(value) ?? value)
-		: value;
+	const isString = typeof value === 'string';
+
+	if (isString && EXPRESSION_ARIA_PREFIX.test(normalized)) {
+		return getAriaValue(element, normalized);
+	}
+
+	if (isString && EXPRESSION_DATA_PREFIX.test(normalized) && parseValue) {
+		return parse(value) ?? value;
+	}
+
+	return value;
 }
 
 export function getStyleValue(

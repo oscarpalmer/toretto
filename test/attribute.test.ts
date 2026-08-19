@@ -186,6 +186,8 @@ test('getAttribute + setAttribute', () => {
 		value: 'keyed',
 	});
 
+	Attribute.setAttribute(element, 'aria-hidden', true);
+	Attribute.setAttribute(element, 'aria-label', 'Test label');
 	Attribute.setAttribute(element, 'data-a', 123);
 	Attribute.setAttribute(element, 'data-b', 'hello, world!');
 
@@ -197,7 +199,9 @@ test('getAttribute + setAttribute', () => {
 	expect(Attribute.getAttribute(element, 'data-b')).toBe('hello, world!');
 	expect(Attribute.getAttribute(element, 'data-b', false)).toBe('hello, world!');
 
-	let first = Attribute.getAttributes(element, [
+	let first: Record<string, unknown> = Attribute.getAttributes(element, [
+		'aria-hidden',
+		'aria-label',
 		'data-a',
 		'data-b',
 		'id',
@@ -207,7 +211,19 @@ test('getAttribute + setAttribute', () => {
 		(() => {}) as never,
 	]);
 
-	expect(Object.keys(first).length).toBe(4);
+	expect(Object.keys(first).length).toBe(6);
+	expect(first['aria-hidden']).toBe(true);
+	expect(first['aria-label']).toBe('Test label');
+	expect(first['data-a']).toBe(123);
+	expect(first['data-b']).toBe('hello, world!');
+	expect(first.id).toBe('test');
+	expect(first.keyed).toBe('keyed');
+
+	first = Attribute.getAttributes(element);
+
+	expect(Object.keys(first).length).toBe(6);
+	expect(first['aria-hidden']).toBe(true);
+	expect(first['aria-label']).toBe('Test label');
 	expect(first['data-a']).toBe(123);
 	expect(first['data-b']).toBe('hello, world!');
 	expect(first.id).toBe('test');
@@ -219,8 +235,25 @@ test('getAttribute + setAttribute', () => {
 	expect(Attribute.getAttribute(element, 'id')).toBe(undefined);
 	expect(Attribute.getAttribute(element, 'keyed')).toBe(undefined);
 
-	first = Attribute.getAttributes(element, ['data-a', 'data-b', 'id', 'keyed'], false);
+	first = Attribute.getAttributes(
+		element,
+		['aria-hidden', 'aria-label', 'data-a', 'data-b', 'id', 'keyed'],
+		false,
+	);
 
+	expect(Object.keys(first).length).toBe(6);
+	expect(first['aria-hidden']).toBe(true);
+	expect(first['aria-label']).toBe('Test label');
+	expect(first['data-a']).toBe('123');
+	expect(first['data-b']).toBe('hello, world!');
+	expect(first.id).toBe(undefined);
+	expect(first.keyed).toBe(undefined);
+
+	first = Attribute.getAttributes(element, false);
+
+	expect(Object.keys(first).length).toBe(4);
+	expect(first['aria-hidden']).toBe(true);
+	expect(first['aria-label']).toBe('Test label');
 	expect(first['data-a']).toBe('123');
 	expect(first['data-b']).toBe('hello, world!');
 	expect(first.id).toBe(undefined);
@@ -236,7 +269,17 @@ test('getAttribute + setAttribute', () => {
 	expect(Attribute.getAttribute(element, 'beta')).toBe('hello');
 	expect(Attribute.getAttribute(element, 'gamma')).toBe('true');
 
-	let second = Attribute.getAttributes(element, ['alpha', 'beta', 'gamma']);
+	let second: Record<string, unknown> = Attribute.getAttributes(element, [
+		'alpha',
+		'beta',
+		'gamma',
+	]);
+
+	expect(second.alpha).toBe('123');
+	expect(second.beta).toBe('hello');
+	expect(second.gamma).toBe('true');
+
+	second = Attribute.getAttributes(element);
 
 	expect(second.alpha).toBe('123');
 	expect(second.beta).toBe('hello');
@@ -249,6 +292,12 @@ test('getAttribute + setAttribute', () => {
 	expect(Attribute.getAttribute(element, 'gamma')).toBe('true');
 
 	second = Attribute.getAttributes(element, ['alpha', 'beta', 'gamma']);
+
+	expect(second.alpha).toBe('123');
+	expect(second.beta).toBe(undefined);
+	expect(second.gamma).toBe('true');
+
+	second = Attribute.getAttributes(element);
 
 	expect(second.alpha).toBe('123');
 	expect(second.beta).toBe(undefined);
@@ -269,6 +318,12 @@ test('getAttribute + setAttribute', () => {
 	expect(second.beta).toBe(undefined);
 	expect(second.gamma).toBe('false');
 
+	second = Attribute.getAttributes(element);
+
+	expect(second.alpha).toBe('456');
+	expect(second.beta).toBe(undefined);
+	expect(second.gamma).toBe('false');
+
 	Attribute.setAttributes(element, [
 		{name: 'alpha', value: null},
 		{name: 'beta', value: ''},
@@ -279,6 +334,12 @@ test('getAttribute + setAttribute', () => {
 	expect(Attribute.getAttribute(element, 'gamma')).toBe('false');
 
 	second = Attribute.getAttributes(element, ['alpha', 'beta', 'gamma']);
+
+	expect(second.alpha).toBe(undefined);
+	expect(second.beta).toBe('');
+	expect(second.gamma).toBe('false');
+
+	second = Attribute.getAttributes(element);
 
 	expect(second.alpha).toBe(undefined);
 	expect(second.beta).toBe('');

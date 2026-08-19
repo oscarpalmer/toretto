@@ -48,15 +48,52 @@ export function getData<Key extends string>(
  */
 export function getData<Key extends string>(element: Element, keys: Key[]): Record<Key, unknown>;
 
-export function getData(element: Element, keys: string | string[], parseValues?: boolean): unknown {
+/**
+ * Get all data values from an element, without parsing the values
+ *
+ * @param element Element to get data from
+ * @param parse Parse the values?
+ * @returns All data values
+ */
+export function getData(element: Element, parse: false): Record<string, unknown>;
+
+/**
+ * Get all data values from an element and parse the values
+ *
+ * @param element Element to get data from
+ * @returns All data values
+ */
+export function getData(element: Element): Record<string, unknown>;
+
+export function getData(
+	element: Element,
+	first?: boolean | string | string[],
+	second?: boolean,
+): unknown {
 	if (!(element instanceof Element)) {
 		return;
 	}
 
-	const noParse = parseValues === false;
+	const noParse = first === false || second === false;
 
-	if (typeof keys === 'string') {
-		return getDataValue(element, keys, noParse);
+	if (typeof first === 'string') {
+		return getDataValue(element, first, false, noParse);
+	}
+
+	let datasetKey = false;
+
+	let keys: string[] | undefined;
+
+	if (Array.isArray(first)) {
+		keys = first;
+	} else if (first == null || typeof first === 'boolean') {
+		datasetKey = true;
+
+		keys = Object.keys((element as HTMLElement).dataset);
+	}
+
+	if (keys == null) {
+		return {};
 	}
 
 	const {length} = keys;
@@ -66,14 +103,19 @@ export function getData(element: Element, keys: string | string[], parseValues?:
 	for (let index = 0; index < length; index += 1) {
 		const key = keys[index];
 
-		data[key] = getDataValue(element, key, noParse);
+		data[key] = getDataValue(element, key, datasetKey, noParse);
 	}
 
 	return data;
 }
 
-function getDataValue(element: Element, key: string, noParse: boolean): unknown {
-	const value = (element as HTMLElement).dataset[camelCase(key)];
+function getDataValue(
+	element: Element,
+	key: string,
+	datasetKey: boolean,
+	noParse: boolean,
+): unknown {
+	const value = (element as HTMLElement).dataset[datasetKey ? key : camelCase(key)];
 
 	if (value == null) {
 		return;

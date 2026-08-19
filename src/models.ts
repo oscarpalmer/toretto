@@ -9,6 +9,11 @@ export type AnyAriaAttribute = AriaAttribute | AriaAttributeUnprefixed;
 export type AnyAriaBooleanAttribute = AriaBooleanAttribute | AriaBooleanAttributeUnprefixed;
 
 /**
+ * Any _ARIA_ attribute for an element that can be set to a numerical value _(both prefixed and unprefixed)_
+ */
+export type AnyAriaNumericalAttribute = AriaNumericalAttribute | AriaNumericalAttributeUnprefixed;
+
+/**
  * _ARIA_ attribute for an element
  *
  * _(https://www.w3.org/TR/wai-aria-1.3/#aria-attributes)_
@@ -24,8 +29,17 @@ export type AriaAttributeUnprefixed = keyof {
 	[Key in AriaAttribute as Key extends `aria-${infer Name}` ? Name : never]: unknown;
 };
 
-type AriaAttributes = {
-	[Key in keyof ARIAMixin as NormalizedName<Key>]: unknown;
+/**
+ * _ARIA_ attributes for an element
+ *
+ * _(https://www.w3.org/TR/wai-aria-1.3/#aria-attributes)_
+ */
+export type AriaAttributes = {
+	[Key in keyof ARIAMixin as NormalizedName<Key>]: NormalizedName<Key> extends AnyAriaBooleanAttribute
+		? boolean | string
+		: NormalizedName<Key> extends AnyAriaNumericalAttribute
+			? number | string
+			: string;
 };
 
 /**
@@ -54,6 +68,30 @@ export type AriaBooleanAttribute =
  */
 export type AriaBooleanAttributeUnprefixed = keyof {
 	[Key in AriaBooleanAttribute as Key extends `aria-${infer Name}` ? Name : never]: string | null;
+};
+
+/**
+ * _ARIA_ attribute for an element that can be set to a numerical value
+ */
+export type AriaNumericalAttribute =
+	| 'aria-colcount'
+	| 'aria-colindex'
+	| 'aria-colspan'
+	| 'aria-level'
+	| 'aria-posinset'
+	| 'aria-rowcount'
+	| 'aria-rowindex'
+	| 'aria-rowspan'
+	| 'aria-setsize'
+	| 'aria-valuemax'
+	| 'aria-valuemin'
+	| 'aria-valuenow';
+
+/**
+ * _ARIA_ attribute for an element that can be set to a numerical value, without the `aria-` prefix
+ */
+export type AriaNumericalAttributeUnprefixed = keyof {
+	[Key in AriaNumericalAttribute as Key extends `aria-${infer Name}` ? Name : never]: number | null;
 };
 
 type NormalizedName<Key extends string> = Key extends `aria${infer Name}`

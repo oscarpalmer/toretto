@@ -24,8 +24,19 @@ test('getData & setData', () => {
 	expect(Data.getData(div, 'foo', false)).toEqual('["bar",1,true]');
 	expect(Data.getData(div, 'bar', false)).toEqual('{"baz":true}');
 
-	let parsed = Data.getData(div, ['foo', 'bar', 'test']);
-	let raw = Data.getData(div, ['foo', 'bar', 'test'], false);
+	let parsed: Record<string, unknown> = Data.getData(div, ['foo', 'bar', 'test']);
+	let raw: Record<string, unknown> = Data.getData(div, ['foo', 'bar', 'test'], false);
+
+	expect(parsed.foo).toEqual(['bar', 1, true]);
+	expect(parsed.bar).toEqual({baz: true});
+	expect(parsed.test).toEqual('value');
+
+	expect(raw.foo).toEqual('["bar",1,true]');
+	expect(raw.bar).toEqual('{"baz":true}');
+	expect(raw.test).toEqual('value');
+
+	parsed = Data.getData(div);
+	raw = Data.getData(div, false);
 
 	expect(parsed.foo).toEqual(['bar', 1, true]);
 	expect(parsed.bar).toEqual({baz: true});
@@ -55,4 +66,18 @@ test('getData & setData', () => {
 	expect(raw.foo).toEqual(undefined);
 	expect(raw.bar).toEqual(undefined);
 	expect(raw.test).toEqual(undefined);
+
+	parsed = Data.getData(div);
+	raw = Data.getData(div, false);
+
+	expect(parsed.foo).toEqual(undefined);
+	expect(parsed.bar).toEqual(undefined);
+	expect(parsed.test).toEqual(undefined);
+	expect(raw.foo).toEqual(undefined);
+	expect(raw.bar).toEqual(undefined);
+	expect(raw.test).toEqual(undefined);
+
+	parsed = Data.getData(div, 123 as never);
+
+	expect(raw).toEqual({});
 });

@@ -23,9 +23,9 @@ export type StyleToggler = {
 /**
  * Get a style from an element
  *
- * @param element Element to get the style from
+ * @param element Element to get style from
  * @param name Style name
- * @param computed Get the computed style? _(defaults to `false`)_
+ * @param computed Get computed style? _(defaults to `false`)_
  * @returns Style value
  */
 export function getStyle(
@@ -41,29 +41,52 @@ export function getStyle(
 /**
  * Get styles from an element
  *
- * @param element Element to get the styles from
+ * @param element Element to get styles from
  * @param names Styles to get
- * @param computed Get the computed styles? _(defaults to `false`)_
+ * @param computed Get computed styles? _(defaults to `false`)_
  * @returns Style values
  */
 export function getStyles<Name extends keyof CSSValues>(
 	element: Element,
 	names: Name[],
 	computed?: boolean,
-): Record<Name, string | undefined> {
-	const styles = {} as Record<Name, string | undefined>;
+): Record<Name, string | undefined>;
 
-	if (!(element instanceof Element && Array.isArray(names))) {
-		return styles;
+/**
+ * Get all styles from an element
+ *
+ * @param element Element to get styles from
+ * @param computed Get computed styles? _(defaults to `false`)_
+ * @returns Style values
+ */
+export function getStyles(element: Element, computed?: boolean): CSSStyleDeclaration;
+
+/**
+ * Get styles from an element
+ *
+ * @param element Element to get styles from
+ * @param names Styles to get
+ * @param computed Get computed styles? _(defaults to `false`)_
+ * @returns Style values
+ */
+export function getStyles(element: Element, first?: boolean | string[], second?: boolean): unknown {
+	if (!(element instanceof Element)) {
+		return {};
 	}
 
-	const {length} = names;
+	if (first == null || typeof first === 'boolean') {
+		return first === true ? getComputedStyle(element) : (element as HTMLElement).style;
+	}
+
+	const {length} = first;
+
+	const styles = {} as Record<string, string | undefined>;
 
 	for (let index = 0; index < length; index += 1) {
-		const name = names[index];
+		const name = first[index];
 
 		if (typeof name === 'string') {
-			styles[name] = getStyleValue(element, name, computed === true) as never;
+			styles[name] = getStyleValue(element, name, second === true) as never;
 		}
 	}
 

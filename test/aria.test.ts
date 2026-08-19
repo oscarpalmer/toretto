@@ -6,6 +6,8 @@ test('getAria + setAria', () => {
 
 	expect(getAria(element, 'label')).toBeUndefined();
 
+	expect(getAria(element)).toEqual({});
+
 	setAria(element, 'label', 'Name');
 
 	expect(getAria(element, 'label')).toBe('Name');
@@ -14,28 +16,50 @@ test('getAria + setAria', () => {
 		label: 'Name',
 	});
 
+	expect(getAria(element)).toEqual({
+		label: 'Name',
+	});
+
 	setAria(element, {
 		label: 'Name (updated)',
 		hidden: true,
 		selected: 'FALSE',
+		valuenow: 123,
 	});
 
-	expect(getAria(element, [123 as never, 'aria-label', 'hidden', 'selected'])).toEqual({
+	expect(getAria(element, [123 as never, 'aria-label', 'hidden', 'selected', 'valuenow'])).toEqual({
 		label: 'Name (updated)',
 		hidden: true,
 		selected: false,
+		valuenow: 123,
+	});
+
+	expect(getAria(element)).toEqual({
+		label: 'Name (updated)',
+		hidden: true,
+		selected: false,
+		valuenow: 123,
 	});
 
 	setAria(element, {
 		label: 'Name (updated, again)',
 		hidden: undefined,
 		selected: 'tRuE',
+		valuenow: 'hmm',
 	});
 
-	expect(getAria(element, ['label', 'hidden', 'selected'])).toEqual({
+	expect(getAria(element, ['label', 'hidden', 'selected', 'valuenow'])).toEqual({
 		label: 'Name (updated, again)',
 		hidden: undefined,
 		selected: true,
+		valuenow: 'hmm',
+	});
+
+	expect(getAria(element)).toEqual({
+		label: 'Name (updated, again)',
+		hidden: undefined,
+		selected: true,
+		valuenow: 'hmm',
 	});
 
 	expect(getAria(123 as never, 'label')).toBeUndefined();
