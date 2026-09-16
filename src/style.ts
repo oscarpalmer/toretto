@@ -5,6 +5,10 @@ import type {CSSValues, TextDirection} from './models';
 
 // #region Types
 
+type InternalStyleToggler = {
+	[STYLE_SYMBOL]: StyleTogglerState;
+} & StyleToggler;
+
 export type StyleToggler = {
 	/**
 	 * Set the provided styles on the element
@@ -15,6 +19,39 @@ export type StyleToggler = {
 	 */
 	remove(): void;
 };
+
+type StyleTogglerState = {
+	active: boolean;
+	element: Element;
+	keys: string[];
+	styles: Record<string, unknown>;
+	values: Record<string, unknown>;
+};
+
+// #endregion
+
+// #region Instances
+
+function StyleToggler(this: any, element: Element, styles: Partial<CSSValues>) {
+	Object.defineProperty(this, STYLE_SYMBOL, {
+		value: {
+			element,
+			styles,
+			active: false,
+			keys: Object.keys(styles),
+			values: {},
+		},
+	});
+}
+
+Object.defineProperties(StyleToggler.prototype, {
+	remove: {
+		value: removeStyleTogglerValues,
+	},
+	set: {
+		value: setStyleTogglerValues,
+	},
+});
 
 // #endregion
 
@@ -123,10 +160,14 @@ export function getTextDirection(node?: Element | Node): TextDirection {
 	let {direction} = target.style;
 
 	if (direction === '') {
-		direction = getStyleValue(target, PROPERTY_DIRECTION, true)!;
+		direction = getStyleValue(target, STYLE_PROPERTY_DIRECTION, true)!;
 	}
 
-	return direction === DIRECTION_RTL ? DIRECTION_RTL : DIRECTION_LTR;
+	return direction === STYLE_DIRECTION_RTL ? STYLE_DIRECTION_RTL : STYLE_DIRECTION_LTR;
+}
+
+function removeStyleTogglerValues(this: InternalStyleToggler): void {
+	toggleStyleValues(this, false);
 }
 
 /**
@@ -140,6 +181,10 @@ export function setStyle(element: Element, name: keyof CSSValues, value?: unknow
 	setElementValues(element, name as string, value, null, updateStyleProperty, true);
 }
 
+function setStyleTogglerValues(this: InternalStyleToggler): void {
+	toggleStyleValues(this, true);
+}
+
 /**
  * Set styles on an element
  *
@@ -150,6 +195,34 @@ export function setStyles(element: Element, styles: Partial<CSSValues>): void {
 	setElementValues(element, styles as never, null, null, updateStyleProperty, true);
 }
 
+function toggleStyleValues(instance: InternalStyleToggler, active: boolean): void {
+	const state = instance[STYLE_SYMBOL];
+
+	if (state.active === active) {
+		return;
+	}
+
+	state.active = active;
+
+	let next: Partial<CSSValues>;
+
+	if (active) {
+		state.values = getStyles(state.element, state.keys as (keyof CSSValues)[]);
+
+		next = state.styles;
+	} else {
+		next = {...state.values};
+
+		state.values = {};
+
+		for (let index = 0; index < state.keys.length; index += 1) {
+			state.values[state.keys[index]] = undefined;
+		}
+	}
+
+	setStyles(state.element, next);
+}
+
 /**
  * Toggle styles for an element
  *
@@ -158,46 +231,8 @@ export function setStyles(element: Element, styles: Partial<CSSValues>): void {
  * @returns Style toggler
  */
 export function toggleStyles(element: Element, styles: Partial<CSSValues>): StyleToggler {
-	function toggle(set: boolean): void {
-		hasSet = set;
-
-		let next: Partial<CSSValues>;
-
-		if (set) {
-			values = getStyles(element, keys);
-
-			next = styles;
-		} else {
-			next = {...values};
-
-			values = {};
-
-			for (let index = 0; index < length; index += 1) {
-				values[keys[index] as never] = undefined;
-			}
-		}
-
-		setStyles(element, next);
-	}
-
-	const keys = Object.keys(styles) as (keyof CSSStyleDeclaration)[];
-	const {length} = keys;
-
-	let hasSet = false;
-	let values: Record<string, unknown> = {};
-
-	return {
-		set(): void {
-			if (!hasSet) {
-				toggle(true);
-			}
-		},
-		remove(): void {
-			if (hasSet) {
-				toggle(false);
-			}
-		},
-	};
+	// @ts-expect-error All good, no worries :-)
+	return new StyleToggler(element, styles);
 }
 
 function updateStyleProperty(element: Element, key: string, value: unknown): void {
@@ -206,21 +241,21 @@ function updateStyleProperty(element: Element, key: string, value: unknown): voi
 		key,
 		value,
 		function (this: Element, name: string, style: unknown) {
-			if (name.startsWith(VARIABLE_PREFIX)) {
+			if (name.startsWith(STYLE_VARIABLE_PREFIX)) {
 				(this as HTMLElement).style.setProperty(name, getString(style));
 			} else {
 				(this as HTMLElement).style[name as never] = getString(style);
 			}
 		},
 		function (this: Element, name: string) {
-			if (name.startsWith(VARIABLE_PREFIX)) {
+			if (name.startsWith(STYLE_VARIABLE_PREFIX)) {
 				(this as HTMLElement).style.removeProperty(name);
 			} else {
 				(this as HTMLElement).style[name as never] = '';
 			}
 
-			if ((this as HTMLElement).getAttribute(ATTRIBUTE_STYLE) === '') {
-				(this as HTMLElement).removeAttribute(ATTRIBUTE_STYLE);
+			if ((this as HTMLElement).getAttribute(STYLE_ATTRIBUTE) === '') {
+				(this as HTMLElement).removeAttribute(STYLE_ATTRIBUTE);
 			}
 		},
 		false,
@@ -231,14 +266,16 @@ function updateStyleProperty(element: Element, key: string, value: unknown): voi
 
 // #region Variables
 
-const ATTRIBUTE_STYLE = 'style';
+const STYLE_ATTRIBUTE = 'style';
 
-const DIRECTION_LTR = 'ltr';
+const STYLE_DIRECTION_LTR = 'ltr';
 
-const DIRECTION_RTL = 'rtl';
+const STYLE_DIRECTION_RTL = 'rtl';
 
-const PROPERTY_DIRECTION = 'direction';
+const STYLE_PROPERTY_DIRECTION = 'direction';
 
-const VARIABLE_PREFIX = '--';
+const STYLE_SYMBOL = Symbol(STYLE_ATTRIBUTE);
+
+const STYLE_VARIABLE_PREFIX = '--';
 
 // #endregion

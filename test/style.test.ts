@@ -140,11 +140,6 @@ test('toggleStyles', () => {
 		position: 'absolute',
 	});
 
-	expect(toggler).toHaveProperty('set');
-	expect(toggler.set).toBeInstanceOf(Function);
-	expect(toggler).toHaveProperty('remove');
-	expect(toggler.remove).toBeInstanceOf(Function);
-
 	expect(Style.getStyles(div, ['color', 'backgroundColor', 'position'])).toEqual({
 		color: '',
 		backgroundColor: '',

@@ -35,8 +35,6 @@ test('dispatch', () => {
 	function onCustom(event: Event): void {
 		value += 1;
 
-		console.log('onCustom', event.type, value);
-
 		expect(event).toBeInstanceOf(value === 3 ? CustomEvent : Event);
 		expect(event.type).toBe(value === 3 ? 'dblclick' : 'hello');
 		expect(event.bubbles).toBe(true);
@@ -52,8 +50,6 @@ test('dispatch', () => {
 
 	function onNative(event: Event): void {
 		value += 1;
-
-		console.log('onNative', event.type, value);
 
 		expect(event).toBeInstanceOf(Event);
 		expect(event.type).toBe(value === 2 ? 'focus' : 'click');
