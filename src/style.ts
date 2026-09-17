@@ -33,25 +33,17 @@ type StyleTogglerState = {
 // #region Instances
 
 function StyleToggler(this: any, element: Element, styles: Partial<CSSValues>) {
-	Object.defineProperty(this, STYLE_SYMBOL, {
-		value: {
-			element,
-			styles,
-			active: false,
-			keys: Object.keys(styles),
-			values: {},
-		},
-	});
+	this[STYLE_SYMBOL] = {
+		element,
+		styles,
+		active: false,
+		keys: Object.keys(styles),
+		values: {},
+	};
 }
 
-Object.defineProperties(StyleToggler.prototype, {
-	remove: {
-		value: removeStyleTogglerValues,
-	},
-	set: {
-		value: setStyleTogglerValues,
-	},
-});
+StyleToggler.prototype.remove = removeStyleTogglerValues;
+StyleToggler.prototype.set = setStyleTogglerValues;
 
 // #endregion
 

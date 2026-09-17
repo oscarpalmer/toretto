@@ -108,7 +108,7 @@ test('dispatch', () => {
 	expect(target.textContent).toBe('5');
 });
 
-test('dispatch:global', () =>
+test('dispatch, global', () =>
 	new Promise<void>(done => {
 		let fromDocument: string | undefined;
 		let fromWindow: string | undefined;
@@ -137,7 +137,7 @@ test('dispatch:global', () =>
 		}, 125);
 	}));
 
-test('dispatch:property', () => {
+test('dispatch, property', () => {
 	const checkbox = document.createElement('input');
 	const details = document.createElement('details');
 	const input = document.createElement('input');

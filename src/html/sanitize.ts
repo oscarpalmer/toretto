@@ -3,14 +3,12 @@ import {_isBadAttribute, _isInvalidBooleanAttribute} from '../internal/attribute
 
 // #region Functions
 
-function handleElement(element: Element, depth: number): void {
-	if (depth === 0) {
-		const removable = [...element.querySelectorAll(REMOVE_SELECTOR)];
-		const {length} = removable;
+function handleElement(element: Element): void {
+	const removable = [...element.querySelectorAll(REMOVE_SELECTOR)];
+	const {length} = removable;
 
-		for (let index = 0; index < length; index += 1) {
-			removable[index].remove();
-		}
+	for (let index = 0; index < length; index += 1) {
+		removable[index].remove();
 	}
 
 	sanitizeAttributes(element, [...element.attributes]);
@@ -56,20 +54,20 @@ export function sanitizeAttributes(element: Element, attributes: Attr[]): void {
 	}
 }
 
-export function sanitizeNodes(nodes: Node[], depth: number): Node[] {
-	const actual = nodes.filter(node => node instanceof Node);
+export function sanitizeNodes(nodes: Node[] | NodeList): Node[] {
+	const actual: Node[] = [];
 
 	let {length} = nodes;
 
 	for (let index = 0; index < length; index += 1) {
-		const node = actual[index];
+		const node = nodes[index];
 
 		let remove = isClobbered(node);
 
 		if (!remove) {
 			switch (node.nodeType) {
 				case Node.ELEMENT_NODE:
-					handleElement(node as Element, depth);
+					handleElement(node as Element);
 					break;
 
 				case Node.COMMENT_NODE:
@@ -80,26 +78,26 @@ export function sanitizeNodes(nodes: Node[], depth: number): Node[] {
 				case Node.PROCESSING_INSTRUCTION_NODE:
 					remove = true;
 					break;
+
+				default:
+					break;
 			}
 		}
 
 		if (remove) {
 			removeNode(node);
 
-			actual.splice(index, 1);
-
-			index -= 1;
-			length -= 1;
-
 			continue;
 		}
 
 		if (node.hasChildNodes()) {
-			sanitizeNodes([...node.childNodes], depth + 1);
+			sanitizeNodes(node.childNodes);
 		}
+
+		actual.push(node);
 	}
 
-	return nodes;
+	return actual;
 }
 
 // #endregion

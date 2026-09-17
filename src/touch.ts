@@ -1,5 +1,9 @@
 // #region Types
 
+type InternalSupportsTouch = {
+	[SUPPORTS_TOUCH_SYMBOL]: SupportsTouchState;
+};
+
 type NavigatorWithMsMaxTouchPoints = Navigator & {
 	msMaxTouchPoints: number;
 };
@@ -23,11 +27,32 @@ type SupporsTouch = {
 	update(): boolean;
 };
 
+type SupportsTouchState = {
+	supported: boolean;
+};
+
+// #endregion
+
+// #region Instances
+
+function SupportsTouch(this: any) {
+	this[SUPPORTS_TOUCH_SYMBOL] = {
+		supported: checkSupport(),
+	};
+}
+
+SupportsTouch.prototype.get = getSupport;
+SupportsTouch.prototype.update = updateSupport;
+
+Object.defineProperty(SupportsTouch.prototype, 'value', {
+	get: getSupport,
+});
+
 // #endregion
 
 // #region Functions
 
-function getSupport(): boolean {
+function checkSupport(): boolean {
 	if (window == null || navigator == null) {
 		return false;
 	}
@@ -58,35 +83,29 @@ function getSupport(): boolean {
 	return false;
 }
 
+function getSupport(this: InternalSupportsTouch) {
+	return this[SUPPORTS_TOUCH_SYMBOL].supported;
+}
+
+function updateSupport(this: InternalSupportsTouch) {
+	const supported = checkSupport();
+
+	this[SUPPORTS_TOUCH_SYMBOL].supported = supported;
+
+	return supported;
+}
+
 // #endregion
 
 // #region Variables
 
+const SUPPORTS_TOUCH_SYMBOL = Symbol('supportsTouch');
+
 /**
  * Does the device support touch events?
  */
-const supportsTouch: SupporsTouch = (() => {
-	let support = getSupport();
-
-	const instance = Object.create({
-		get(): boolean {
-			return support;
-		},
-		update(): boolean {
-			support = getSupport();
-
-			return support;
-		},
-	});
-
-	Object.defineProperty(instance, 'value', {
-		get(): boolean {
-			return support;
-		},
-	});
-
-	return instance;
-})();
+// @ts-expect-error All good, no worries :-)
+const supportsTouch: SupporsTouch = new SupportsTouch();
 
 // #endregion
 

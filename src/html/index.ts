@@ -23,12 +23,19 @@ type Tagged = {
 
 // #region Functions
 
+/**
+ * Clear cache of template elements
+ */
+function clearHtmlTemplates(): void {
+	templates.clear();
+}
+
 function createHtml(value: string | HTMLTemplateElement): string {
 	const parsed = getParser().parseFromString(getHtml(value), PARSE_TYPE_HTML);
 
 	parsed.body.normalize();
 
-	sanitizeNodes([parsed.body], 0);
+	sanitizeNodes([parsed.body]);
 
 	return parsed.body.innerHTML;
 }
@@ -208,24 +215,17 @@ export function html(first: unknown, ...second: unknown[]): Node[] {
 	return getNodes(first, getOptions(second[0]));
 }
 
-/**
- * Clear cache of template elements
- */
-html.clear = (): void => {
-	templates.clear();
-};
+function isTagged(value: unknown): value is TemplateStringsArray {
+	return Array.isArray(value) && Array.isArray((value as unknown as TemplateStringsArray).raw);
+}
 
 /**
  * Remove cached template element for an _HTML_ string or _ID_
  *
  * @param template _HTML_ string or ID for a template element
  */
-html.remove = (template: string): void => {
+function removeHtmlTemplate(template: string): void {
 	templates.delete(template);
-};
-
-function isTagged(value: unknown): value is TemplateStringsArray {
-	return Array.isArray(value) && Array.isArray((value as unknown as TemplateStringsArray).raw);
 }
 
 function replaceComments(origin: NodeList | Node[], replacements: Node[]): void {
@@ -259,7 +259,7 @@ function replaceComments(origin: NodeList | Node[], replacements: Node[]): void 
  * @returns Sanitized nodes
  */
 export function sanitize(value: Node | Node[]): Node[] {
-	return sanitizeNodes(Array.isArray(value) ? value : [value], 0);
+	return sanitizeNodes(Array.isArray(value) ? value : [value]);
 }
 
 // #endregion
@@ -283,5 +283,12 @@ const TEMPORARY_ELEMENT = '<toretto-temporary></toretto-temporary>';
 const templates = new SizedMap<string, HTMLTemplateElement>(128);
 
 let parser: DOMParser;
+
+// #endregion
+
+// #region Initialization
+
+html.clear = clearHtmlTemplates;
+html.remove = removeHtmlTemplate;
 
 // #endregion

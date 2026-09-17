@@ -35,7 +35,9 @@ test('', () => {
 	});
 
 	const checkbox = createElement('input', {
-		type: 'checkbox',
+		property: {
+			type: 'checkbox',
+		},
 	});
 
 	let count = 0;
