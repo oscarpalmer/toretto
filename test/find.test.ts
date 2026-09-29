@@ -1,4 +1,4 @@
-import {afterAll, expect, test} from 'vitest';
+import {afterAll, expect, test} from 'vite-plus/test';
 import * as Find from '../src/find/index';
 
 document.body.innerHTML = `<div>

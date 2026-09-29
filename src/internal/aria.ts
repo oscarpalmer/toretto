@@ -36,11 +36,11 @@ export function getAriaName(value: string): string {
 
 export const ATTRIBUTE_ARIA_PREFIX = 'aria-';
 
-export const EXPRESSION_ARIA_PREFIX = /^aria-/i;
+export const EXPRESSION_ARIA_PREFIX: RegExp = /^aria-/i;
 
-export const EXPRESSION_BOOLEAN = /^(true|false)$/i;
+export const EXPRESSION_BOOLEAN: RegExp = /^(true|false)$/i;
 
-export const EXPRESSION_NUMERICAL = /^-?\d+(\.\d+)?$/;
+export const EXPRESSION_NUMERICAL: RegExp = /^-?\d+(\.\d+)?$/;
 
 /**
  * List of _ARIA_ attributes that can be treated as boolean values
@@ -67,7 +67,7 @@ export const ariaBooleanAttributes: readonly AriaBooleanAttribute[] = Object.fre
 /**
  * Set of _ARIA_ attributes that can be treated as boolean values
  */
-export const ariaBooleanAttributesSet = new Set(ariaBooleanAttributes);
+export const ariaBooleanAttributesSet: Set<AriaBooleanAttribute> = new Set(ariaBooleanAttributes);
 
 /**
  * List of _ARIA_ attributes that can be treated as numerical values
@@ -90,6 +90,8 @@ export const ariaNumericalAttributes: readonly AriaNumericalAttribute[] = Object
 /**
  * Set of _ARIA_ attributes that can be treated as numerical values
  */
-export const ariaNumericalAttributesSet = new Set(ariaNumericalAttributes);
+export const ariaNumericalAttributesSet: Set<AriaNumericalAttribute> = new Set(
+	ariaNumericalAttributes,
+);
 
 // #endregion

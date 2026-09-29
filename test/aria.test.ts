@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {getAria, getRole, setAria, setRole} from '../src/aria';
 
 test('getAria + setAria', () => {

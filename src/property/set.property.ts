@@ -13,9 +13,9 @@ type DispatchedPropertyValue<
 > = Property extends keyof SetProperties<Target> ? SetProperties<Target>[Property] : never;
 
 type SetProperties<Target extends Element> = {
-	[Property in keyof Target as Target[Property] extends Primitive
-		? Property
-		: never]?: Target[Property];
+	[
+		Property in keyof Target as Target[Property] extends Primitive ? Property : never
+	]?: Target[Property];
 };
 
 // #endregion

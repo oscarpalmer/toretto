@@ -35,7 +35,9 @@ export type AriaAttributeUnprefixed = keyof {
  * _(https://www.w3.org/TR/wai-aria-1.3/#aria-attributes)_
  */
 export type AriaAttributes = {
-	[Key in keyof ARIAMixin as NormalizedName<Key>]: NormalizedName<Key> extends AnyAriaBooleanAttribute
+	[
+		Key in keyof ARIAMixin as NormalizedName<Key>
+	]: NormalizedName<Key> extends AnyAriaBooleanAttribute
 		? boolean | string
 		: NormalizedName<Key> extends AnyAriaNumericalAttribute
 			? number | string

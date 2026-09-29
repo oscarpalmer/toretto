@@ -62,9 +62,9 @@ export function getStyle(
 	name: keyof CSSValues,
 	computed?: boolean,
 ): string | undefined {
-	if (element instanceof Element && typeof name === 'string') {
-		return getStyleValue(element, name, computed === true);
-	}
+	return element instanceof Element && typeof name === 'string'
+		? getStyleValue(element, name, computed === true)
+		: undefined;
 }
 
 /**

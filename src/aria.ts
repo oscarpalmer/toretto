@@ -24,9 +24,9 @@ type AriaAttributeItem<Name extends AnyAriaAttribute = AnyAriaAttribute> = {
 };
 
 type AriaAttributeValues<Attribute extends AnyAriaAttribute> = {
-	[Key in Attribute as Key extends `aria-${infer Name}`
-		? Name
-		: Key]: Key extends AnyAriaBooleanAttribute
+	[
+		Key in Attribute as Key extends `aria-${infer Name}` ? Name : Key
+	]: Key extends AnyAriaBooleanAttribute
 		? boolean | string | undefined
 		: Key extends AnyAriaNumericalAttribute
 			? number | string | undefined
@@ -123,9 +123,7 @@ export function getAria(element: Element, value?: string | string[]): unknown {
  * @returns Element role _(or `undefined`)_
  */
 export function getRole(element: Element): string | undefined {
-	if (element instanceof Element) {
-		return element.getAttribute('role') ?? undefined;
-	}
+	return element instanceof Element ? (element.getAttribute('role') ?? undefined) : undefined;
 }
 
 /**

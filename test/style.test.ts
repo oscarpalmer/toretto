@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import * as Style from '../src/style';
 
 test('getStyle(s) & setStyle(s)', () =>

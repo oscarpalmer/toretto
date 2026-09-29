@@ -1,5 +1,5 @@
 import {noop} from '@oscarpalmer/atoms/function';
-import {afterEach, expect, test} from 'vitest';
+import {afterEach, expect, test} from 'vite-plus/test';
 import * as Attr from '../src/attribute/index';
 import * as Evt from '../src/event/index';
 import type {RemovableEventListener} from '../src/models';

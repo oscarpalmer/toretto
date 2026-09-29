@@ -217,6 +217,8 @@ function traverse(from: Element, to: Element): number | undefined {
 		distance += 1;
 		parent = parent.parentElement;
 	}
+
+	return undefined;
 }
 
 // #endregion

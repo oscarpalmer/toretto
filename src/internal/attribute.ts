@@ -206,9 +206,9 @@ export const booleanAttributes: readonly string[] = Object.freeze([
 	'selected',
 ]);
 
-export const booleanAttributesSet = new Set(booleanAttributes);
+export const booleanAttributesSet: Set<string> = new Set(booleanAttributes);
 
-export const dispatchedAttributes = new Set(['checked', 'open', 'value']);
+export const dispatchedAttributes: Set<string> = new Set(['checked', 'open', 'value']);
 
 const formElement = document.createElement('form');
 

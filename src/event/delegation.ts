@@ -102,15 +102,13 @@ export function getDelegatedName(
 	type: string,
 	options: AddEventListenerOptions,
 ): string | undefined {
-	if (
-		isEventTarget(target) &&
+	return isEventTarget(target) &&
 		EVENT_TYPES.has(type) &&
 		!options.capture &&
 		!options.once &&
 		options.signal == null
-	) {
-		return `@${type}${options.passive ? EVENT_SUFFIX_PASSIVE : EVENT_SUFFIX_ACTIVE}`;
-	}
+		? `@${type}${options.passive ? EVENT_SUFFIX_PASSIVE : EVENT_SUFFIX_ACTIVE}`
+		: undefined;
 }
 
 export function removeDelegatedListener(

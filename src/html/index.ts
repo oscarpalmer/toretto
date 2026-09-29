@@ -286,6 +286,15 @@ let parser: DOMParser;
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace html {
+	export var clear: typeof clearHtmlTemplates;
+	export var remove: typeof removeHtmlTemplate;
+}
+
+// #endregion
+
 // #region Initialization
 
 html.clear = clearHtmlTemplates;

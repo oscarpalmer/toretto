@@ -65,9 +65,9 @@ export function getAttribute<Name extends `aria-${string}`>(
 export function getAttribute(element: Element, name: string): string | undefined;
 
 export function getAttribute(element: Element, name: string, parse?: boolean): unknown {
-	if (element instanceof Element && typeof name === 'string') {
-		return getAttributeValue(element, kebabCase(name), parse !== false);
-	}
+	return element instanceof Element && typeof name === 'string'
+		? getAttributeValue(element, kebabCase(name), parse !== false)
+		: undefined;
 }
 
 /**

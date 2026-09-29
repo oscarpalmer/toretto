@@ -46,7 +46,7 @@ export function getStyleValue(
 
 // #region Variables
 
-export const EXPRESSION_DATA_PREFIX = /^data-/i;
+export const EXPRESSION_DATA_PREFIX: RegExp = /^data-/i;
 
 const CSS_VARIABLE_PREFIX = '--';
 

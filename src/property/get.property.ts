@@ -4,9 +4,9 @@ import {camelCase} from '@oscarpalmer/atoms/string/case';
 // #region Types
 
 type GetProperties<Target extends Element> = {
-	[Property in keyof Target as Target[Property] extends Primitive
-		? Property
-		: never]?: Target[Property];
+	[
+		Property in keyof Target as Target[Property] extends Primitive ? Property : never
+	]?: Target[Property];
 };
 
 // #endregion
@@ -54,9 +54,9 @@ export function getProperty<Target extends Element, Property extends keyof GetPr
 	target: Target,
 	property: Property,
 ): GetProperties<Target>[Property] {
-	if (target instanceof Element && typeof property === 'string') {
-		return getPropertyValue(target, property) as GetProperties<Target>[Property];
-	}
+	return target instanceof Element && typeof property === 'string'
+		? (getPropertyValue(target, property) as GetProperties<Target>[Property])
+		: undefined;
 }
 
 function getPropertyValue(element: Element, property: string): unknown {
@@ -69,6 +69,8 @@ function getPropertyValue(element: Element, property: string): unknown {
 	if (actual in element) {
 		return element[actual as keyof Element];
 	}
+
+	return undefined;
 }
 
 // #endregion
