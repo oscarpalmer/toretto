@@ -1,6 +1,16 @@
 import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {isEventPosition} from '../internal/is';
 import type {EventPosition, Selector} from '../models';
+import {
+	FIND_QUERY_SELECTOR_ALL,
+	FIND_QUERY_SELECTOR_SINGLE,
+	FIND_STYLE_HIDDEN,
+	FIND_STYLE_IMPORTANT,
+	FIND_STYLE_NONE,
+	FIND_STYLE_POINTER_EVENTS,
+	FIND_SUFFIX_HOVER,
+	FIND_TAG_HEAD,
+} from '../models/find.model';
 
 // #region Functions
 
@@ -34,7 +44,7 @@ function findElementOrElements(
 	context: Selector | null | undefined,
 	single: boolean,
 ): Element | Element[] | null {
-	const callback = single ? QUERY_SELECTOR_SINGLE : QUERY_SELECTOR_ALL;
+	const callback = single ? FIND_QUERY_SELECTOR_SINGLE : FIND_QUERY_SELECTOR_ALL;
 
 	const contexts =
 		context == null
@@ -178,11 +188,11 @@ export function getElementFromPosition(position: EventPosition): Element[] {
 		elements.push(current);
 
 		events.push({
-			value: current.style.getPropertyValue(STYLE_POINTER_EVENTS),
-			priority: current.style.getPropertyPriority(STYLE_POINTER_EVENTS),
+			value: current.style.getPropertyValue(FIND_STYLE_POINTER_EVENTS),
+			priority: current.style.getPropertyPriority(FIND_STYLE_POINTER_EVENTS),
 		});
 
-		current.style.setProperty(STYLE_POINTER_EVENTS, STYLE_NONE, STYLE_IMPORTANT);
+		current.style.setProperty(FIND_STYLE_POINTER_EVENTS, FIND_STYLE_NONE, FIND_STYLE_IMPORTANT);
 	}
 
 	const {length} = elements;
@@ -192,7 +202,7 @@ export function getElementFromPosition(position: EventPosition): Element[] {
 		const event = events[index];
 
 		if (element instanceof HTMLElement) {
-			element.style.setProperty(STYLE_POINTER_EVENTS, event.value ?? '', event.priority);
+			element.style.setProperty(FIND_STYLE_POINTER_EVENTS, event.value ?? '', event.priority);
 		}
 	}
 
@@ -209,7 +219,7 @@ export function getElementFromPosition(position: EventPosition): Element[] {
  * @returns Found element or `null`
  */
 export function getElementUnderPointer(skipIgnore?: boolean): Element | null {
-	const elements = [...document.querySelectorAll(SUFFIX_HOVER)];
+	const elements = [...document.querySelectorAll(FIND_SUFFIX_HOVER)];
 	const {length} = elements;
 
 	const returned: Element[] = [];
@@ -217,7 +227,7 @@ export function getElementUnderPointer(skipIgnore?: boolean): Element | null {
 	for (let index = 0; index < length; index += 1) {
 		const element = elements[index];
 
-		if (element.tagName === TAG_HEAD) {
+		if (element.tagName === FIND_TAG_HEAD) {
 			continue;
 		}
 
@@ -225,7 +235,7 @@ export function getElementUnderPointer(skipIgnore?: boolean): Element | null {
 
 		if (
 			skipIgnore === true ||
-			(style.pointerEvents !== STYLE_NONE && style.visibility !== STYLE_HIDDEN)
+			(style.pointerEvents !== FIND_STYLE_NONE && style.visibility !== FIND_STYLE_HIDDEN)
 		) {
 			returned.push(element);
 		}
@@ -240,26 +250,6 @@ function isContext(value: unknown): boolean {
 		typeof (value as PlainObject)?.querySelectorAll === 'function'
 	);
 }
-
-// #endregion
-
-// #region Variables
-
-const QUERY_SELECTOR_ALL = 'querySelectorAll';
-
-const QUERY_SELECTOR_SINGLE = 'querySelector';
-
-const STYLE_HIDDEN = 'hidden';
-
-const STYLE_IMPORTANT = 'important';
-
-const STYLE_NONE = 'none';
-
-const STYLE_POINTER_EVENTS = 'pointer-events';
-
-const SUFFIX_HOVER = ':hover';
-
-const TAG_HEAD = 'HEAD';
 
 // #endregion
 

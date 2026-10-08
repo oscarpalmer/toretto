@@ -1,25 +1,8 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
 import {SizedMap} from '@oscarpalmer/atoms/sized/map';
 import {getString} from '@oscarpalmer/atoms/string';
+import type {HtmlOptions, Tagged} from '../models/html.model';
 import {sanitizeNodes} from './sanitize';
-
-// #region Types
-
-export type HtmlOptions = {
-	/**
-	 * Cache template element for the _HTML_ string? _(defaults to `true`)_
-	 */
-	cache?: boolean;
-};
-
-type Options = Required<HtmlOptions>;
-
-type Tagged = {
-	nodes: Node[];
-	template: string;
-};
-
-// #endregion
 
 // #region Functions
 
@@ -42,7 +25,7 @@ function createHtml(value: string | HTMLTemplateElement): string {
 
 function createTemplate(
 	value: string | HTMLTemplateElement,
-	options: Options,
+	options: Required<HtmlOptions>,
 ): HTMLTemplateElement {
 	const template = document.createElement(TEMPLATE_TAG);
 
@@ -63,7 +46,7 @@ function getHtml(value: string | HTMLTemplateElement): string {
 	return `${TEMPORARY_ELEMENT}${typeof value === 'string' ? value : value.innerHTML}${TEMPORARY_ELEMENT}`;
 }
 
-function getNodes(value: unknown, options: Options, nodes?: Node[]): Node[] {
+function getNodes(value: unknown, options: Required<HtmlOptions>, nodes?: Node[]): Node[] {
 	if (typeof value !== 'string' && !(value instanceof HTMLTemplateElement)) {
 		return [];
 	}
@@ -83,12 +66,12 @@ function getNodes(value: unknown, options: Options, nodes?: Node[]): Node[] {
 	return cloned;
 }
 
-function getOptions(input?: unknown): Options {
+function getOptions(input?: unknown): Required<HtmlOptions> {
 	const options = isPlainObject(input) ? input : {};
 
 	options.cache = typeof options.cache === 'boolean' ? options.cache : true;
 
-	return options as Options;
+	return options as Required<HtmlOptions>;
 }
 
 function getParser(): DOMParser {
@@ -151,7 +134,7 @@ function getTagged(strings: TemplateStringsArray, values: unknown[]): Tagged {
 
 function getTemplate(
 	value: string | HTMLTemplateElement,
-	options: Options,
+	options: Required<HtmlOptions>,
 ): HTMLTemplateElement | undefined {
 	if (value instanceof HTMLTemplateElement) {
 		return createTemplate(value, options);

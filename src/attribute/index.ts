@@ -77,7 +77,6 @@ export function isInvalidBooleanAttribute(first: unknown, second?: unknown): boo
 
 // #region Exports
 
-export {booleanAttributes} from '../internal/attribute';
 export * from './get.attribute';
 export {setAttribute, setAttributes} from './set.attribute';
 

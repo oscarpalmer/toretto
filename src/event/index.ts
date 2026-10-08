@@ -2,24 +2,9 @@ import {noop} from '@oscarpalmer/atoms/function';
 import {isPlainObject} from '@oscarpalmer/atoms/is';
 import {getBoolean} from '../internal/get-value';
 import {isEventTarget} from '../internal/is';
-import type {CustomEventListener, EventPosition, RemovableEventListener} from '../models';
-import {
-	addDelegatedListener,
-	type EventTargetWithListeners,
-	getDelegatedName,
-	removeDelegatedListener,
-} from './delegation';
-
-// #region Types
-
-type EventOptions = {
-	capture: boolean;
-	once: boolean;
-	passive: boolean;
-	signal?: AbortSignal;
-};
-
-// #endregion
+import type {EventOptions, EventTargetWithListeners} from '../models/event.model';
+import type {CustomEventListener, EventPosition, RemovableEventListener} from '../models/index';
+import {addDelegatedListener, getDelegatedName, removeDelegatedListener} from './delegation';
 
 // #region Functions
 

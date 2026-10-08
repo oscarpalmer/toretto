@@ -2,7 +2,8 @@ import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {parse} from '@oscarpalmer/atoms/string';
 import {camelCase, kebabCase} from '@oscarpalmer/atoms/string/case';
 import {setElementValues, updateElementValue} from './internal/element-value';
-import {EXPRESSION_DATA_PREFIX} from './internal/get-value';
+import {ATTRIBUTE_DATA_PREFIX} from './models/attribute.model';
+import {DATA_EXPRESSION_PREFIX} from './models/misc.model';
 
 // #region Functions
 
@@ -129,7 +130,7 @@ function getDataValue(
 }
 
 function getName(original: string): string {
-	return `${ATTRIBUTE_DATA_PREFIX}${kebabCase(original.replace(EXPRESSION_DATA_PREFIX, ''))}`;
+	return `${ATTRIBUTE_DATA_PREFIX}${kebabCase(original.replace(DATA_EXPRESSION_PREFIX, ''))}`;
 }
 
 /**
@@ -167,11 +168,5 @@ function updateDataAttribute(element: Element, key: string, value: unknown): voi
 		true,
 	);
 }
-
-// #endregion
-
-// #region Variables
-
-const ATTRIBUTE_DATA_PREFIX = 'data-';
 
 // #endregion

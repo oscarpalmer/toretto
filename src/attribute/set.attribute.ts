@@ -1,12 +1,7 @@
 import {updateAttribute} from '../internal/attribute';
 import {setElementValue, setElementValues} from '../internal/element-value';
-import type {Attribute} from '../models';
-
-// #region Types
-
-export type DispatchedAttributeName = 'checked' | 'open' | 'value';
-
-// #endregion
+import type {DispatchedAttributeName} from '../models/attribute.model';
+import type {Attribute} from '../models/index';
 
 // #region Functions
 

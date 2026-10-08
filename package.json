@@ -1,11 +1,15 @@
 {
 	"name": "@oscarpalmer/toretto",
-	"version": "0.55.0",
+	"version": "0.56.0",
 	"description": "A collection of badass DOM utilities.",
 	"keywords": [
+		"aria",
+		"attribute",
 		"dom",
+		"event",
 		"html",
 		"sanitization",
+		"style",
 		"utility"
 	],
 	"license": "MIT",
@@ -18,8 +22,7 @@
 		"url": "git+https://github.com/oscarpalmer/toretto.git"
 	},
 	"files": [
-		"dist",
-		"src"
+		"dist"
 	],
 	"type": "module",
 	"module": "dist/index.mjs",
@@ -67,7 +70,7 @@
 			"default": "./dist/is.mjs"
 		},
 		"./models": {
-			"types": "./dist/models.d.mts"
+			"types": "./dist/models/index.d.mts"
 		},
 		"./property": {
 			"types": "./dist/property/index.d.mts",
@@ -90,7 +93,7 @@
 		"test:leak": "npx vp test run --detect-async-leaks --coverage"
 	},
 	"dependencies": {
-		"@oscarpalmer/atoms": "^0.205"
+		"@oscarpalmer/atoms": "^0.216"
 	},
 	"devDependencies": {
 		"@types/node": "^26.6",

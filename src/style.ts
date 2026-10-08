@@ -2,37 +2,20 @@ import {getString} from '@oscarpalmer/atoms/string';
 import {setElementValues, updateElementValue} from './internal/element-value';
 import {getStyleValue} from './internal/get-value';
 import type {CSSValues, TextDirection} from './models';
-
-// #region Types
-
-type InternalStyleToggler = {
-	[STYLE_SYMBOL]: StyleTogglerState;
-} & StyleToggler;
-
-export type StyleToggler = {
-	/**
-	 * Set the provided styles on the element
-	 */
-	set(): void;
-	/**
-	 * Remove the provided styles from the element _(and sets any previous styles)_
-	 */
-	remove(): void;
-};
-
-type StyleTogglerState = {
-	active: boolean;
-	element: Element;
-	keys: string[];
-	styles: Record<string, unknown>;
-	values: Record<string, unknown>;
-};
-
-// #endregion
+import {CSS_VARIABLE_PREFIX} from './models/misc.model';
+import {
+	type InternalStyleToggler,
+	type StyleToggler,
+	STYLE_ATTRIBUTE,
+	STYLE_DIRECTION_LTR,
+	STYLE_DIRECTION_RTL,
+	STYLE_PROPERTY_DIRECTION,
+	STYLE_SYMBOL,
+} from './models/style.model';
 
 // #region Instances
 
-function StyleToggler(this: any, element: Element, styles: Partial<CSSValues>) {
+function StyleToggler(this: any, element: Element, styles: Partial<CSSValues>): void {
 	this[STYLE_SYMBOL] = {
 		element,
 		styles,
@@ -233,14 +216,14 @@ function updateStyleProperty(element: Element, key: string, value: unknown): voi
 		key,
 		value,
 		function (this: Element, name: string, style: unknown) {
-			if (name.startsWith(STYLE_VARIABLE_PREFIX)) {
+			if (name.startsWith(CSS_VARIABLE_PREFIX)) {
 				(this as HTMLElement).style.setProperty(name, getString(style));
 			} else {
 				(this as HTMLElement).style[name as never] = getString(style);
 			}
 		},
 		function (this: Element, name: string) {
-			if (name.startsWith(STYLE_VARIABLE_PREFIX)) {
+			if (name.startsWith(CSS_VARIABLE_PREFIX)) {
 				(this as HTMLElement).style.removeProperty(name);
 			} else {
 				(this as HTMLElement).style[name as never] = '';
@@ -256,18 +239,8 @@ function updateStyleProperty(element: Element, key: string, value: unknown): voi
 
 // #endregion
 
-// #region Variables
+// #region Exports
 
-const STYLE_ATTRIBUTE = 'style';
-
-const STYLE_DIRECTION_LTR = 'ltr';
-
-const STYLE_DIRECTION_RTL = 'rtl';
-
-const STYLE_PROPERTY_DIRECTION = 'direction';
-
-const STYLE_SYMBOL = Symbol(STYLE_ATTRIBUTE);
-
-const STYLE_VARIABLE_PREFIX = '--';
+export type {StyleToggler};
 
 // #endregion

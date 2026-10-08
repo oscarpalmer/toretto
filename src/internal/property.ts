@@ -1,6 +1,7 @@
 import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {getString} from '@oscarpalmer/atoms/string';
 import {camelCase} from '@oscarpalmer/atoms/string/case';
+import {elementEvents} from '../models/event.model';
 import {isInputElement} from './is';
 
 // #region Functions
@@ -39,16 +40,5 @@ export function updateProperty(
 		element.dispatchEvent(new Event(event, {bubbles: true, cancelable: true}));
 	}
 }
-
-// #endregion
-
-// #region Variables
-
-const elementEvents: Record<string, Record<string, string>> = {
-	DETAILS: {open: 'toggle'},
-	INPUT: {checked: 'change', value: 'input'},
-	SELECT: {value: 'change'},
-	TEXTAREA: {value: 'input'},
-};
 
 // #endregion

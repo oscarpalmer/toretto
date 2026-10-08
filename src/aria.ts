@@ -1,39 +1,14 @@
+import {getAriaName, getAriaValue} from './internal/aria';
+import {setElementValues, updateElementValue} from './internal/element-value';
+import type {AnyAriaAttribute, AnyAriaBooleanAttribute, AriaAttributes, AriaRole} from './models';
 import {
+	ARIA_EXPRESSION_BOOLEAN,
+	ARIA_EXPRESSION_PREFIX,
 	ariaBooleanAttributes,
 	ariaBooleanAttributesSet,
-	ATTRIBUTE_ARIA_PREFIX,
-	EXPRESSION_ARIA_PREFIX,
-	EXPRESSION_BOOLEAN,
-	getAriaName,
-	getAriaValue,
-} from './internal/aria';
-import {setElementValues, updateElementValue} from './internal/element-value';
-import type {
-	AnyAriaAttribute,
-	AnyAriaBooleanAttribute,
-	AnyAriaNumericalAttribute,
-	AriaAttributes,
-	AriaRole,
-} from './models';
-
-// #region Types
-
-type AriaAttributeItem<Name extends AnyAriaAttribute = AnyAriaAttribute> = {
-	name: Name;
-	value?: Name extends AnyAriaBooleanAttribute ? boolean | string : string;
-};
-
-type AriaAttributeValues<Attribute extends AnyAriaAttribute> = {
-	[
-		Key in Attribute as Key extends `aria-${infer Name}` ? Name : Key
-	]: Key extends AnyAriaBooleanAttribute
-		? boolean | string | undefined
-		: Key extends AnyAriaNumericalAttribute
-			? number | string | undefined
-			: string | undefined;
-};
-
-// #endregion
+	type AriaAttributeItem,
+	type AriaAttributeValues,
+} from './models/aria.model';
 
 // #region Functions
 
@@ -93,7 +68,7 @@ export function getAria(element: Element, value?: string | string[]): unknown {
 		attributes = value;
 	} else if (value == null) {
 		attributes = [...element.attributes]
-			.filter(attribute => EXPRESSION_ARIA_PREFIX.test(attribute.name))
+			.filter(attribute => ARIA_EXPRESSION_PREFIX.test(attribute.name))
 			.map(attribute => attribute.name);
 	}
 
@@ -109,7 +84,7 @@ export function getAria(element: Element, value?: string | string[]): unknown {
 		const attribute = attributes[index];
 
 		if (typeof attribute === 'string') {
-			arias[attribute.replace(ATTRIBUTE_ARIA_PREFIX, '')] = getAriaValue(element, attribute);
+			arias[attribute.replace(ARIA_EXPRESSION_PREFIX, '')] = getAriaValue(element, attribute);
 		}
 	}
 
@@ -202,7 +177,7 @@ function updateAriaAttribute(element: Element, key: string, value: unknown): voi
 	if (
 		ariaBooleanAttributesSet.has(name as never) &&
 		typeof value === 'string' &&
-		EXPRESSION_BOOLEAN.test(value)
+		ARIA_EXPRESSION_BOOLEAN.test(value)
 	) {
 		actual = value.toLowerCase() === 'true';
 	}
@@ -225,6 +200,6 @@ function updateAriaAttribute(element: Element, key: string, value: unknown): voi
 
 // #region Exports
 
-export {ariaBooleanAttributes, ariaBooleanAttributesSet};
+export {ariaBooleanAttributes, ariaBooleanAttributesSet, type AriaAttributeValues};
 
 // #endregion

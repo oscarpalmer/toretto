@@ -1,3 +1,5 @@
+import type {SupportsTouch, SupportsTouchState} from './models/touch.model';
+
 // #region Types
 
 type InternalSupportsTouch = {
@@ -8,34 +10,11 @@ type NavigatorWithMsMaxTouchPoints = Navigator & {
 	msMaxTouchPoints: number;
 };
 
-type SupporsTouch = {
-	/**
-	 * Are touch events supported?
-	 */
-	readonly value: boolean;
-	/**
-	 * Are touch events supported?
-	 *
-	 * @returns `true` if touch events are supported, otherwise `false`
-	 */
-	get(): boolean;
-	/**
-	 * Re-evaluate if touch events are supported
-	 *
-	 * @returns `true` if touch events are supported, otherwise `false`
-	 */
-	update(): boolean;
-};
-
-type SupportsTouchState = {
-	supported: boolean;
-};
-
 // #endregion
 
 // #region Instances
 
-function SupportsTouch(this: any) {
+function SupportsTouch(this: any): void {
 	this[SUPPORTS_TOUCH_SYMBOL] = {
 		supported: checkSupport(),
 	};
@@ -105,12 +84,12 @@ const SUPPORTS_TOUCH_SYMBOL = Symbol('supportsTouch');
  * Does the device support touch events?
  */
 // @ts-expect-error All good, no worries :-)
-const supportsTouch: SupporsTouch = new SupportsTouch();
+const supportsTouch: SupportsTouch = new SupportsTouch();
 
 // #endregion
 
 // #region Exports
 
-export default supportsTouch;
+export {supportsTouch, type SupportsTouch};
 
 // #endregion

@@ -1,22 +1,7 @@
 import {kebabCase} from '@oscarpalmer/atoms/string/case';
 import {getAttributeValue} from '../internal/get-value';
-import type {AriaBooleanAttribute} from '../models';
-
-// #region Types
-
-type ParsedAttributes<Keys extends string = string> = {
-	[Key in Keys]: Key extends AriaBooleanAttribute
-		? boolean | undefined
-		: Key extends `data-${string}`
-			? unknown
-			: string | undefined;
-};
-
-type UnparsedAttributes<Keys extends string = string> = {
-	[Key in Keys]: Key extends AriaBooleanAttribute ? boolean | undefined : string | undefined;
-};
-
-// #endregion
+import type {ParsedAttributes, UnparsedAttributes} from '../models/attribute.model';
+import type {AriaBooleanAttribute} from '../models/index';
 
 // #region Functions
 

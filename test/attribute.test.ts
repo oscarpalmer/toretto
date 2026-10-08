@@ -1,5 +1,6 @@
 import {expect, test} from 'vite-plus/test';
 import * as Attribute from '../src/attribute/index';
+import {booleanAttributes} from '../src/models/attribute.model';
 
 const nonBooleanAttributes: string[] = [
 	'abbr',
@@ -403,7 +404,7 @@ test('isBadAttribute', () => {
 });
 
 test('isBooleanAttribute', () => {
-	const attributes = [...Attribute.booleanAttributes, ...nonBooleanAttributes];
+	const attributes = [...booleanAttributes, ...nonBooleanAttributes];
 
 	const {length} = attributes;
 
@@ -411,7 +412,7 @@ test('isBooleanAttribute', () => {
 		const attribute = attributes[index];
 
 		expect(Attribute.isBooleanAttribute(attribute)).toBe(
-			index < Attribute.booleanAttributes.length,
+			index < booleanAttributes.length,
 		);
 	}
 
@@ -419,10 +420,10 @@ test('isBooleanAttribute', () => {
 });
 
 test('isInvalidBooleanAttribute', () => {
-	let {length} = Attribute.booleanAttributes;
+	let {length} = booleanAttributes;
 
 	for (let index = 0; index < length; index += 1) {
-		const name = Attribute.booleanAttributes[index];
+		const name = booleanAttributes[index];
 
 		expect(Attribute.isInvalidBooleanAttribute({name, value: ''})).toBe(false);
 

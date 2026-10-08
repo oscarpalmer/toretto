@@ -1,31 +1,14 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import type {Primitive} from '@oscarpalmer/atoms/models';
 import {setAria} from './aria';
 import {setAttributes} from './attribute';
 import {setData} from './data';
-import type {AnyAriaAttribute, AnyAriaBooleanAttribute, CSSValues} from './models';
+import {
+	CREATE_MESSAGE,
+	type CreateElementValues,
+	type CreateElementValuesProperties,
+} from './models/create.model';
 import {setProperties} from './property';
 import {setStyles} from './style';
-
-// #region Types
-
-type CreateElementValues<Target extends Element> = {
-	aria?: CreateElementValuesAria;
-	attribute?: Record<string, unknown>;
-	data?: Record<string, unknown>;
-	property?: CreateElementValuesProperties<Target>;
-	style?: Partial<CSSValues>;
-};
-
-type CreateElementValuesAria = {
-	[Key in AnyAriaAttribute]?: Key extends AnyAriaBooleanAttribute ? boolean | string : string;
-};
-
-type CreateElementValuesProperties<Target extends Element> = {
-	[Property in keyof Target]?: Target[Property] extends Primitive ? Target[Property] : never;
-};
-
-// #endregion
 
 // #region Functions
 
@@ -55,7 +38,7 @@ export function createElement(
 
 export function createElement(tag: string, values?: CreateElementValues<HTMLElement>): HTMLElement {
 	if (typeof tag !== 'string') {
-		throw new TypeError(MESSAGE);
+		throw new TypeError(CREATE_MESSAGE);
 	}
 
 	const element = document.createElement(tag);
@@ -91,8 +74,8 @@ function getElementValues<Target extends Element>(input?: unknown): CreateElemen
 
 // #endregion
 
-// #region Variables
+// #region Exports
 
-const MESSAGE = 'Tag name must be a string';
+export type {CreateElementValues};
 
 // #endregion

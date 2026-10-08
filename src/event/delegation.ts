@@ -1,23 +1,21 @@
 import {isEventTarget} from '../internal/is';
-import type {CustomEventListener, RemovableEventListener} from '../models';
-
-// #region Types
-
-export type EventTargetWithListeners = EventTarget &
-	Partial<{
-		[key: string]: Set<EventListener | CustomEventListener>;
-	}>;
-
-// #endregion
+import {
+	EVENT_DELEGATED,
+	EVENT_SUFFIX_ACTIVE,
+	EVENT_SUFFIX_PASSIVE,
+	EVENT_DELEGATABLE,
+	type EventTargetWithListeners,
+} from '../models/event.model';
+import type {CustomEventListener, RemovableEventListener} from '../models/index';
 
 // #region Functions
 
 function addDelegatedHandler(doc: Document, type: string, name: string, passive: boolean): void {
-	if (DELEGATED.has(name)) {
+	if (EVENT_DELEGATED.has(name)) {
 		return;
 	}
 
-	DELEGATED.add(name);
+	EVENT_DELEGATED.add(name);
 
 	doc.addEventListener(type, passive ? HANDLER_PASSIVE : HANDLER_ACTIVE, {
 		passive,
@@ -103,7 +101,7 @@ export function getDelegatedName(
 	options: AddEventListenerOptions,
 ): string | undefined {
 	return isEventTarget(target) &&
-		EVENT_TYPES.has(type) &&
+		EVENT_DELEGATABLE.has(type) &&
 		!options.capture &&
 		!options.once &&
 		options.signal == null
@@ -134,37 +132,6 @@ export function removeDelegatedListener(
 // #endregion
 
 // #region Variables
-
-const DELEGATED = new Set<string>();
-
-const EVENT_SUFFIX_ACTIVE = ':active';
-
-const EVENT_SUFFIX_PASSIVE = ':passive';
-
-const EVENT_TYPES = new Set([
-	'beforeinput',
-	'click',
-	'dblclick',
-	'contextmenu',
-	'focusin',
-	'focusout',
-	'input',
-	'keydown',
-	'keyup',
-	'mousedown',
-	'mousemove',
-	'mouseout',
-	'mouseover',
-	'mouseup',
-	'pointerdown',
-	'pointermove',
-	'pointerout',
-	'pointerover',
-	'pointerup',
-	'touchend',
-	'touchmove',
-	'touchstart',
-]);
 
 const HANDLER_ACTIVE = delegatedEventHandler.bind(false);
 

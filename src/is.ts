@@ -1,3 +1,5 @@
+import {IS_CHILDNODES} from './models/misc.model';
+
 // #region Functions
 
 /**
@@ -7,7 +9,7 @@
  * @returns `true` if it's a child node, otherwise `false`
  */
 export function isChildNode(value: unknown): value is ChildNode {
-	return value instanceof Node && CHILD_NODE_TYPES.has(value.nodeType);
+	return value instanceof Node && IS_CHILDNODES.has(value.nodeType);
 }
 
 /**
@@ -40,18 +42,6 @@ export function isInDocument(node: Node, doc?: Document): boolean {
 		? node === doc
 		: node.ownerDocument === doc && doc.contains(node);
 }
-
-// #endregion
-
-// #region Variables
-
-const CHILD_NODE_TYPES: Set<number> = new Set([
-	Node.ELEMENT_NODE,
-	Node.TEXT_NODE,
-	Node.PROCESSING_INSTRUCTION_NODE,
-	Node.COMMENT_NODE,
-	Node.DOCUMENT_TYPE_NODE,
-]);
 
 // #endregion
 

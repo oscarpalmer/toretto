@@ -3,6 +3,18 @@ import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {getString} from '@oscarpalmer/atoms/string';
 import {kebabCase} from '@oscarpalmer/atoms/string/case';
 import type {Attribute} from '../models';
+import {
+	ATTRIBUTE_EXPRESSION_CLOBBERED_NAME,
+	ATTRIBUTE_EXPRESSION_DATA_OR_SCRIPT,
+	ATTRIBUTE_EXPRESSION_EVENT_NAME,
+	ATTRIBUTE_EXPRESSION_SKIP_NAME,
+	ATTRIBUTE_EXPRESSION_SOURCE_NAME,
+	ATTRIBUTE_EXPRESSION_SOURCE_VALUE,
+	ATTRIBUTE_EXPRESSION_URI_VALUE,
+	ATTRIBUTE_EXPRESSION_WHITESPACE,
+	booleanAttributesSet,
+	dispatchedAttributes,
+} from '../models/attribute.model';
 import {updateElementValue} from './element-value';
 import {updateProperty} from './property';
 
@@ -14,21 +26,22 @@ function badAttributeHandler(name?: string, value?: string): boolean {
 	}
 
 	if (
-		(EXPRESSION_CLOBBERED_NAME.test(name) && (value in document || value in formElement)) ||
-		EXPRESSION_EVENT_NAME.test(name)
+		(ATTRIBUTE_EXPRESSION_CLOBBERED_NAME.test(name) &&
+			(value in document || value in formElement)) ||
+		ATTRIBUTE_EXPRESSION_EVENT_NAME.test(name)
 	) {
 		return true;
 	}
 
 	if (
-		EXPRESSION_SKIP_NAME.test(name) ||
-		EXPRESSION_URI_VALUE.test(value) ||
+		ATTRIBUTE_EXPRESSION_SKIP_NAME.test(name) ||
+		ATTRIBUTE_EXPRESSION_URI_VALUE.test(value) ||
 		isValidSourceAttribute(name, value)
 	) {
 		return false;
 	}
 
-	return EXPRESSION_DATA_OR_SCRIPT.test(value);
+	return ATTRIBUTE_EXPRESSION_DATA_OR_SCRIPT.test(value);
 }
 
 function booleanAttributeHandler(name?: string, value?: string): boolean {
@@ -80,7 +93,7 @@ function handleAttribute(
 		value = decodeAttribute(value);
 	}
 
-	return callback(name, value?.replace(EXPRESSION_WHITESPACE, ''));
+	return callback(name, value?.replace(ATTRIBUTE_EXPRESSION_WHITESPACE, ''));
 }
 
 export function isAttribute(value: unknown): value is Attr | Attribute {
@@ -114,7 +127,9 @@ export function _isInvalidBooleanAttribute(
 }
 
 function isValidSourceAttribute(name: string, value: string): boolean {
-	return EXPRESSION_SOURCE_NAME.test(name) && EXPRESSION_SOURCE_VALUE.test(value);
+	return (
+		ATTRIBUTE_EXPRESSION_SOURCE_NAME.test(name) && ATTRIBUTE_EXPRESSION_SOURCE_VALUE.test(value)
+	);
 }
 
 export function updateAttribute(
@@ -155,60 +170,6 @@ export function updateAttribute(
 // #endregion
 
 // #region Variables
-
-const EXPRESSION_CLOBBERED_NAME = /^(id|name)$/i;
-
-const EXPRESSION_DATA_OR_SCRIPT = /^(?:data|\w+script):/i;
-
-const EXPRESSION_EVENT_NAME = /^on/i;
-
-const EXPRESSION_SKIP_NAME = /^(aria-[-\w]+|data-[-\w.\u00B7-\uFFFF]+)$/i;
-
-const EXPRESSION_SOURCE_NAME = /^src$/i;
-
-const EXPRESSION_SOURCE_VALUE = /^data:/i;
-
-const EXPRESSION_URI_VALUE =
-	/^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|matrix):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i;
-
-// oxlint-disable-next-line no-control-regex
-const EXPRESSION_WHITESPACE = /[\u0000-\u0020\u00A0\u1680\u180E\u2000-\u2029\u205F\u3000]/g;
-
-//
-
-/**
- * List of boolean attributes
- */
-export const booleanAttributes: readonly string[] = Object.freeze([
-	'async',
-	'autofocus',
-	'autoplay',
-	'checked',
-	'controls',
-	'default',
-	'defer',
-	'disabled',
-	'formnovalidate',
-	'hidden',
-	'inert',
-	'ismap',
-	'itemscope',
-	'loop',
-	'multiple',
-	'muted',
-	'nomodule',
-	'novalidate',
-	'open',
-	'playsinline',
-	'readonly',
-	'required',
-	'reversed',
-	'selected',
-]);
-
-export const booleanAttributesSet: Set<string> = new Set(booleanAttributes);
-
-export const dispatchedAttributes: Set<string> = new Set(['checked', 'open', 'value']);
 
 const formElement = document.createElement('form');
 

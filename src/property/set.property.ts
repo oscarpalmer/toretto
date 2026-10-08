@@ -1,24 +1,16 @@
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import type {PlainObject, Primitive} from '@oscarpalmer/atoms/models';
+import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {setAttribute} from '../attribute';
-import type {DispatchedAttributeName} from '../attribute/set.attribute';
-import {booleanAttributesSet, dispatchedAttributes} from '../internal/attribute';
 import {updateProperty} from '../internal/property';
-
-// #region Types
-
-type DispatchedPropertyValue<
-	Target extends Element,
-	Property extends DispatchedAttributeName,
-> = Property extends keyof SetProperties<Target> ? SetProperties<Target>[Property] : never;
-
-type SetProperties<Target extends Element> = {
-	[
-		Property in keyof Target as Target[Property] extends Primitive ? Property : never
-	]?: Target[Property];
-};
-
-// #endregion
+import {
+	booleanAttributesSet,
+	dispatchedAttributes,
+	type DispatchedAttributeName,
+} from '../models/attribute.model';
+import type {
+	PropertyDispatchedPropertyValue,
+	PropertySetProperties,
+} from '../models/property.model';
 
 // #region Functions
 
@@ -33,7 +25,7 @@ type SetProperties<Target extends Element> = {
  */
 export function setProperties<Target extends Element>(
 	target: Target,
-	properties: SetProperties<Target>,
+	properties: PropertySetProperties<Target>,
 	dispatch?: boolean,
 ): void {
 	if (!(target instanceof Element) || !isPlainObject(properties)) {
@@ -61,7 +53,7 @@ export function setProperties<Target extends Element>(
 export function setProperty<Target extends Element, Property extends DispatchedAttributeName>(
 	target: Target,
 	property: Property,
-	value: DispatchedPropertyValue<Target, Property>,
+	value: PropertyDispatchedPropertyValue<Target, Property>,
 	dispatch?: boolean,
 ): void;
 
@@ -72,16 +64,18 @@ export function setProperty<Target extends Element, Property extends DispatchedA
  * @param property Property to set
  * @param value Value to set
  */
-export function setProperty<Target extends Element, Property extends keyof SetProperties<Target>>(
-	target: Target,
-	property: Property,
-	value: SetProperties<Target>[Property],
-): void;
+export function setProperty<
+	Target extends Element,
+	Property extends keyof PropertySetProperties<Target>,
+>(target: Target, property: Property, value: PropertySetProperties<Target>[Property]): void;
 
-export function setProperty<Target extends Element, Property extends keyof SetProperties<Target>>(
+export function setProperty<
+	Target extends Element,
+	Property extends keyof PropertySetProperties<Target>,
+>(
 	target: Target,
 	property: Property,
-	value: SetProperties<Target>[Property],
+	value: PropertySetProperties<Target>[Property],
 	dispatch?: boolean,
 ): void {
 	if (target instanceof Element && typeof property === 'string') {

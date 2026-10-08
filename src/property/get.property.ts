@@ -1,15 +1,5 @@
-import type {Primitive} from '@oscarpalmer/atoms/models';
 import {camelCase} from '@oscarpalmer/atoms/string/case';
-
-// #region Types
-
-type GetProperties<Target extends Element> = {
-	[
-		Property in keyof Target as Target[Property] extends Primitive ? Property : never
-	]?: Target[Property];
-};
-
-// #endregion
+import type {PropertyGetProperties} from '../models/property.model';
 
 // #region Functions
 
@@ -20,14 +10,14 @@ type GetProperties<Target extends Element> = {
  * @param properties Properties to get
  * @returns Property values
  */
-export function getProperties<Target extends Element, Property extends keyof GetProperties<Target>>(
-	target: Target,
-	properties: Property[],
-): Pick<GetProperties<Target>, Property> {
-	const values: Partial<GetProperties<Target>> = {};
+export function getProperties<
+	Target extends Element,
+	Property extends keyof PropertyGetProperties<Target>,
+>(target: Target, properties: Property[]): Pick<PropertyGetProperties<Target>, Property> {
+	const values: Partial<PropertyGetProperties<Target>> = {};
 
 	if (!(target instanceof Element && Array.isArray(properties))) {
-		return values as Pick<GetProperties<Target>, Property>;
+		return values as Pick<PropertyGetProperties<Target>, Property>;
 	}
 
 	const {length} = properties;
@@ -36,11 +26,14 @@ export function getProperties<Target extends Element, Property extends keyof Get
 		const property = properties[index];
 
 		if (typeof property === 'string') {
-			values[property] = getPropertyValue(target, property) as GetProperties<Target>[Property];
+			values[property] = getPropertyValue(
+				target,
+				property,
+			) as PropertyGetProperties<Target>[Property];
 		}
 	}
 
-	return values as Pick<GetProperties<Target>, Property>;
+	return values as Pick<PropertyGetProperties<Target>, Property>;
 }
 
 /**
@@ -50,12 +43,12 @@ export function getProperties<Target extends Element, Property extends keyof Get
  * @param property Property to get
  * @returns Property value
  */
-export function getProperty<Target extends Element, Property extends keyof GetProperties<Target>>(
-	target: Target,
-	property: Property,
-): GetProperties<Target>[Property] {
+export function getProperty<
+	Target extends Element,
+	Property extends keyof PropertyGetProperties<Target>,
+>(target: Target, property: Property): PropertyGetProperties<Target>[Property] {
 	return target instanceof Element && typeof property === 'string'
-		? (getPropertyValue(target, property) as GetProperties<Target>[Property])
+		? (getPropertyValue(target, property) as PropertyGetProperties<Target>[Property])
 		: undefined;
 }
 

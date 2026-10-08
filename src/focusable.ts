@@ -1,17 +1,28 @@
+import {
+	FOCUSABLE_ATTRIBUTE_CONTENTEDITABLE,
+	FOCUSABLE_ATTRIBUTE_INERT,
+	FOCUSABLE_ATTRIBUTE_TABINDEX,
+	FOCUSABLE_EXPRESSION_DISABLEABLE,
+	FOCUSABLE_EXPRESSION_SPECIAL_TABINDEX,
+	FOCUSABLE_EXPRESSION_SUMMARY,
+	FOCUSABLE_EXPRESSION_TRUEISH,
+	FOCUSABLE_SELECTOR_DETAILS_CLOSED_CHILDREN,
+	FOCUSABLE_SELECTOR_FIELDSET_DISABLED,
+	FOCUSABLE_SELECTOR_FULL,
+	FOCUSABLE_SELECTOR_RADIO_PREFIX,
+	FOCUSABLE_SELECTOR_RADIO_SUFFIX,
+	FOCUSABLE_SELECTOR_SUMMARY_FIRST,
+	FOCUSABLE_STYLE_HIDDEN,
+	FOCUSABLE_STYLE_NONE,
+	FOCUSABLE_TABINDEX_BASE,
+	FOCUSABLE_TABINDEX_DEFAULT,
+	FOCUSABLE_TYPE_RADIO,
+	type FocusableElementWithTabIndex,
+	type FocusableFilter,
+	type FocusableInertElement,
+} from './models/focusable.model';
+
 // Based on https://github.com/focus-trap/tabbable :-)
-
-// #region Types
-
-type ElementWithTabIndex = {
-	element: Element;
-	tabIndex: number;
-};
-
-type Filter = (item: ElementWithTabIndex) => boolean;
-
-type InertElement = Element & {inert: boolean};
-
-// #endregion
 
 // #region Functions
 
@@ -25,10 +36,10 @@ export function getFocusable(parent: Element): Element[] {
 	return getValidElements(parent, FILTERS_FOCUSABLE, false);
 }
 
-function getItem(element: Element, tabbable: boolean): ElementWithTabIndex {
+function getItem(element: Element, tabbable: boolean): FocusableElementWithTabIndex {
 	return {
 		element,
-		tabIndex: tabbable ? getTabIndex(element) : TABINDEX_DEFAULT,
+		tabIndex: tabbable ? getTabIndex(element) : FOCUSABLE_TABINDEX_DEFAULT,
 	};
 }
 
@@ -43,26 +54,30 @@ export function getTabbable(parent: Element): Element[] {
 }
 
 function getTabIndex(element: Element): number {
-	const tabIndex = (element as HTMLElement)?.tabIndex ?? TABINDEX_DEFAULT;
+	const tabIndex = (element as HTMLElement)?.tabIndex ?? FOCUSABLE_TABINDEX_DEFAULT;
 
 	if (
-		tabIndex < TABINDEX_BASE &&
-		(EXPRESSION_SPECIAL_TABINDEX.test(element.tagName) || isEditable(element)) &&
+		tabIndex < FOCUSABLE_TABINDEX_BASE &&
+		(FOCUSABLE_EXPRESSION_SPECIAL_TABINDEX.test(element.tagName) || isEditable(element)) &&
 		!hasTabIndex(element)
 	) {
-		return TABINDEX_BASE;
+		return FOCUSABLE_TABINDEX_BASE;
 	}
 
 	return tabIndex;
 }
 
-function getValidElements(parent: Element, filters: Filter[], tabbable: boolean): Element[] {
+function getValidElements(
+	parent: Element,
+	filters: FocusableFilter[],
+	tabbable: boolean,
+): Element[] {
 	if (!(parent instanceof Element)) {
 		return [];
 	}
 
-	const elements = [...parent.querySelectorAll(SELECTOR_FULL)];
-	const items: ElementWithTabIndex[] = [];
+	const elements = [...parent.querySelectorAll(FOCUSABLE_SELECTOR_FULL)];
+	const items: FocusableElementWithTabIndex[] = [];
 
 	let {length} = elements;
 
@@ -86,7 +101,7 @@ function getValidElements(parent: Element, filters: Filter[], tabbable: boolean)
 	for (let index = 0; index < length; index += 1) {
 		const item = items[index];
 
-		if (item.tabIndex === TABINDEX_BASE) {
+		if (item.tabIndex === FOCUSABLE_TABINDEX_BASE) {
 			zeroed.push(item.element);
 		} else {
 			indiced[item.tabIndex] = [...(indiced[item.tabIndex] ?? []), item.element];
@@ -97,11 +112,16 @@ function getValidElements(parent: Element, filters: Filter[], tabbable: boolean)
 }
 
 function hasTabIndex(element: Element): boolean {
-	return !Number.isNaN(Number.parseInt(element.getAttribute(ATTRIBUTE_TABINDEX) as string, 10));
+	return !Number.isNaN(
+		Number.parseInt(element.getAttribute(FOCUSABLE_ATTRIBUTE_TABINDEX) as string, 10),
+	);
 }
 
-function isDisabled(item: ElementWithTabIndex): boolean {
-	if (EXPRESSION_DISABLEABLE.test(item.element.tagName) && isDisabledFromFieldset(item.element)) {
+function isDisabled(item: FocusableElementWithTabIndex): boolean {
+	if (
+		FOCUSABLE_EXPRESSION_DISABLEABLE.test(item.element.tagName) &&
+		isDisabledFromFieldset(item.element)
+	) {
 		return true;
 	}
 
@@ -120,7 +140,7 @@ function isDisabledFromFieldset(element: Element): boolean {
 				const child = children[index];
 
 				if (child instanceof HTMLLegendElement) {
-					return parent.matches(SELECTOR_FIELDSET_DISABLED) || !child.contains(element);
+					return parent.matches(FOCUSABLE_SELECTOR_FIELDSET_DISABLED) || !child.contains(element);
 				}
 			}
 
@@ -134,7 +154,9 @@ function isDisabledFromFieldset(element: Element): boolean {
 }
 
 function isEditable(element: Element): boolean {
-	return EXPRESSION_TRUEISH.test(element.getAttribute(ATTRIBUTE_CONTENTEDITABLE) as string);
+	return FOCUSABLE_EXPRESSION_TRUEISH.test(
+		element.getAttribute(FOCUSABLE_ATTRIBUTE_CONTENTEDITABLE) as string,
+	);
 }
 
 /**
@@ -147,25 +169,25 @@ export function isFocusable(element: Element): boolean {
 	return element instanceof Element ? isValidElement(element, FILTERS_FOCUSABLE, false) : false;
 }
 
-function isHidden(item: ElementWithTabIndex): boolean {
+function isHidden(item: FocusableElementWithTabIndex): boolean {
 	if (
 		((item.element as HTMLElement).hidden ?? false) ||
-		(item.element instanceof HTMLInputElement && item.element.type === STYLE_HIDDEN)
+		(item.element instanceof HTMLInputElement && item.element.type === FOCUSABLE_STYLE_HIDDEN)
 	) {
 		return true;
 	}
 
-	const isDirectSummary = item.element.matches(SELECTOR_SUMMARY_FIRST);
+	const isDirectSummary = item.element.matches(FOCUSABLE_SELECTOR_SUMMARY_FIRST);
 
 	const nodeUnderDetails = isDirectSummary ? item.element.parentElement : item.element;
 
-	if (nodeUnderDetails?.matches(SELECTOR_DETAILS_CLOSED_CHILDREN) ?? false) {
+	if (nodeUnderDetails?.matches(FOCUSABLE_SELECTOR_DETAILS_CLOSED_CHILDREN) ?? false) {
 		return true;
 	}
 
 	const style = getComputedStyle(item.element);
 
-	if (style.display === STYLE_NONE || style.visibility === STYLE_HIDDEN) {
+	if (style.display === FOCUSABLE_STYLE_NONE || style.visibility === FOCUSABLE_STYLE_HIDDEN) {
 		return true;
 	}
 
@@ -174,26 +196,28 @@ function isHidden(item: ElementWithTabIndex): boolean {
 	return height === 0 && width === 0;
 }
 
-function isInert(item: ElementWithTabIndex): boolean {
+function isInert(item: FocusableElementWithTabIndex): boolean {
 	return (
-		((item.element as InertElement).inert ?? false) ||
-		EXPRESSION_TRUEISH.test(item.element.getAttribute(ATTRIBUTE_INERT) as string) ||
+		((item.element as FocusableInertElement).inert ?? false) ||
+		FOCUSABLE_EXPRESSION_TRUEISH.test(
+			item.element.getAttribute(FOCUSABLE_ATTRIBUTE_INERT) as string,
+		) ||
 		(item.element.parentElement != null &&
 			isInert({
 				element: item.element.parentElement,
-				tabIndex: TABINDEX_DEFAULT,
+				tabIndex: FOCUSABLE_TABINDEX_DEFAULT,
 			}))
 	);
 }
 
-function isNotTabbable(item: ElementWithTabIndex): boolean {
-	return (item.tabIndex ?? TABINDEX_DEFAULT) < TABINDEX_BASE;
+function isNotTabbable(item: FocusableElementWithTabIndex): boolean {
+	return (item.tabIndex ?? FOCUSABLE_TABINDEX_DEFAULT) < FOCUSABLE_TABINDEX_BASE;
 }
 
-function isNotTabbableRadio(item: ElementWithTabIndex): boolean {
+function isNotTabbableRadio(item: FocusableElementWithTabIndex): boolean {
 	if (
 		!(item.element instanceof HTMLInputElement) ||
-		item.element.type !== TYPE_RADIO ||
+		item.element.type !== FOCUSABLE_TYPE_RADIO ||
 		!item.element.name ||
 		item.element.checked
 	) {
@@ -206,7 +230,7 @@ function isNotTabbableRadio(item: ElementWithTabIndex): boolean {
 
 	const radios = [
 		...(parent as Element).querySelectorAll(
-			`${SELECTOR_RADIO_PREFIX}${realName}${SELECTOR_RADIO_SUFFIX}`,
+			`${FOCUSABLE_SELECTOR_RADIO_PREFIX}${realName}${FOCUSABLE_SELECTOR_RADIO_SUFFIX}`,
 		),
 	] as HTMLInputElement[];
 
@@ -215,10 +239,10 @@ function isNotTabbableRadio(item: ElementWithTabIndex): boolean {
 	return checked != null && checked !== item.element;
 }
 
-function isSummarised(item: ElementWithTabIndex): boolean {
+function isSummarised(item: FocusableElementWithTabIndex): boolean {
 	return (
 		item.element instanceof HTMLDetailsElement &&
-		[...item.element.children].some(child => EXPRESSION_SUMMARY.test(child.tagName))
+		[...item.element.children].some(child => FOCUSABLE_EXPRESSION_SUMMARY.test(child.tagName))
 	);
 }
 
@@ -232,7 +256,7 @@ export function isTabbable(element: Element): boolean {
 	return element instanceof Element ? isValidElement(element, FILTERS_TABBABLE, true) : false;
 }
 
-function isValidElement(element: Element, filters: Filter[], tabbable: boolean): boolean {
+function isValidElement(element: Element, filters: FocusableFilter[], tabbable: boolean): boolean {
 	const item = getItem(element, tabbable);
 
 	return !filters.some(filter => filter(item));
@@ -242,67 +266,17 @@ function isValidElement(element: Element, filters: Filter[], tabbable: boolean):
 
 // #region Variables
 
-const ATTRIBUTE_CONTENTEDITABLE = 'contenteditable';
-
-const ATTRIBUTE_INERT = 'inert';
-
-const ATTRIBUTE_TABINDEX = 'tabindex';
-
-const EXPRESSION_DISABLEABLE = /^(button|input|select|textarea)$/i;
-
-const EXPRESSION_SPECIAL_TABINDEX = /^(audio|details|video)$/i;
-
-const EXPRESSION_SUMMARY = /^summary$/i;
-
-const EXPRESSION_TRUEISH = /^(|true)$/i;
-
-const FILTERS_FOCUSABLE: Array<(item: ElementWithTabIndex) => boolean> = [
+const FILTERS_FOCUSABLE: Array<(item: FocusableElementWithTabIndex) => boolean> = [
 	isDisabled,
 	isInert,
 	isHidden,
 	isSummarised,
 ];
 
-const FILTERS_TABBABLE: Array<(item: ElementWithTabIndex) => boolean> = [
+const FILTERS_TABBABLE: Array<(item: FocusableElementWithTabIndex) => boolean> = [
 	isNotTabbable,
 	isNotTabbableRadio,
 	...FILTERS_FOCUSABLE,
 ];
-
-const SELECTOR_DETAILS_CLOSED_CHILDREN = 'details:not([open]) *';
-
-const SELECTOR_FIELDSET_DISABLED = 'fieldset[disabled] *';
-
-const SELECTOR_SUMMARY_FIRST = 'details > summary:first-of-type';
-
-const SELECTOR_RADIO_PREFIX = 'input[type="radio"][name="';
-
-const SELECTOR_RADIO_SUFFIX = '"]';
-
-const SELECTOR_FULL: string = [
-	'[contenteditable]:not([contenteditable="false"])',
-	'[tabindex]:not(slot)',
-	'a[href]',
-	'audio[controls]',
-	'button',
-	'details',
-	SELECTOR_SUMMARY_FIRST,
-	'input',
-	'select',
-	'textarea',
-	'video[controls]',
-]
-	.map(selector => `${selector}:not([inert])`)
-	.join(',');
-
-const STYLE_HIDDEN = 'hidden';
-
-const STYLE_NONE = 'none';
-
-const TABINDEX_BASE = 0;
-
-const TABINDEX_DEFAULT = -1;
-
-const TYPE_RADIO = 'radio';
 
 // #endregion

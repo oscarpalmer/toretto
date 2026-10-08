@@ -1,10 +1,11 @@
 import {setAttribute} from '../attribute/set.attribute';
 import {_isBadAttribute, _isInvalidBooleanAttribute} from '../internal/attribute';
+import {HTML_COMMENT_HARMFUL, HTML_REMOVE_SELECTOR} from '../models/html.model';
 
 // #region Functions
 
 function handleElement(element: Element): void {
-	const removable = [...element.querySelectorAll(REMOVE_SELECTOR)];
+	const removable = [...element.querySelectorAll(HTML_REMOVE_SELECTOR)];
 	const {length} = removable;
 
 	for (let index = 0; index < length; index += 1) {
@@ -71,7 +72,7 @@ export function sanitizeNodes(nodes: Node[] | NodeList): Node[] {
 					break;
 
 				case Node.COMMENT_NODE:
-					remove = COMMENT_HARMFUL.test((node as Comment).data);
+					remove = HTML_COMMENT_HARMFUL.test((node as Comment).data);
 					break;
 
 				case Node.DOCUMENT_TYPE_NODE:
@@ -99,13 +100,5 @@ export function sanitizeNodes(nodes: Node[] | NodeList): Node[] {
 
 	return actual;
 }
-
-// #endregion
-
-// #region Variables
-
-const COMMENT_HARMFUL = /<[/\w]/g;
-
-const REMOVE_SELECTOR = 'script, toretto-temporary';
 
 // #endregion

@@ -1,8 +1,5 @@
-import supportsTouch from './touch';
-
 export * from './aria';
 export {
-	booleanAttributes,
 	getAttribute,
 	getAttributes,
 	isBadAttribute,
@@ -18,8 +15,15 @@ export * from './find/index';
 export * from './focusable';
 export * from './html/index';
 export * from './is';
-export * from './models';
+export {
+	ariaBooleanAttributes,
+	ariaNumericalAttributes,
+	type AriaAttributeValues,
+} from './models/aria.model';
+export {
+	booleanAttributes,
+} from './models/attribute.model';
+export * from './models/index';
 export * from './property/index';
 export * from './style';
-
-export {supportsTouch};
+export * from './touch';

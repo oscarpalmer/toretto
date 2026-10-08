@@ -16,7 +16,9 @@ export default defineConfig({
 			// https://tsdown.dev/options/dependencies#deps-resolvedepsubpath
 			resolveDepSubpath: true,
 		},
-		dts: true,
+		dts: {
+			generator: 'oxc',
+		},
 		entry: ['./src/**/*.ts'],
 		unbundle: true,
 	},

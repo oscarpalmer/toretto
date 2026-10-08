@@ -1,4 +1,11 @@
-import type {AriaBooleanAttribute, AriaNumericalAttribute} from '../models';
+import {
+	ARIA_EXPRESSION_BOOLEAN,
+	ARIA_EXPRESSION_NUMERICAL,
+	ARIA_EXPRESSION_PREFIX,
+	ARIA_PREFIX,
+	ariaBooleanAttributesSet,
+	ariaNumericalAttributesSet,
+} from '../models/aria.model';
 
 // #region Functions
 
@@ -10,7 +17,7 @@ export function getAriaValue(element: Element, attribute: string): unknown {
 	if (
 		ariaBooleanAttributesSet.has(name as never) &&
 		typeof value === 'string' &&
-		EXPRESSION_BOOLEAN.test(value)
+		ARIA_EXPRESSION_BOOLEAN.test(value)
 	) {
 		return value.toLowerCase() === 'true';
 	}
@@ -18,7 +25,7 @@ export function getAriaValue(element: Element, attribute: string): unknown {
 	if (
 		ariaNumericalAttributesSet.has(name as never) &&
 		typeof value === 'string' &&
-		EXPRESSION_NUMERICAL.test(value)
+		ARIA_EXPRESSION_NUMERICAL.test(value)
 	) {
 		return Number.parseFloat(value);
 	}
@@ -27,71 +34,7 @@ export function getAriaValue(element: Element, attribute: string): unknown {
 }
 
 export function getAriaName(value: string): string {
-	return EXPRESSION_ARIA_PREFIX.test(value) ? value : `${ATTRIBUTE_ARIA_PREFIX}${value}`;
+	return ARIA_EXPRESSION_PREFIX.test(value) ? value : `${ARIA_PREFIX}${value}`;
 }
-
-// #endregion
-
-// #region Variables
-
-export const ATTRIBUTE_ARIA_PREFIX = 'aria-';
-
-export const EXPRESSION_ARIA_PREFIX: RegExp = /^aria-/i;
-
-export const EXPRESSION_BOOLEAN: RegExp = /^(true|false)$/i;
-
-export const EXPRESSION_NUMERICAL: RegExp = /^-?\d+(\.\d+)?$/;
-
-/**
- * List of _ARIA_ attributes that can be treated as boolean values
- */
-export const ariaBooleanAttributes: readonly AriaBooleanAttribute[] = Object.freeze([
-	'aria-atomic',
-	'aria-busy',
-	'aria-checked',
-	'aria-current',
-	'aria-disabled',
-	'aria-expanded',
-	'aria-haspopup',
-	'aria-hidden',
-	'aria-invalid',
-	'aria-modal',
-	'aria-multiline',
-	'aria-multiselectable',
-	'aria-pressed',
-	'aria-readonly',
-	'aria-required',
-	'aria-selected',
-]);
-
-/**
- * Set of _ARIA_ attributes that can be treated as boolean values
- */
-export const ariaBooleanAttributesSet: Set<AriaBooleanAttribute> = new Set(ariaBooleanAttributes);
-
-/**
- * List of _ARIA_ attributes that can be treated as numerical values
- */
-export const ariaNumericalAttributes: readonly AriaNumericalAttribute[] = Object.freeze([
-	'aria-colcount',
-	'aria-colindex',
-	'aria-colspan',
-	'aria-level',
-	'aria-posinset',
-	'aria-rowcount',
-	'aria-rowindex',
-	'aria-rowspan',
-	'aria-setsize',
-	'aria-valuemax',
-	'aria-valuemin',
-	'aria-valuenow',
-]);
-
-/**
- * Set of _ARIA_ attributes that can be treated as numerical values
- */
-export const ariaNumericalAttributesSet: Set<AriaNumericalAttribute> = new Set(
-	ariaNumericalAttributes,
-);
 
 // #endregion

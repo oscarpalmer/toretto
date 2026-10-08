@@ -1,5 +1,6 @@
 import {getString} from '@oscarpalmer/atoms/string';
 import {kebabCase} from '@oscarpalmer/atoms/string/case';
+import {CSS_VARIABLE_PREFIX} from '../models/misc.model';
 import {isAttribute} from './attribute';
 
 // #region Functions
@@ -97,9 +98,3 @@ export function updateElementValue(
 }
 
 // #endregion Functions
-
-// #region Variables
-
-const CSS_VARIABLE_PREFIX = '--';
-
-// #endregion
