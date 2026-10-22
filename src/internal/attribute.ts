@@ -142,21 +142,32 @@ export function updateAttribute(
 
 	const isBoolean = booleanAttributesSet.has(lowerCaseName);
 
-	const next = isBoolean
-		? value === true ||
-			(typeof value === 'string' && (value === '' || value.toLowerCase() === lowerCaseName))
-		: value == null
-			? ''
-			: value;
+	let next: unknown;
+
+	if (isBoolean) {
+		next =
+			value === true ||
+			(typeof value === 'string' && (value === '' || value.toLowerCase() === lowerCaseName));
+	} else {
+		next = value ?? '';
+	}
 
 	if (isBoolean || dispatchedAttributes.has(name)) {
 		updateProperty(element, name, next, dispatch);
 	}
 
+	let nextValue: unknown;
+
+	if (isBoolean) {
+		nextValue = next ? '' : null;
+	} else {
+		nextValue = value;
+	}
+
 	updateElementValue(
 		element,
 		name,
-		isBoolean ? (next ? '' : null) : value,
+		nextValue,
 		// Using `.call` in `updateElementValue`
 		// oxlint-disable-next-line typescript/unbound-method
 		element.setAttribute,

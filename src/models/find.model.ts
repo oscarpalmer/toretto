@@ -1,3 +1,11 @@
+// #region Types
+
+export type FindAncestorOrigin = Element | Event | EventTarget;
+
+export type FindResult = Element | Element[] | null;
+
+// #endregion
+
 // #region Variables
 
 export const FIND_QUERY_SELECTOR_ALL = 'querySelectorAll';

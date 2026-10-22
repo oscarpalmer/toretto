@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/toretto",
-	"version": "0.56.0",
+	"version": "0.57.0",
 	"description": "A collection of badass DOM utilities.",
 	"keywords": [
 		"aria",
@@ -93,21 +93,15 @@
 		"test:leak": "npx vp test run --detect-async-leaks --coverage"
 	},
 	"dependencies": {
-		"@oscarpalmer/atoms": "^0.216"
+		"@oscarpalmer/atoms": "^0.221"
 	},
 	"devDependencies": {
 		"@types/node": "^26.6",
-		"@vitest/coverage-istanbul": "5.0.1",
+		"@vitest/coverage-istanbul": "^5",
 		"jsdom": "30.0.1",
 		"tsdown": "^0.23",
 		"typescript": "^7",
-		"vite": "npm:@voidzero-dev/vite-plus-core@1.0.0",
-		"vite-plus": "1.0.0",
-		"vitest": "5.0.1"
-	},
-	"overrides": {
-		"vite": "npm:@voidzero-dev/vite-plus-core@1.0.0",
-		"vitest": "5.0.1"
+		"vite-plus": "^1.2"
 	},
 	"packageManager": "npm@11.11.1"
 }

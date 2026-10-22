@@ -3,6 +3,7 @@ import {afterEach, expect, test} from 'vite-plus/test';
 import * as Attr from '../src/attribute/index';
 import * as Evt from '../src/event/index';
 import type {RemovableEventListener} from '../src/models';
+import {TORETTO_SYMBOL} from '../src/models/misc.model';
 
 class FakeTouch {
 	clientX: number;
@@ -392,13 +393,13 @@ test('on & off (delegated)', () => {
 			}),
 		);
 
-		const handlers = (div as any)[`@click:${div.id === 'two' ? 'active' : 'passive'}`];
+		const handlers = (div as any)[TORETTO_SYMBOL][div.id === 'two' ? 'active' : 'passive'].get(`click`);
 
 		expect(handlers).toBeInstanceOf(Set);
 		expect(handlers.size).toBe(1);
 	}
 
-	let handlers = (document as any)['@click:passive'];
+	let handlers = (document as any)[TORETTO_SYMBOL].passive.get('click');
 
 	expect(handlers).toBeInstanceOf(Set);
 	expect(handlers.size).toBe(1);
@@ -419,7 +420,7 @@ test('on & off (delegated)', () => {
 		Evt.off(last, 'click', handler);
 	}
 
-	handlers = (document as any)['@click:passive'];
+	handlers = (document as any)[TORETTO_SYMBOL].passive.get('click');
 
 	expect(handlers).toBeInstanceOf(Set);
 	expect(handlers.size).toBe(1);
@@ -429,12 +430,12 @@ test('on & off (delegated)', () => {
 	}
 
 	for (const div of divs) {
-		const handlers = (div as any)[`@click:${div.id === 'two' ? 'active' : 'passive'}`];
+		const handlers = (div as any)[TORETTO_SYMBOL][div.id === 'two' ? 'active' : 'passive'].get(`click`);
 
 		expect(handlers).toBeUndefined();
 	}
 
-	handlers = (document as any)['@click:passive'];
+	handlers = (document as any)[TORETTO_SYMBOL].passive.get('click');
 
 	expect(handlers).toBeInstanceOf(Set);
 	expect(handlers.size).toBe(1);
@@ -455,7 +456,7 @@ test('on & off (delegated)', () => {
 
 	remove();
 
-	handlers = (document as any)['@click:passive'];
+	handlers = (document as any)[TORETTO_SYMBOL].passive.get('click');
 
 	expect(handlers).toBeUndefined();
 
@@ -491,8 +492,8 @@ test('on & off (delegated, multiple on single element)', () => {
 		second: 0,
 	};
 
-	expect((div as any)['@click:passive']).toBeInstanceOf(Set);
-	expect((div as any)['@click:passive'].size).toBe(2);
+	expect((div as any)[TORETTO_SYMBOL].passive.get('click')).toBeInstanceOf(Set);
+	expect((div as any)[TORETTO_SYMBOL].passive.get('click').size).toBe(2);
 
 	div.click();
 
@@ -503,8 +504,8 @@ test('on & off (delegated, multiple on single element)', () => {
 
 	listeners.first();
 
-	expect((div as any)['@click:passive']).toBeInstanceOf(Set);
-	expect((div as any)['@click:passive'].size).toBe(1);
+	expect((div as any)[TORETTO_SYMBOL].passive.get('click')).toBeInstanceOf(Set);
+	expect((div as any)[TORETTO_SYMBOL].passive.get('click').size).toBe(1);
 
 	div.click();
 
@@ -515,7 +516,7 @@ test('on & off (delegated, multiple on single element)', () => {
 
 	listeners.second();
 
-	expect((div as any)['@click:passive']).toBeUndefined();
+	expect((div as any)[TORETTO_SYMBOL].passive.get('click')).toBeUndefined();
 
 	div.click();
 

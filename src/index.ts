@@ -20,9 +20,7 @@ export {
 	ariaNumericalAttributes,
 	type AriaAttributeValues,
 } from './models/aria.model';
-export {
-	booleanAttributes,
-} from './models/attribute.model';
+export {booleanAttributes} from './models/attribute.model';
 export * from './models/index';
 export * from './property/index';
 export * from './style';

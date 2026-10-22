@@ -1,47 +1,60 @@
 import {isEventTarget} from '../internal/is';
 import {
-	EVENT_DELEGATED,
-	EVENT_SUFFIX_ACTIVE,
-	EVENT_SUFFIX_PASSIVE,
 	EVENT_DELEGATABLE,
+	EVENT_DELEGATED_ACTIVE,
+	EVENT_DELEGATED_PASSIVE,
+	EVENT_STORE_ACTIVE,
+	EVENT_STORE_PASSIVE,
+	type EventStore,
 	type EventTargetWithListeners,
 } from '../models/event.model';
 import type {CustomEventListener, RemovableEventListener} from '../models/index';
+import {TORETTO_SYMBOL} from '../models/misc.model';
 
 // #region Functions
 
-function addDelegatedHandler(doc: Document, type: string, name: string, passive: boolean): void {
-	if (EVENT_DELEGATED.has(name)) {
+function addDelegatedHandler(doc: Document, name: string, passive: boolean): void {
+	const handlers = passive ? EVENT_DELEGATED_PASSIVE : EVENT_DELEGATED_ACTIVE;
+
+	if (handlers.has(name)) {
 		return;
 	}
 
-	EVENT_DELEGATED.add(name);
+	handlers.add(name);
 
-	doc.addEventListener(type, passive ? HANDLER_PASSIVE : HANDLER_ACTIVE, {
+	doc.addEventListener(name, passive ? HANDLER_PASSIVE : HANDLER_ACTIVE, {
 		passive,
 	});
 }
 
 export function addDelegatedListener(
 	target: EventTargetWithListeners,
-	type: string,
+	store: EventStore,
 	name: string,
 	listener: EventListener | CustomEventListener,
 	passive: boolean,
 ): RemovableEventListener {
-	target[name] ??= new Set();
+	target[TORETTO_SYMBOL] ??= {active: new Map(), passive: new Map()};
 
-	target[name].add(listener);
+	let stored = target[TORETTO_SYMBOL][store].get(name);
 
-	addDelegatedHandler(document, type, name, passive);
+	if (stored == null) {
+		stored = new Set();
+
+		target[TORETTO_SYMBOL][store].set(name, stored);
+	}
+
+	stored.add(listener);
+
+	addDelegatedHandler(document, name, passive);
 
 	return () => {
-		removeDelegatedListener(target, name, listener);
+		removeDelegatedListener(target, store, name, listener);
 	};
 }
 
 function delegatedEventHandler(this: boolean, event: Event): void {
-	const key = `@${event.type}${this ? EVENT_SUFFIX_PASSIVE : EVENT_SUFFIX_ACTIVE}`;
+	const store = this ? EVENT_STORE_PASSIVE : EVENT_STORE_ACTIVE;
 
 	const items = event.composedPath();
 	const {length} = items;
@@ -77,7 +90,7 @@ function delegatedEventHandler(this: boolean, event: Event): void {
 
 	for (let index = 0; index < length; index += 1) {
 		const item = items[index] as EventTargetWithListeners;
-		const listeners = item[key];
+		const listeners = item[TORETTO_SYMBOL]?.[store].get(event.type);
 
 		if ((item as unknown as HTMLButtonElement).disabled || listeners == null) {
 			continue;
@@ -95,35 +108,40 @@ function delegatedEventHandler(this: boolean, event: Event): void {
 	}
 }
 
-export function getDelegatedName(
+export function getDelegatedStore(
 	target: EventTarget,
 	type: string,
 	options: AddEventListenerOptions,
-): string | undefined {
-	return isEventTarget(target) &&
+): EventStore | undefined {
+	if (
+		isEventTarget(target) &&
 		EVENT_DELEGATABLE.has(type) &&
 		!options.capture &&
 		!options.once &&
 		options.signal == null
-		? `@${type}${options.passive ? EVENT_SUFFIX_PASSIVE : EVENT_SUFFIX_ACTIVE}`
-		: undefined;
+	) {
+		return options.passive ? EVENT_STORE_PASSIVE : EVENT_STORE_ACTIVE;
+	}
+
+	return undefined;
 }
 
 export function removeDelegatedListener(
 	target: EventTargetWithListeners,
+	store: EventStore,
 	name: string,
 	listener: EventListener | CustomEventListener,
 ): boolean {
-	const handlers = target[name];
+	const handlers = target[TORETTO_SYMBOL]?.[store].get(name);
 
-	if (handlers == null || !handlers.has(listener)) {
+	if (!handlers?.has(listener)) {
 		return false;
 	}
 
 	handlers.delete(listener);
 
 	if (handlers.size === 0) {
-		target[name] = undefined;
+		target[TORETTO_SYMBOL]![store].delete(name);
 	}
 
 	return true;

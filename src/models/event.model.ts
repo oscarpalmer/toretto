@@ -1,4 +1,5 @@
 import type {CustomEventListener} from './index';
+import type {TORETTO_SYMBOL} from './misc.model';
 
 // #region Types
 
@@ -9,10 +10,16 @@ export type EventOptions = {
 	signal?: AbortSignal;
 };
 
-export type EventTargetWithListeners = EventTarget &
-	Partial<{
-		[key: string]: Set<EventListener | CustomEventListener>;
-	}>;
+export type EventStore = 'active' | 'passive';
+
+export type EventTargetWithListeners = EventTarget & {
+	[TORETTO_SYMBOL]?: EventTargetWithListenersItems;
+};
+
+type EventTargetWithListenersItems = Record<
+	EventStore,
+	Map<string, Set<EventListener | CustomEventListener>>
+>;
 
 // #endregion
 
@@ -43,11 +50,13 @@ export const EVENT_DELEGATABLE: Set<string> = new Set([
 	'touchstart',
 ]);
 
-export const EVENT_DELEGATED: Set<string> = new Set();
+export const EVENT_DELEGATED_ACTIVE: Set<string> = new Set();
 
-export const EVENT_SUFFIX_ACTIVE = ':active';
+export const EVENT_DELEGATED_PASSIVE: Set<string> = new Set();
 
-export const EVENT_SUFFIX_PASSIVE = ':passive';
+export const EVENT_STORE_ACTIVE: EventStore = 'active';
+
+export const EVENT_STORE_PASSIVE: EventStore = 'passive';
 
 export const elementEvents: Record<string, Record<string, string>> = {
 	DETAILS: {open: 'toggle'},

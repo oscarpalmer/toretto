@@ -1,6 +1,6 @@
 import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {isEventPosition} from '../internal/is';
-import type {EventPosition, Selector} from '../models';
+import type {FindResult} from '../models/find.model';
 import {
 	FIND_QUERY_SELECTOR_ALL,
 	FIND_QUERY_SELECTOR_SINGLE,
@@ -11,6 +11,7 @@ import {
 	FIND_SUFFIX_HOVER,
 	FIND_TAG_HEAD,
 } from '../models/find.model';
+import type {EventPosition, Selector} from '../models/index';
 
 // #region Functions
 
@@ -43,7 +44,7 @@ function findElementOrElements(
 	selector: Selector,
 	context: Selector | null | undefined,
 	single: boolean,
-): Element | Element[] | null {
+): FindResult {
 	const callback = single ? FIND_QUERY_SELECTOR_SINGLE : FIND_QUERY_SELECTOR_ALL;
 
 	const contexts =
@@ -71,7 +72,7 @@ function findElementOrElementsForSelector(
 	contexts: Array<Document | Element>,
 	callback: 'querySelector' | 'querySelectorAll',
 	single: boolean,
-): Element | Element[] | null {
+): FindResult {
 	const {length} = contexts;
 
 	const result: Element[] = [];
@@ -177,7 +178,7 @@ export function getElementFromPosition(position: EventPosition): Element[] {
 	while (true) {
 		current = document.elementFromPoint(x, y);
 
-		if (current == null || elements.indexOf(current) !== -1) {
+		if (current == null || elements.includes(current)) {
 			break;
 		}
 

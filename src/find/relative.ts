@@ -1,3 +1,5 @@
+import type {FindAncestorOrigin} from '../models/find.model';
+
 // #region Functions
 
 /**
@@ -11,7 +13,7 @@
  * @returns Found ancestor or `null`
  */
 export function findAncestor<TagName extends keyof HTMLElementTagNameMap>(
-	origin: Element | Event | EventTarget,
+	origin: FindAncestorOrigin,
 	tagName: TagName,
 ): HTMLElementTagNameMap[TagName] | null;
 

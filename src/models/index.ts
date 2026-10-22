@@ -1,3 +1,5 @@
+// #region Types
+
 /**
  * Any _ARIA_ attribute for an element _(both prefixed and unprefixed)_
  */
@@ -250,3 +252,11 @@ export type Selector = string | Node | Node[] | NodeList;
  * Text direction for an element
  */
 export type TextDirection = 'ltr' | 'rtl';
+
+// #endregion
+
+// #region Exports
+
+export {TORETTO_SYMBOL} from './misc.model';
+
+// #endregion

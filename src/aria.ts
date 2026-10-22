@@ -4,7 +4,6 @@ import type {AnyAriaAttribute, AnyAriaBooleanAttribute, AriaAttributes, AriaRole
 import {
 	ARIA_EXPRESSION_BOOLEAN,
 	ARIA_EXPRESSION_PREFIX,
-	ariaBooleanAttributes,
 	ariaBooleanAttributesSet,
 	type AriaAttributeItem,
 	type AriaAttributeValues,
@@ -200,6 +199,7 @@ function updateAriaAttribute(element: Element, key: string, value: unknown): voi
 
 // #region Exports
 
-export {ariaBooleanAttributes, ariaBooleanAttributesSet, type AriaAttributeValues};
+export {ariaBooleanAttributes} from './models/aria.model';
+export {ariaBooleanAttributesSet, type AriaAttributeValues};
 
 // #endregion

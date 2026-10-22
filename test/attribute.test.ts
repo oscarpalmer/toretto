@@ -411,9 +411,7 @@ test('isBooleanAttribute', () => {
 	for (let index = 0; index < length; index += 1) {
 		const attribute = attributes[index];
 
-		expect(Attribute.isBooleanAttribute(attribute)).toBe(
-			index < booleanAttributes.length,
-		);
+		expect(Attribute.isBooleanAttribute(attribute)).toBe(index < booleanAttributes.length);
 	}
 
 	expect(Attribute.isBooleanAttribute(123 as never)).toBe(false);

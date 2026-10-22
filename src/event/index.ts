@@ -4,7 +4,7 @@ import {getBoolean} from '../internal/get-value';
 import {isEventTarget} from '../internal/is';
 import type {EventOptions, EventTargetWithListeners} from '../models/event.model';
 import type {CustomEventListener, EventPosition, RemovableEventListener} from '../models/index';
-import {addDelegatedListener, getDelegatedName, removeDelegatedListener} from './delegation';
+import {addDelegatedListener, getDelegatedStore, removeDelegatedListener} from './delegation';
 
 // #region Functions
 
@@ -161,11 +161,11 @@ export function off(
 	}
 
 	const extended = createEventOptions(options);
-	const delegated = getDelegatedName(target, type, extended);
+	const store = getDelegatedStore(target, type, extended);
 
 	if (
-		delegated == null ||
-		!removeDelegatedListener(target as EventTargetWithListeners, delegated, listener)
+		store == null ||
+		!removeDelegatedListener(target as EventTargetWithListeners, store, type, listener)
 	) {
 		target.removeEventListener(type, listener as EventListener, extended);
 	}
@@ -212,13 +212,13 @@ export function on(
 	}
 
 	const extended = createEventOptions(options);
-	const delegated = getDelegatedName(target, type, extended);
+	const store = getDelegatedStore(target, type, extended);
 
-	if (delegated != null) {
+	if (store != null) {
 		return addDelegatedListener(
 			target as EventTargetWithListeners,
+			store,
 			type,
-			delegated,
 			listener,
 			extended.passive,
 		);

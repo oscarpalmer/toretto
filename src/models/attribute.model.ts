@@ -20,6 +20,8 @@ export type UnparsedAttributes<Keys extends string = string> = {
 
 // #region Variables
 
+// Expressions via DOMPurify (https://github.com/cure53/dompurify)
+
 export const ATTRIBUTE_DATA_PREFIX = 'data-';
 
 export const ATTRIBUTE_EXPRESSION_CLOBBERED_NAME: RegExp = /^(id|name)$/i;
@@ -35,7 +37,7 @@ export const ATTRIBUTE_EXPRESSION_SOURCE_NAME: RegExp = /^src$/i;
 export const ATTRIBUTE_EXPRESSION_SOURCE_VALUE: RegExp = /^data:/i;
 
 export const ATTRIBUTE_EXPRESSION_URI_VALUE: RegExp =
-	/^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|matrix):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i;
+	/^(?:(?:(?:f|ht)tps?|sftp|mailto|tel|callto|sms|cid|xmpp|matrix):|[^a-z]|[a-z+.-]+(?:[^a-z+.-:]|$))/i;
 
 export const ATTRIBUTE_EXPRESSION_WHITESPACE: RegExp =
 	// oxlint-disable-next-line no-control-regex

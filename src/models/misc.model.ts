@@ -12,4 +12,11 @@ export const IS_CHILDNODES: Set<number> = new Set([
 	Node.DOCUMENT_TYPE_NODE,
 ]);
 
+/**
+ * Used internally by _Toretto_ to store metadata on _DOM_ elements
+ *
+ * _Exported for use when extending _Toretto_, hydration (moving listeners between elements), etc._
+ */
+export const TORETTO_SYMBOL: unique symbol = Symbol('toretto');
+
 // #endregion
