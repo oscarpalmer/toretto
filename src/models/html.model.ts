@@ -8,6 +8,7 @@ export type HtmlOptions = {
 };
 
 export type Tagged = {
+	index: number;
 	nodes: Node[];
 	template: string;
 };

@@ -2,7 +2,9 @@
 
 export const CSS_VARIABLE_PREFIX = '--';
 
-export const DATA_EXPRESSION_PREFIX: RegExp = /^data-/i;
+export const EXPRESSION_DATA_PREFIX: RegExp = /^data-/i;
+
+export const EXPRESSION_TRUE: RegExp = /^true$/i;
 
 export const IS_CHILDNODES: Set<number> = new Set([
 	Node.ELEMENT_NODE,

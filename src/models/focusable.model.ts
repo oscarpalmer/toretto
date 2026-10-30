@@ -19,13 +19,13 @@ export const FOCUSABLE_ATTRIBUTE_INERT = 'inert';
 
 export const FOCUSABLE_ATTRIBUTE_TABINDEX = 'tabindex';
 
+export const FOCUSABLE_EXPRESSION_CONTENTEDITABLE: RegExp = /^(plaintext-only|true)$/i;
+
 export const FOCUSABLE_EXPRESSION_DISABLEABLE: RegExp = /^(button|input|select|textarea)$/i;
 
 export const FOCUSABLE_EXPRESSION_SPECIAL_TABINDEX: RegExp = /^(audio|details|video)$/i;
 
 export const FOCUSABLE_EXPRESSION_SUMMARY: RegExp = /^summary$/i;
-
-export const FOCUSABLE_EXPRESSION_TRUEISH: RegExp = /^(|true)$/i;
 
 export const FOCUSABLE_SELECTOR_DETAILS_CLOSED_CHILDREN = 'details:not([open]) *';
 

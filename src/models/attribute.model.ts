@@ -36,8 +36,10 @@ export const ATTRIBUTE_EXPRESSION_SOURCE_NAME: RegExp = /^src$/i;
 
 export const ATTRIBUTE_EXPRESSION_SOURCE_VALUE: RegExp = /^data:/i;
 
-export const ATTRIBUTE_EXPRESSION_URI_VALUE: RegExp =
-	/^(?:(?:(?:f|ht)tps?|sftp|mailto|tel|callto|sms|cid|xmpp|matrix):|[^a-z]|[a-z+.-]+(?:[^a-z+.-:]|$))/i;
+export const ATTRIBUTE_EXPRESSION_URI_RELATIVE_VALUE: RegExp = /^[^:]*(?:[/?#]|$)/;
+
+export const ATTRIBUTE_EXPRESSION_URI_SCHEME_VALUE: RegExp =
+	/^(?:(?:f|ht)tps?|sftp|mailto|tel|callto|sms|cid|xmpp|matrix):/i;
 
 export const ATTRIBUTE_EXPRESSION_WHITESPACE: RegExp =
 	// oxlint-disable-next-line no-control-regex

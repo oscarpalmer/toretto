@@ -82,13 +82,12 @@ function getParser(): DOMParser {
 
 function getTagged(strings: TemplateStringsArray, values: unknown[]): Tagged {
 	const tagged: Tagged = {
+		index: 0,
 		nodes: [],
 		template: '',
 	};
 
 	const stringsLength = strings.length;
-
-	let nodeIndex = 0;
 
 	for (let stringIndex = 0; stringIndex < stringsLength; stringIndex += 1) {
 		const value = values[stringIndex];
@@ -96,40 +95,52 @@ function getTagged(strings: TemplateStringsArray, values: unknown[]): Tagged {
 		tagged.template += strings[stringIndex];
 
 		if (value instanceof Node) {
-			tagged.nodes.push(value);
-
-			tagged.template += getComment(nodeIndex);
-
-			nodeIndex += 1;
+			getTaggedNode(tagged, value);
 		} else if (hasNodes(value)) {
-			const items = [...value];
-			const itemsLength = items.length;
-
-			for (let itemIndex = 0; itemIndex < itemsLength; itemIndex += 1) {
-				const item = items[itemIndex];
-
-				if (item instanceof Node) {
-					tagged.nodes.push(item);
-
-					tagged.template += getComment(nodeIndex);
-
-					nodeIndex += 1;
-				} else {
-					tagged.template += getString(item);
-				}
-			}
+			getTaggedNodes(tagged, value);
 		} else if (Array.isArray(value)) {
-			const valueLength = value.length;
-
-			for (let valueIndex = 0; valueIndex < valueLength; valueIndex += 1) {
-				tagged.template += getString(value[valueIndex]);
-			}
+			getTaggedStrings(tagged, value);
 		} else {
 			tagged.template += getString(value);
 		}
 	}
 
 	return tagged;
+}
+
+function getTaggedNode(tagged: Tagged, value: Node): void {
+	tagged.nodes.push(value);
+
+	tagged.template += getComment(tagged.index);
+
+	tagged.index += 1;
+}
+
+function getTaggedNodes(tagged: Tagged, value: HTMLCollection | NodeList | Node[]): void {
+	const items = [...value];
+	const itemsLength = items.length;
+
+	for (let itemIndex = 0; itemIndex < itemsLength; itemIndex += 1) {
+		const item = items[itemIndex];
+
+		if (item instanceof Node) {
+			tagged.nodes.push(item);
+
+			tagged.template += getComment(tagged.index);
+
+			tagged.index += 1;
+		} else {
+			tagged.template += getString(item);
+		}
+	}
+}
+
+function getTaggedStrings(tagged: Tagged, value: unknown[]): void {
+	const valueLength = value.length;
+
+	for (let valueIndex = 0; valueIndex < valueLength; valueIndex += 1) {
+		tagged.template += getString(value[valueIndex]);
+	}
 }
 
 function getTemplate(

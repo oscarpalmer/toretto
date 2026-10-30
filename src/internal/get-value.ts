@@ -1,7 +1,7 @@
 import {parse} from '@oscarpalmer/atoms/string';
 import {camelCase, kebabCase} from '@oscarpalmer/atoms/string/case';
 import {ARIA_EXPRESSION_PREFIX} from '../models/aria.model';
-import {CSS_VARIABLE_PREFIX, DATA_EXPRESSION_PREFIX} from '../models/misc.model';
+import {CSS_VARIABLE_PREFIX, EXPRESSION_DATA_PREFIX} from '../models/misc.model';
 import {getAriaValue} from './aria';
 
 // #region Functions
@@ -21,7 +21,7 @@ export function getAttributeValue(element: Element, name: string, parseValue: bo
 		return getAriaValue(element, normalized);
 	}
 
-	if (isString && DATA_EXPRESSION_PREFIX.test(normalized) && parseValue) {
+	if (isString && EXPRESSION_DATA_PREFIX.test(normalized) && parseValue) {
 		return parse(value) ?? value;
 	}
 

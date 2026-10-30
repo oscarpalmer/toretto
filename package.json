@@ -93,7 +93,7 @@
 		"test:leak": "npx vp test run --detect-async-leaks --coverage"
 	},
 	"dependencies": {
-		"@oscarpalmer/atoms": "^0.221"
+		"@oscarpalmer/atoms": "^0.222"
 	},
 	"devDependencies": {
 		"@types/node": "^26.6",
@@ -101,7 +101,6 @@
 		"jsdom": "30.0.1",
 		"tsdown": "^0.23",
 		"typescript": "^7",
-		"vite-plus": "^1.2"
-	},
-	"packageManager": "npm@11.11.1"
+		"vite-plus": "^1.4"
+	}
 }

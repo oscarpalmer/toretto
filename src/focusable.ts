@@ -2,10 +2,10 @@ import {
 	FOCUSABLE_ATTRIBUTE_CONTENTEDITABLE,
 	FOCUSABLE_ATTRIBUTE_INERT,
 	FOCUSABLE_ATTRIBUTE_TABINDEX,
+	FOCUSABLE_EXPRESSION_CONTENTEDITABLE,
 	FOCUSABLE_EXPRESSION_DISABLEABLE,
 	FOCUSABLE_EXPRESSION_SPECIAL_TABINDEX,
 	FOCUSABLE_EXPRESSION_SUMMARY,
-	FOCUSABLE_EXPRESSION_TRUEISH,
 	FOCUSABLE_SELECTOR_DETAILS_CLOSED_CHILDREN,
 	FOCUSABLE_SELECTOR_FIELDSET_DISABLED,
 	FOCUSABLE_SELECTOR_FULL,
@@ -154,9 +154,13 @@ function isDisabledFromFieldset(element: Element): boolean {
 }
 
 function isEditable(element: Element): boolean {
-	return FOCUSABLE_EXPRESSION_TRUEISH.test(
-		element.getAttribute(FOCUSABLE_ATTRIBUTE_CONTENTEDITABLE) as string,
-	);
+	const attribute = element.getAttribute(FOCUSABLE_ATTRIBUTE_CONTENTEDITABLE);
+
+	if (attribute == null) {
+		return false;
+	}
+
+	return attribute.length === 0 || FOCUSABLE_EXPRESSION_CONTENTEDITABLE.test(attribute);
 }
 
 /**
@@ -197,16 +201,22 @@ function isHidden(item: FocusableElementWithTabIndex): boolean {
 }
 
 function isInert(item: FocusableElementWithTabIndex): boolean {
+	if ((item.element as FocusableInertElement).inert ?? false) {
+		return true;
+	}
+
+	const attribute = item.element.getAttribute(FOCUSABLE_ATTRIBUTE_INERT);
+
+	if (attribute != null) {
+		return true;
+	}
+
 	return (
-		((item.element as FocusableInertElement).inert ?? false) ||
-		FOCUSABLE_EXPRESSION_TRUEISH.test(
-			item.element.getAttribute(FOCUSABLE_ATTRIBUTE_INERT) as string,
-		) ||
-		(item.element.parentElement != null &&
-			isInert({
-				element: item.element.parentElement,
-				tabIndex: FOCUSABLE_TABINDEX_DEFAULT,
-			}))
+		item.element.parentElement != null &&
+		isInert({
+			element: item.element.parentElement,
+			tabIndex: FOCUSABLE_TABINDEX_DEFAULT,
+		})
 	);
 }
 

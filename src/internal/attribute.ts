@@ -10,7 +10,8 @@ import {
 	ATTRIBUTE_EXPRESSION_SKIP_NAME,
 	ATTRIBUTE_EXPRESSION_SOURCE_NAME,
 	ATTRIBUTE_EXPRESSION_SOURCE_VALUE,
-	ATTRIBUTE_EXPRESSION_URI_VALUE,
+	ATTRIBUTE_EXPRESSION_URI_RELATIVE_VALUE,
+	ATTRIBUTE_EXPRESSION_URI_SCHEME_VALUE,
 	ATTRIBUTE_EXPRESSION_WHITESPACE,
 	booleanAttributesSet,
 	dispatchedAttributes,
@@ -35,7 +36,8 @@ function badAttributeHandler(name?: string, value?: string): boolean {
 
 	if (
 		ATTRIBUTE_EXPRESSION_SKIP_NAME.test(name) ||
-		ATTRIBUTE_EXPRESSION_URI_VALUE.test(value) ||
+		ATTRIBUTE_EXPRESSION_URI_RELATIVE_VALUE.test(value) ||
+		ATTRIBUTE_EXPRESSION_URI_SCHEME_VALUE.test(value) ||
 		isValidSourceAttribute(name, value)
 	) {
 		return false;

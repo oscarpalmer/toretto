@@ -3,7 +3,7 @@ import {parse} from '@oscarpalmer/atoms/string';
 import {camelCase, kebabCase} from '@oscarpalmer/atoms/string/case';
 import {setElementValues, updateElementValue} from './internal/element-value';
 import {ATTRIBUTE_DATA_PREFIX} from './models/attribute.model';
-import {DATA_EXPRESSION_PREFIX} from './models/misc.model';
+import {EXPRESSION_DATA_PREFIX} from './models/misc.model';
 
 // #region Functions
 
@@ -130,7 +130,7 @@ function getDataValue(
 }
 
 function getName(original: string): string {
-	return `${ATTRIBUTE_DATA_PREFIX}${kebabCase(original.replace(DATA_EXPRESSION_PREFIX, ''))}`;
+	return `${ATTRIBUTE_DATA_PREFIX}${kebabCase(original.replace(EXPRESSION_DATA_PREFIX, ''))}`;
 }
 
 /**

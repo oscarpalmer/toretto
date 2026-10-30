@@ -1,4 +1,0 @@
-{
-	"$schema": "./node_modules/oxlint/configuration_schema.json",
-	"jsPlugins": ["./node_modules/@oscarpalmer/atoms/plugin/index.js"]
-}
