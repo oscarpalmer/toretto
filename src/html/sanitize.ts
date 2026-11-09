@@ -15,6 +15,22 @@ function handleElement(element: Element): void {
 	sanitizeAttributes(element, [...element.attributes]);
 }
 
+function handleNode(node: Node): boolean {
+	if (node.nodeType === Node.ELEMENT_NODE) {
+		handleElement(node as Element);
+
+		return false;
+	}
+
+	if (node.nodeType === Node.COMMENT_NODE) {
+		return HTML_COMMENT_HARMFUL.test((node as Comment).data);
+	}
+
+	return (
+		node.nodeType === Node.DOCUMENT_TYPE_NODE || node.nodeType === Node.PROCESSING_INSTRUCTION_NODE
+	);
+}
+
 /**
  * Is the element clobbered?
  *
@@ -33,12 +49,6 @@ function isClobbered(value: unknown): boolean {
 			typeof value.insertBefore !== 'function' ||
 			typeof value.hasChildNodes !== 'function')
 	);
-}
-
-function removeNode(node: Node): void {
-	if (typeof (node as ChildNode).remove === 'function') {
-		(node as ChildNode).remove();
-	}
 }
 
 export function sanitizeAttributes(element: Element, attributes: Attr[]): void {
@@ -63,30 +73,10 @@ export function sanitizeNodes(nodes: Node[] | NodeList): Node[] {
 	for (let index = 0; index < length; index += 1) {
 		const node = nodes[index];
 
-		let remove = isClobbered(node);
-
-		if (!remove) {
-			switch (node.nodeType) {
-				case Node.ELEMENT_NODE:
-					handleElement(node as Element);
-					break;
-
-				case Node.COMMENT_NODE:
-					remove = HTML_COMMENT_HARMFUL.test((node as Comment).data);
-					break;
-
-				case Node.DOCUMENT_TYPE_NODE:
-				case Node.PROCESSING_INSTRUCTION_NODE:
-					remove = true;
-					break;
-
-				default:
-					break;
-			}
-		}
+		const remove = isClobbered(node) || handleNode(node);
 
 		if (remove) {
-			removeNode(node);
+			node.parentNode?.removeChild(node);
 
 			continue;
 		}

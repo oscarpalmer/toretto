@@ -1,6 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {createElement, html, sanitize} from '../src';
-import {htmlCases} from './html.fixture';
+import {sanitizeNodes} from '../src/html/sanitize';
+import {htmlCases} from './.fixtures/html.fixture';
 
 function join(nodes: Node[]): string {
 	return nodes
@@ -68,30 +69,30 @@ test('tagged', () => {
 	);
 
 	const nodes = html`<div>
-		<!-- a comment ignored by temporary comment usage -->
-		${[null, undefined, false, true, 123, 123n, 'abc', [1, 2, 3], {foo: 'bar'}]}
-		<hr />
-		${paragraph}
-		<hr />
-		<ul>
-			${items}
-		</ul>
-		<hr />
-		${document.querySelectorAll('img')}
-	</div>`;
+			<!-- a comment ignored by temporary comment usage -->
+			${[null, undefined, false, true, 123, 123n, 'abc', [1, 2, 3], {foo: 'bar'}]}
+			<hr />
+			${paragraph}
+			<hr />
+			<ul>
+				${items}
+			</ul>
+			<hr />
+			${document.querySelectorAll('img')}
+		</div>`;
 
 	expect(join(nodes)).toBe(`<div>
-		<!-- a comment ignored by temporary comment usage -->
-		falsetrue123123abc1,2,3{"foo":"bar"}
-		<hr>
-		<p>Hello, world!</p>
-		<hr>
-		<ul>
-			<li>#1</li>1<li>#3</li>3<li>#5</li>
-		</ul>
-		<hr>
-		<img src="https://example.com/image_1.jpg" alt="Example image #1"><img src="https://example.com/image_2.jpg" alt="Example image #2">
-	</div>`);
+			<!-- a comment ignored by temporary comment usage -->
+			falsetrue123123abc1,2,3{"foo":"bar"}
+			<hr>
+			<p>Hello, world!</p>
+			<hr>
+			<ul>
+				<li>#1</li>1<li>#3</li>3<li>#5</li>
+			</ul>
+			<hr>
+			<img src="https://example.com/image_1.jpg" alt="Example image #1"><img src="https://example.com/image_2.jpg" alt="Example image #2">
+		</div>`);
 });
 
 test('templates', () => {
@@ -139,4 +140,13 @@ test('sanitize', () => {
 	expect(firstHtml).toBe('<div><p>Hello, world!</p></div>');
 	expect(secondHtml).toBe('<div><p>Hello, world!</p></div>');
 	expect(firstHtml).toBe(secondHtml);
+});
+
+test('node types', () => {
+	const sanitized = sanitizeNodes([
+		document.implementation.createDocumentType('html', '', ''),
+		document.createProcessingInstruction('xml-stylesheet', 'type="text/xsl" href="style.xsl"'),
+	]);
+
+	expect(sanitized).toEqual([]);
 });

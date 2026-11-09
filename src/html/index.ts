@@ -14,20 +14,22 @@ function clearHtmlTemplates(): void {
 }
 
 function createHtml(value: string | HTMLTemplateElement): string {
-	const parsed = getParser().parseFromString(getHtml(value), PARSE_TYPE_HTML);
+	const body = getParser()
+		.parseFromString(getHtml(value), PARSE_TYPE_HTML)
+		.documentElement.querySelector(TAG_BODY) as HTMLBodyElement;
 
-	parsed.body.normalize();
+	body.normalize();
 
-	sanitizeNodes([parsed.body]);
+	sanitizeNodes([body]);
 
-	return parsed.body.innerHTML;
+	return body.innerHTML;
 }
 
 function createTemplate(
 	value: string | HTMLTemplateElement,
 	options: Required<HtmlOptions>,
 ): HTMLTemplateElement {
-	const template = document.createElement(TEMPLATE_TAG);
+	const template = document.createElement(TAG_TEMPLATE);
 
 	template.innerHTML = createHtml(value);
 
@@ -270,7 +272,9 @@ const EXPRESSION_ID = /^[a-z][\w-]*$/i;
 
 const PARSE_TYPE_HTML = 'text/html';
 
-const TEMPLATE_TAG = 'template';
+const TAG_BODY = 'body';
+
+const TAG_TEMPLATE = 'template';
 
 const TEMPORARY_ELEMENT = '<toretto-temporary></toretto-temporary>';
 

@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/toretto",
-	"version": "0.57.0",
+	"version": "0.58.0",
 	"description": "A collection of badass DOM utilities.",
 	"keywords": [
 		"aria",
@@ -25,6 +25,7 @@
 		"dist"
 	],
 	"type": "module",
+	"sideEffects": false,
 	"module": "dist/index.mjs",
 	"types": "dist/index.d.mts",
 	"exports": {
@@ -93,14 +94,14 @@
 		"test:leak": "npx vp test run --detect-async-leaks --coverage"
 	},
 	"dependencies": {
-		"@oscarpalmer/atoms": "^0.222"
+		"@oscarpalmer/atoms": "^0.223"
 	},
 	"devDependencies": {
 		"@types/node": "^26.6",
 		"@vitest/coverage-istanbul": "^5",
-		"jsdom": "30.0.1",
+		"jsdom": "^30.1",
 		"tsdown": "^0.23",
 		"typescript": "^7",
-		"vite-plus": "^1.4"
+		"vite-plus": "^1.5"
 	}
 }

@@ -1,4 +1,4 @@
-import {afterAll, expect, test} from 'vite-plus/test';
+import {afterAll, afterEach, expect, test, vi} from 'vite-plus/test';
 import * as Find from '../src/find/index';
 
 document.body.innerHTML = `<div>
@@ -16,12 +16,170 @@ afterAll(() => {
 	document.body.innerHTML = '';
 });
 
+afterEach(() => {
+	vi.restoreAllMocks();
+});
+
 test('getElementFromPosition', () => {
+	// jsdom has no `elementFromPoint`
 	expect(Find.getElementFromPosition({x: 0, y: 0})).toEqual([]);
+
+	const original = document.elementFromPoint;
+
+	const outer = document.createElement('div');
+	const middle = document.createElement('p');
+	const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+	const inner = document.createElement('span');
+
+	// Pre-existing inline value and priority should be restored
+	middle.style.setProperty('pointer-events', 'auto', 'important');
+
+	const stack = (...elements: (Element | null)[]) => {
+		const queue = [...elements];
+
+		document.elementFromPoint = vi.fn(() => queue.shift() ?? null);
+	};
+
+	try {
+		expect(Find.getElementFromPosition({x: 'a', y: 0} as never)).toEqual([]);
+
+		stack(inner, svg, middle, outer, null);
+
+		expect(Find.getElementFromPosition({x: 1, y: 2})).toEqual([inner, svg, middle, outer]);
+		expect(document.elementFromPoint).toHaveBeenCalledWith(1, 2);
+
+		// Restored
+		expect(inner.style.getPropertyValue('pointer-events')).toBe('');
+		expect(svg.style.getPropertyValue('pointer-events')).toBe('');
+		expect(middle.style.getPropertyValue('pointer-events')).toBe('auto');
+		expect(middle.style.getPropertyPriority('pointer-events')).toBe('important');
+
+		// Same element twice, i.e., hiding did not work
+		stack(inner, inner);
+
+		expect(Find.getElementFromPosition({x: 0, y: 0})).toEqual([inner]);
+
+		// Nothing found
+		stack(null);
+
+		expect(Find.getElementFromPosition({x: 0, y: 0})).toEqual([]);
+
+		// Elements without inline styles cannot be hidden, so the search ends
+		const plain = document.createElementNS('urn:test', 'plain');
+
+		stack(inner, plain, outer);
+
+		expect(Find.getElementFromPosition({x: 0, y: 0})).toEqual([inner]);
+	} finally {
+		document.elementFromPoint = original;
+	}
 });
 
 test('getElementUnderPointer', () => {
-	// TODO: find a way to test hover, etc.
+	// jsdom never matches `:hover`, so the list of hovered elements is stubbed
+	const origin = document.getElementById('origin') as HTMLElement;
+	const ignored = document.getElementById('hover') as HTMLElement;
+
+	const hidden = document.createElement('span');
+
+	hidden.style.visibility = 'hidden';
+
+	const stub = (...elements: Element[]) =>
+		vi
+			.spyOn(document, 'querySelectorAll')
+			.mockReturnValue(elements as unknown as NodeListOf<Element>);
+
+	expect(Find.getElementUnderPointer()).toBe(null);
+
+	stub();
+
+	expect(Find.getElementUnderPointer()).toBe(null);
+
+	// `head` is always skipped
+	stub(document.head);
+
+	expect(Find.getElementUnderPointer(true)).toBe(null);
+
+	// `pointer-events: none` is ignored by default...
+	stub(document.documentElement, origin, ignored);
+
+	expect(Find.getElementUnderPointer()).toBe(origin);
+	expect(Find.getElementUnderPointer(false)).toBe(origin);
+
+	// ...unless skipping ignore
+	expect(Find.getElementUnderPointer(true)).toBe(ignored);
+
+	// `visibility: hidden` is ignored by default
+	stub(document.head, origin, hidden);
+
+	expect(Find.getElementUnderPointer()).toBe(origin);
+	expect(Find.getElementUnderPointer(true)).toBe(hidden);
+
+	// Everything ignored
+	stub(ignored, hidden);
+
+	expect(Find.getElementUnderPointer()).toBe(null);
+});
+
+test('getDistance', () => {
+	const root = document.createElement('div');
+
+	root.innerHTML = `<div id="a">
+	<div id="a1">
+		<span id="a1x"></span>
+	</div>
+	<div id="a2"></div>
+</div>
+<div id="b">
+	<div id="b1"></div>
+</div>
+<p id="c"></p>`;
+
+	const get = (id: string) => root.querySelector(`#${id}`) as Element;
+
+	const [a, a1, a1x, a2, b, b1, c] = ['a', 'a1', 'a1x', 'a2', 'b', 'b1', 'c'].map(get);
+
+	// Same element
+	expect(Find.getDistance(a, a)).toBe(0);
+
+	// Parent and child
+	expect(Find.getDistance(a, a1)).toBe(1);
+	expect(Find.getDistance(a1, a)).toBe(1);
+
+	// Siblings
+	expect(Find.getDistance(a1, a2)).toBe(1);
+	expect(Find.getDistance(a, b)).toBe(1);
+	expect(Find.getDistance(a, c)).toBe(2);
+
+	// Further apart
+	expect(Find.getDistance(a1x, a)).toBe(2);
+	expect(Find.getDistance(a1x, a2)).toBe(2);
+	expect(Find.getDistance(a1x, b)).toBe(3);
+	expect(Find.getDistance(a1x, b1)).toBe(4);
+	expect(Find.getDistance(a1x, c)).toBe(4);
+	expect(Find.getDistance(b1, c)).toBe(2);
+
+	// Distance is the same in both directions
+	for (const from of [a, a1, a1x, a2, b, b1, c]) {
+		for (const to of [a, a1, a1x, a2, b, b1, c]) {
+			expect(Find.getDistance(from, to)).toBe(Find.getDistance(to, from));
+		}
+	}
+
+	// Not in the same tree
+	expect(Find.getDistance(a, document.createElement('div'))).toBe(-1);
+	expect(Find.getDistance(a1x, document.createElement('div'))).toBe(-1);
+
+	// Same tree, but no shared ancestor element
+	const fragment = document.createDocumentFragment();
+	const first = document.createElement('div');
+	const second = document.createElement('div');
+
+	first.innerHTML = '<span></span>';
+	fragment.append(first, second);
+
+	expect(Find.getDistance(first, second)).toBe(-1);
+	expect(Find.getDistance(first.firstElementChild as Element, second)).toBe(-1);
 });
 
 test('findAncestor', () => {
@@ -52,9 +210,15 @@ test('findAncestor', () => {
 	expect(Find.findAncestor(event, element => element.id === 'origin')).toBe(origin);
 	expect(Find.findAncestor(event.target!, element => element.id === 'origin')).toBe(origin);
 
-	expect(Find.findAncestor(origin, element => (element as HTMLElement).hidden)).toBe(hidden);
-	expect(Find.findAncestor(event, element => (element as HTMLElement).hidden)).toBe(hidden);
-	expect(Find.findAncestor(event.target!, element => (element as HTMLElement).hidden)).toBe(hidden);
+	expect(Find.findAncestor(origin, element => (element as HTMLElement).hidden === true)).toBe(
+		hidden,
+	);
+	expect(Find.findAncestor(event, element => (element as HTMLElement).hidden === true)).toBe(
+		hidden,
+	);
+	expect(
+		Find.findAncestor(event.target!, element => (element as HTMLElement).hidden === true),
+	).toBe(hidden);
 
 	expect(Find.findAncestor(origin, 'noop')).toBe(null);
 	expect(Find.findAncestor(event, 'noop')).toBe(null);
@@ -123,6 +287,19 @@ test('findElements', () => {
 	expect(
 		Find.findElements([123, 'a', document.body, ...origin, ...children] as never, document).length,
 	).toBe(3);
+
+	// Documents resolve to their body, other nodes are ignored, and duplicates are removed
+	const text = document.createTextNode('text');
+	const comment = document.createComment('comment');
+
+	expect(Find.findElements([document, document.body, text, comment] as never)).toEqual([
+		document.body,
+	]);
+
+	// Elements outside of the context are removed
+	expect(Find.findElements([document.body, origin[0]] as never, origin[0])).toEqual([origin[0]]);
+
+	expect(Find.findElements(document.querySelectorAll('span')).length).toBe(1);
 });
 
 test('findRelatives', () => {

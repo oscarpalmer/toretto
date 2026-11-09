@@ -112,6 +112,7 @@ test('getTextDirection', () => {
 		return;
 	}
 
+	expect(Style.getTextDirection(parentElement.ownerDocument)).toBe('ltr');
 	expect(Style.getTextDirection(parentElement)).toBe('ltr');
 	expect(Style.getTextDirection(outerElement)).toBe('rtl');
 	expect(Style.getTextDirection(textElement)).toBe('ltr');

@@ -1,5 +1,5 @@
 import type {PlainObject} from '@oscarpalmer/atoms/models';
-import {isEventPosition} from '../internal/is';
+import {isEventPosition, isHTMLOrSVGElement} from '../internal/is';
 import type {FindResult} from '../models/find.model';
 import {
 	FIND_QUERY_SELECTOR_ALL,
@@ -182,8 +182,9 @@ export function getElementFromPosition(position: EventPosition): Element[] {
 			break;
 		}
 
-		if (!(current instanceof HTMLElement)) {
-			continue;
+		// Elements without inline styles cannot be hidden, so nothing beneath them can be reached
+		if (!isHTMLOrSVGElement(current)) {
+			break;
 		}
 
 		elements.push(current);
@@ -199,12 +200,13 @@ export function getElementFromPosition(position: EventPosition): Element[] {
 	const {length} = elements;
 
 	for (let index = 0; index < length; index += 1) {
-		const element = elements[index];
 		const event = events[index];
 
-		if (element instanceof HTMLElement) {
-			element.style.setProperty(FIND_STYLE_POINTER_EVENTS, event.value ?? '', event.priority);
-		}
+		(elements[index] as HTMLElement).style.setProperty(
+			FIND_STYLE_POINTER_EVENTS,
+			event.value,
+			event.priority,
+		);
 	}
 
 	return elements;

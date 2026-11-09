@@ -149,7 +149,10 @@ export function findRelatives(
 }
 
 /**
- * Get the distance between two elements _(i.e., the amount of nodes of between them)_
+ * Get the distance between two elements _(i.e., the amount of steps between them)_
+ *
+ * - Ancestors and descendants: the number of levels between them
+ * - Other elements: the levels up to the closest shared ancestor, the number of siblings to step over at that level, and the levels down to the target
  *
  * @param origin Origin element
  * @param target Target element
@@ -160,25 +163,39 @@ export function getDistance(origin: Element, target: Element): number {
 		return 0;
 	}
 
-	if (origin.parentElement === target || target.parentElement === origin) {
-		return 1;
-	}
-
-	if (origin.parentElement != null && origin.parentElement === target.parentElement) {
-		const children = [...origin.parentElement.children];
-
-		return Math.abs(children.indexOf(origin) - children.indexOf(target));
-	}
-
-	const comparison = origin.compareDocumentPosition(target);
-
-	if (comparison & Node.DOCUMENT_POSITION_DISCONNECTED) {
+	if (origin.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_DISCONNECTED) {
 		return -1;
 	}
 
-	const preceding = comparison & Node.DOCUMENT_POSITION_PRECEDING;
+	if (target.contains(origin)) {
+		return getLevels(origin, target);
+	}
 
-	return traverse(preceding ? origin : target, preceding ? target : origin) ?? -1;
+	if (origin.contains(target)) {
+		return getLevels(target, origin);
+	}
+
+	let branch = origin;
+
+	while (branch.parentElement != null && !branch.parentElement.contains(target)) {
+		branch = branch.parentElement;
+	}
+
+	const {parentElement} = branch;
+
+	// No shared ancestor element, e.g., top-level elements in a fragment
+	if (parentElement == null) {
+		return -1;
+	}
+
+	const children = [...parentElement.children];
+	const other = children.find(child => child.contains(target)) as Element;
+
+	return (
+		getLevels(origin, branch) +
+		getLevels(target, other) +
+		Math.abs(children.indexOf(branch) - children.indexOf(other))
+	);
 }
 
 function getElement(origin: unknown): Element | undefined {
@@ -189,38 +206,17 @@ function getElement(origin: unknown): Element | undefined {
 	return origin instanceof Event && origin.target instanceof Element ? origin.target : undefined;
 }
 
-function traverse(from: Element, to: Element): number | undefined {
-	let current = from;
-	let distance = 0;
-	let parent: Element | null = from.parentElement;
+/**
+ * Get the number of levels from an element up to one of its ancestors _(or itself)_
+ */
+function getLevels(from: Element, ancestor: Element): number {
+	let levels = 0;
 
-	while (parent != null) {
-		if (parent === to) {
-			return distance + 1;
-		}
-
-		const children = [...parent.children];
-
-		if (to.parentElement === parent) {
-			return distance + Math.abs(children.indexOf(current) - children.indexOf(to));
-		}
-
-		const index = children.findIndex(child => child.contains(to));
-
-		if (index > -1) {
-			const traversed = traverse(current, children[index]);
-
-			return traversed == null || traversed === -1
-				? -1
-				: distance + Math.abs(index - children.indexOf(current)) + traversed;
-		}
-
-		current = parent;
-		distance += 1;
-		parent = parent.parentElement;
+	for (let current = from; current !== ancestor; current = current.parentElement as Element) {
+		levels += 1;
 	}
 
-	return undefined;
+	return levels;
 }
 
 // #endregion

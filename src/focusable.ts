@@ -43,18 +43,8 @@ function getItem(element: Element, tabbable: boolean): FocusableElementWithTabIn
 	};
 }
 
-/**
- * Get a list of tabbable elements within a parent element
- *
- * @param parent Parent element
- * @returns Tabbable elements
- */
-export function getTabbable(parent: Element): Element[] {
-	return getValidElements(parent, FILTERS_TABBABLE, true);
-}
-
 function getTabIndex(element: Element): number {
-	const tabIndex = (element as HTMLElement)?.tabIndex ?? FOCUSABLE_TABINDEX_DEFAULT;
+	const {tabIndex} = element as HTMLElement;
 
 	if (
 		tabIndex < FOCUSABLE_TABINDEX_BASE &&
@@ -67,6 +57,16 @@ function getTabIndex(element: Element): number {
 	return tabIndex;
 }
 
+/**
+ * Get a list of tabbable elements within a parent element
+ *
+ * @param parent Parent element
+ * @returns Tabbable elements
+ */
+export function getTabbable(parent: Element): Element[] {
+	return getValidElements(parent, FILTERS_TABBABLE, true);
+}
+
 function getValidElements(
 	parent: Element,
 	filters: FocusableFilter[],
@@ -76,21 +76,23 @@ function getValidElements(
 		return [];
 	}
 
-	const elements = [...parent.querySelectorAll(FOCUSABLE_SELECTOR_FULL)];
+	const found = [...parent.querySelectorAll(FOCUSABLE_SELECTOR_FULL)];
 	const items: FocusableElementWithTabIndex[] = [];
 
-	let {length} = elements;
+	let {length} = found;
+	let elements: Element[] = [];
 
 	for (let index = 0; index < length; index += 1) {
-		const item = getItem(elements[index], tabbable);
+		const item = getItem(found[index], tabbable);
 
 		if (!filters.some(filter => filter(item))) {
+			elements.push(item.element);
 			items.push(item);
 		}
 	}
 
 	if (!tabbable) {
-		return items.map(item => item.element);
+		return elements;
 	}
 
 	const indiced: Element[][] = [];
@@ -108,7 +110,7 @@ function getValidElements(
 		}
 	}
 
-	return [...indiced.flat(), ...zeroed];
+	return indiced.length === 0 ? elements : [...indiced.flat(), ...zeroed];
 }
 
 function hasTabIndex(element: Element): boolean {
@@ -164,18 +166,18 @@ function isEditable(element: Element): boolean {
 }
 
 /**
- * Is the element focusable?
+ * Is the value a focusable element?
  *
- * @param element Element to check
- * @returns `true` if focusable, otherwise `false`
+ * @param element Value to check
+ * @returns `true` if it's a focusable element, otherwise `false`
  */
-export function isFocusable(element: Element): boolean {
-	return element instanceof Element ? isValidElement(element, FILTERS_FOCUSABLE, false) : false;
+export function isFocusable(value: unknown): boolean {
+	return value instanceof Element ? isValidElement(value, FILTERS_FOCUSABLE, false) : false;
 }
 
 function isHidden(item: FocusableElementWithTabIndex): boolean {
 	if (
-		((item.element as HTMLElement).hidden ?? false) ||
+		(item.element as HTMLElement).hidden ||
 		(item.element instanceof HTMLInputElement && item.element.type === FOCUSABLE_STYLE_HIDDEN)
 	) {
 		return true;
@@ -183,9 +185,10 @@ function isHidden(item: FocusableElementWithTabIndex): boolean {
 
 	const isDirectSummary = item.element.matches(FOCUSABLE_SELECTOR_SUMMARY_FIRST);
 
-	const nodeUnderDetails = isDirectSummary ? item.element.parentElement : item.element;
+	// A direct summary always has a details parent, as per the selector
+	const nodeUnderDetails = isDirectSummary ? (item.element.parentElement as Element) : item.element;
 
-	if (nodeUnderDetails?.matches(FOCUSABLE_SELECTOR_DETAILS_CLOSED_CHILDREN) ?? false) {
+	if (nodeUnderDetails.matches(FOCUSABLE_SELECTOR_DETAILS_CLOSED_CHILDREN)) {
 		return true;
 	}
 
@@ -221,7 +224,7 @@ function isInert(item: FocusableElementWithTabIndex): boolean {
 }
 
 function isNotTabbable(item: FocusableElementWithTabIndex): boolean {
-	return (item.tabIndex ?? FOCUSABLE_TABINDEX_DEFAULT) < FOCUSABLE_TABINDEX_BASE;
+	return item.tabIndex < FOCUSABLE_TABINDEX_BASE;
 }
 
 function isNotTabbableRadio(item: FocusableElementWithTabIndex): boolean {
@@ -234,9 +237,9 @@ function isNotTabbableRadio(item: FocusableElementWithTabIndex): boolean {
 		return false;
 	}
 
-	const parent = item.element.form ?? item.element.getRootNode?.() ?? item.element.ownerDocument;
+	const parent = item.element.form ?? item.element.getRootNode();
 
-	const realName = CSS?.escape?.(item.element.name) ?? item.element.name;
+	const realName = CSS.escape(item.element.name);
 
 	const radios = [
 		...(parent as Element).querySelectorAll(
@@ -257,13 +260,13 @@ function isSummarised(item: FocusableElementWithTabIndex): boolean {
 }
 
 /**
- * Is the element tabbable?
+ * Is the value a tabbable element?
  *
- * @param element Element to check
- * @returns `true` if tabbable, otherwise `false`
+ * @param element Value to check
+ * @returns `true` if it's a tabbable element, otherwise `false`
  */
-export function isTabbable(element: Element): boolean {
-	return element instanceof Element ? isValidElement(element, FILTERS_TABBABLE, true) : false;
+export function isTabbable(value: unknown): boolean {
+	return value instanceof Element ? isValidElement(value, FILTERS_TABBABLE, true) : false;
 }
 
 function isValidElement(element: Element, filters: FocusableFilter[], tabbable: boolean): boolean {

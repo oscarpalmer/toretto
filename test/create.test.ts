@@ -1,7 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {createElement} from '../src/create';
 
-test('', () => {
+test('createElement', () => {
 	const div = createElement('div');
 
 	expect(div).toBeInstanceOf(HTMLDivElement);

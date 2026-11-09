@@ -32,12 +32,12 @@ Object.defineProperty(SupportsTouch.prototype, 'value', {
 // #region Functions
 
 function checkSupport(): boolean {
-	if (window == null || navigator == null) {
+	if (typeof window === 'undefined' || typeof navigator === 'undefined') {
 		return false;
 	}
 
-	if ('matchMedia' in window) {
-		const media = matchMedia?.('(pointer: coarse)');
+	if ('matchMedia' in window && typeof window.matchMedia === 'function') {
+		const media = matchMedia('(pointer: coarse)');
 
 		if (typeof media?.matches === 'boolean' && media.matches) {
 			return true;

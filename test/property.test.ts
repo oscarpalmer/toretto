@@ -1,7 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {createElement, getProperties, getProperty, on, setProperties, setProperty} from '../src';
 
-test('', () => {
+test('property', () => {
 	const div = createElement('div');
 	const input = createElement('input');
 

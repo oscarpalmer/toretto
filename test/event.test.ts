@@ -393,7 +393,9 @@ test('on & off (delegated)', () => {
 			}),
 		);
 
-		const handlers = (div as any)[TORETTO_SYMBOL][div.id === 'two' ? 'active' : 'passive'].get(`click`);
+		const handlers = (div as any)[TORETTO_SYMBOL][div.id === 'two' ? 'active' : 'passive'].get(
+			`click`,
+		);
 
 		expect(handlers).toBeInstanceOf(Set);
 		expect(handlers.size).toBe(1);
@@ -430,7 +432,9 @@ test('on & off (delegated)', () => {
 	}
 
 	for (const div of divs) {
-		const handlers = (div as any)[TORETTO_SYMBOL][div.id === 'two' ? 'active' : 'passive'].get(`click`);
+		const handlers = (div as any)[TORETTO_SYMBOL][div.id === 'two' ? 'active' : 'passive'].get(
+			`click`,
+		);
 
 		expect(handlers).toBeUndefined();
 	}
