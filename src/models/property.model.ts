@@ -1,4 +1,4 @@
-import type {Primitive} from '@oscarpalmer/atoms/models';
+import type {Primitive} from '@oscarpalmer/atoms';
 import type {DispatchedAttributeName} from './attribute.model';
 
 // #region Types

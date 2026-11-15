@@ -1,4 +1,4 @@
-import type {PlainObject} from '@oscarpalmer/atoms/models';
+import type {PlainObject} from '@oscarpalmer/atoms';
 import {isEventPosition, isHTMLOrSVGElement} from '../internal/is';
 import type {FindResult} from '../models/find.model';
 import {

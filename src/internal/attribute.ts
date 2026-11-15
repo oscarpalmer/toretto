@@ -1,5 +1,5 @@
+import type {PlainObject} from '@oscarpalmer/atoms';
 import {isPlainObject} from '@oscarpalmer/atoms/is';
-import type {PlainObject} from '@oscarpalmer/atoms/models';
 import {getString} from '@oscarpalmer/atoms/string';
 import {kebabCase} from '@oscarpalmer/atoms/string/case';
 import type {Attribute} from '../models';

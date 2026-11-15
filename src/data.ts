@@ -1,4 +1,4 @@
-import type {PlainObject} from '@oscarpalmer/atoms/models';
+import type {PlainObject} from '@oscarpalmer/atoms';
 import {parse} from '@oscarpalmer/atoms/string';
 import {camelCase, kebabCase} from '@oscarpalmer/atoms/string/case';
 import {setElementValues, updateElementValue} from './internal/element-value';

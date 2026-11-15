@@ -1,4 +1,4 @@
-import type {PlainObject} from '@oscarpalmer/atoms/models';
+import type {PlainObject} from '@oscarpalmer/atoms';
 import {getString} from '@oscarpalmer/atoms/string';
 import {camelCase} from '@oscarpalmer/atoms/string/case';
 import {elementEvents} from '../models/event.model';
